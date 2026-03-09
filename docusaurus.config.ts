@@ -75,6 +75,17 @@ const config: Config = {
         },
       ],
     },
+plugins: [
+  [
+    require.resolve("@easyops-cn/docusaurus-search-local"),
+    {
+      hashed: true,
+      indexDocs: true,
+      indexBlog: false,
+      docsRouteBasePath: '/',
+    }
+  ]
+],
     footer: {
       style: 'dark',
       links: [

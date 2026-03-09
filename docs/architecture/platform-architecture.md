@@ -110,3 +110,26 @@ The PrintPrice architecture is based on several principles:
 
 These principles enable reliable automated production workflows.
 
+## Architecture Diagram
+
+```mermaid
+flowchart LR
+
+USER[User]
+
+BPE[Book Pricing Engine]
+PRE[Preflight Engine]
+INT[Production Intelligence]
+COMP[Compatibility Engine]
+MATCH[Matchmaker]
+
+PRINTER[Printer Network]
+
+USER --> BPE
+BPE --> PRE
+PRE --> INT
+INT --> COMP
+COMP --> MATCH
+MATCH --> PRINTER
+```
+
