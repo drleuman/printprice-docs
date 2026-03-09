@@ -19,6 +19,7 @@ const config: Config = {
 
   onBrokenLinks: 'throw',
   markdown: {
+    mermaid: true,
     hooks: {
       onBrokenMarkdownLinks: 'warn',
     },
@@ -28,6 +29,20 @@ const config: Config = {
     defaultLocale: 'en',
     locales: ['en'],
   },
+
+  themes: ['@docusaurus/theme-mermaid'],
+
+  plugins: [
+    [
+      require.resolve('@easyops-cn/docusaurus-search-local'),
+      {
+        hashed: true,
+        indexDocs: true,
+        indexBlog: false,
+        docsRouteBasePath: '/',
+      },
+    ],
+  ],
 
   presets: [
     [
@@ -75,17 +90,6 @@ const config: Config = {
         },
       ],
     },
-plugins: [
-  [
-    require.resolve("@easyops-cn/docusaurus-search-local"),
-    {
-      hashed: true,
-      indexDocs: true,
-      indexBlog: false,
-      docsRouteBasePath: '/',
-    }
-  ]
-],
     footer: {
       style: 'dark',
       links: [
