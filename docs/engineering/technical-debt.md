@@ -2,57 +2,106 @@
 title: Technical Debt
 ---
 
-# PrintPrice Technical Debt Map
+# Technical Debt
 
-As the platform evolves, certain areas may accumulate technical debt.
+Technical debt represents the accumulated engineering compromises that make future development slower, riskier, or harder to understand.
 
-Documenting these areas allows systematic refactoring over time.
-
----
-
-## Codebase Complexity
-
-Several engines have grown organically and may benefit from refactoring into clearer module boundaries.
-
-Examples include:
-
-- pricing calculation logic
-- compatibility scoring rules
-- production intelligence heuristics
+In a platform like PrintPrice, technical debt should be tracked deliberately rather than ignored.
 
 ---
 
-## Data Model Evolution
+## Why It Matters
 
-As new features are introduced, the system data model may require normalization and schema updates.
+Technical debt affects:
 
-Maintaining clear versioning of data structures will be important.
+- development speed
+- system reliability
+- onboarding difficulty
+- integration stability
+- production confidence
 
----
-
-## API Standardization
-
-Future work may include aligning all APIs with a unified schema and response format.
-
-This improves integration reliability.
+Unchecked debt can gradually reduce platform quality.
 
 ---
 
-## Observability
+## Typical Sources
 
-Improved monitoring and logging infrastructure may be required as the platform scales.
+Technical debt commonly emerges from areas such as:
 
-Examples include:
+- rapidly expanded business logic
+- duplicated compatibility rules
+- inconsistent data contracts
+- mixed responsibilities inside modules
+- temporary workarounds that become permanent
 
-- job processing metrics
-- error tracking
-- performance monitoring
+These patterns are common in growing systems.
 
 ---
 
-## Long-Term Strategy
+## Platform-Specific Risk Areas
 
-Technical debt should be addressed incrementally while maintaining production stability.
+In PrintPrice, debt may appear in domains such as:
 
-Periodic refactoring cycles can ensure long-term maintainability.
+- pricing formulas
+- preflight normalization
+- compatibility scoring
+- routing heuristics
+- integration contracts
+- admin and orchestration workflows
 
+These are high-value areas and should be monitored carefully.
+
+---
+
+## Operational Impact
+
+Technical debt is not only a code quality issue.
+
+It can increase:
+
+- debugging time
+- regression frequency
+- deployment risk
+- inconsistency across outputs
+- difficulty of extending the platform
+
+This gives debt a direct business cost.
+
+---
+
+## Managing Debt
+
+Technical debt should be managed through:
+
+- documentation
+- explicit prioritization
+- targeted refactoring
+- schema cleanup
+- architectural clarification
+- periodic review cycles
+
+The goal is not zero debt, but controlled debt.
+
+---
+
+## Refactoring Strategy
+
+Refactoring should be incremental and practical.
+
+Useful triggers include:
+
+- repeated confusion in the same area
+- high regression frequency
+- duplicated logic across services
+- brittle integration points
+- difficulty onboarding new contributors
+
+These are signs that cleanup will create real value.
+
+---
+
+## Long-Term Goal
+
+The long-term goal is a platform that remains understandable and evolvable even as it grows in complexity.
+
+Technical debt should therefore be treated as a strategic engineering concern, not only a code hygiene issue.
