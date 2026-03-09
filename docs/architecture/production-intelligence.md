@@ -1,7 +1,7 @@
 
 # Production Intelligence Engine
 
-::: mermaid
+```mermaid
 flowchart TD
 
 INPUT[Production Inputs]
@@ -22,5 +22,5 @@ INTEL --> OPT[Optimization]
 
 OPT --> RESULT[Best Production Option]
 
-:::
+```
 

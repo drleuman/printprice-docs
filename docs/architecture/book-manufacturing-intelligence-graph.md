@@ -1,7 +1,7 @@
 
 # Book Manufacturing Intelligence Graph
 
-::: mermaid
+```mermaid
 flowchart TD
 
 BOOK[Book Project]
@@ -46,5 +46,5 @@ SPEED --> DECISION
 DECISION --> BEST[Best Manufacturing Route]
 DECISION --> ALT[Alternative Production Routes]
 
-:::
+```
 

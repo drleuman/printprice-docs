@@ -1,7 +1,7 @@
 
 # Preflight Processing Pipeline
 
-::: mermaid
+```mermaid
 flowchart TD
 
 UPLOAD[PDF Upload]
@@ -25,5 +25,5 @@ BLEED --> FONT
 FONT --> RISK
 RISK --> REPORT
 
-:::
+```
 

@@ -184,7 +184,7 @@ MATCH --> PNET
 
 ## Architecture Diagram
 
-::: mermaid
+```mermaid
 flowchart LR
 
 USER[User / Client]
@@ -205,5 +205,5 @@ PRE --> INT
 INT --> COMP
 COMP --> MATCH
 MATCH --> PNET
-:::
+```
 

@@ -202,7 +202,7 @@ It transforms the traditional manual print workflow into a **Production Intellig
 
 ## Pipeline Diagram
 
-::: mermaid
+```mermaid
 flowchart TD
 
 SPEC[Production Specification]
@@ -233,5 +233,5 @@ CAP --> MATCH
 MATCH --> QUOTE
 
 QUOTE --> ORDER
-:::
+```
 

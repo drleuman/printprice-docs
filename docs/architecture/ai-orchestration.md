@@ -1,7 +1,7 @@
 
 # AI Orchestration Layer
 
-::: mermaid
+```mermaid
 flowchart LR
 
 USER[User Request]
@@ -29,5 +29,5 @@ INTEL --> MATCH
 
 MATCH --> RESULT[Production Recommendation]
 
-:::
+```
 

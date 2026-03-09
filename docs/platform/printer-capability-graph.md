@@ -1,7 +1,7 @@
 
 # Printer Capability Graph
 
-::: mermaid
+```mermaid
 flowchart LR
 
 BOOK[Book Specification]
@@ -23,5 +23,5 @@ BIND --> FILTER
 
 FILTER --> PRINTERS[Compatible Printers]
 
-:::
+```
 
