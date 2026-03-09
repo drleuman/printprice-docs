@@ -11,6 +11,7 @@ const sidebars: SidebarsConfig = {
         'platform/architecture',
         'platform/production-pipeline',
         'platform/system-data-model',
+        'platform/print-network',
       ],
     },
     {
@@ -19,6 +20,7 @@ const sidebars: SidebarsConfig = {
       items: [
         'engines/book-pricing-engine',
         'engines/preflight-engine',
+        'engines/production-intelligence',
         'engines/compatibility-engine',
         'engines/matchmaker',
       ],
@@ -28,6 +30,7 @@ const sidebars: SidebarsConfig = {
       label: 'API',
       items: [
         'api/overview',
+        'api/integration-contracts',
         'api/authentication',
         'api/pricing-api',
         'api/preflight-api',
@@ -60,7 +63,8 @@ const sidebars: SidebarsConfig = {
         'engineering/coding-standards',
         'engineering/repository-structure',
         'engineering/development-workflow',
-        'engineering/technical-debt-map',
+        'engineering/technical-debt',
+        'engineering/refactoring-map',
       ],
     },
     {
@@ -68,8 +72,15 @@ const sidebars: SidebarsConfig = {
       label: 'Roadmap',
       items: [
         'roadmap/product-roadmap',
-        'roadmap/strategic-moat',
         'roadmap/future-vision',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Strategy',
+      items: [
+        'strategy/strategic-moat',
+        'strategy/future-vision',
       ],
     },
   ],
