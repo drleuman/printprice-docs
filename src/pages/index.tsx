@@ -17,32 +17,32 @@ export default function Home(): JSX.Element {
         <h2>Platform</h2>
 
         <ul>
-          <li><a href="/platform/overview">Platform Overview</a></li>
+          <li><a href="/docs/platform/overview">Platform Overview</a></li>
           <li><a href="/architecture/platform-architecture">Architecture</a></li>
-          <li><a href="/platform/production-pipeline">Production Pipeline</a></li>
-          <li><a href="/platform/system-data-model">System Data Model</a></li>
+          <li><a href="/docs/platform/production-pipeline">Production Pipeline</a></li>
+          <li><a href="/docs/platform/system-data-model">System Data Model</a></li>
         </ul>
 
         <h2>Core Engines</h2>
 
         <ul>
-          <li><a href="/engines/book-pricing-engine">Book Pricing Engine</a></li>
-          <li><a href="/engines/preflight-engine">Preflight Engine</a></li>
-          <li><a href="/engines/production-intelligence">Production Intelligence</a></li>
-          <li><a href="/engines/matchmaker">Matchmaker Engine</a></li>
+          <li><a href="/docs/engines/book-pricing-engine">Book Pricing Engine</a></li>
+          <li><a href="/docs/engines/preflight-engine">Preflight Engine</a></li>
+          <li><a href="/docs/engines/production-intelligence">Production Intelligence</a></li>
+          <li><a href="/docs/engines/matchmaker">Matchmaker Engine</a></li>
         </ul>
 
         <h2>API</h2>
 
         <ul>
-          <li><a href="/api/overview">API Overview</a></li>
-          <li><a href="/api/integration-contracts">Integration Contracts</a></li>
+          <li><a href="/docs/api/overview">API Overview</a></li>
+          <li><a href="/docs/api/integration-contracts">Integration Contracts</a></li>
         </ul>
 
         <h2>Infrastructure</h2>
 
         <ul>
-          <li><a href="/infrastructure/deployment-blueprint">Deployment Blueprint</a></li>
+          <li><a href="/docs/infrastructure/deployment-blueprint">Deployment Blueprint</a></li>
         </ul>
 
       </main>
