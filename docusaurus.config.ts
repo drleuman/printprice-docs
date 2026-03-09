@@ -50,7 +50,7 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.ts',
-          routeBasePath: '/',
+          routeBasePath: 'docs',
         },
         blog: false,
         theme: {
