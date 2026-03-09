@@ -199,3 +199,39 @@ This pipeline is the core of the PrintPrice platform.
 
 It transforms the traditional manual print workflow into a **Production Intelligence System** capable of supporting scalable print manufacturing networks.
 
+
+## Pipeline Diagram
+
+::: mermaid
+flowchart TD
+
+SPEC[Production Specification]
+PRICE[Pricing Estimation]
+
+UPLOAD[PDF Upload]
+ANALYSIS[Deterministic Analysis]
+PREFLIGHT[Preflight Validation]
+
+INTEL[Production Intelligence]
+
+CAP[Printer Capability Graph]
+MATCH[Printer Matchmaking]
+QUOTE[Production Quote]
+
+ORDER[Production Order]
+
+SPEC --> PRICE
+PRICE --> UPLOAD
+
+UPLOAD --> ANALYSIS
+ANALYSIS --> PREFLIGHT
+
+PREFLIGHT --> INTEL
+
+INTEL --> CAP
+CAP --> MATCH
+MATCH --> QUOTE
+
+QUOTE --> ORDER
+:::
+

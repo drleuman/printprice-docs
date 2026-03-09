@@ -133,3 +133,77 @@ COMP --> MATCH
 MATCH --> PRINTER
 ```
 
+
+## Architecture Diagram
+
+```mermaid
+flowchart LR
+
+USER[User / Client]
+UI[Web Interface]
+
+BPE[Book Pricing Engine]
+PRE[Preflight Engine]
+INT[Production Intelligence]
+COMP[Compatibility Engine]
+MATCH[Matchmaker Engine]
+PNET[Printer Network]
+
+USER --> UI
+UI --> BPE
+UI --> PRE
+BPE --> INT
+PRE --> INT
+INT --> COMP
+COMP --> MATCH
+MATCH --> PNET
+
+## Architecture Diagram
+
+```mermaid
+flowchart LR
+
+USER[User / Client]
+UI[Web Interface]
+
+BPE[Book Pricing Engine]
+PRE[Preflight Engine]
+INT[Production Intelligence]
+COMP[Compatibility Engine]
+MATCH[Matchmaker Engine]
+PNET[Printer Network]
+
+USER --> UI
+UI --> BPE
+UI --> PRE
+BPE --> INT
+PRE --> INT
+INT --> COMP
+COMP --> MATCH
+MATCH --> PNET
+
+## Architecture Diagram
+
+::: mermaid
+flowchart LR
+
+USER[User / Client]
+UI[Web Interface]
+
+BPE[Book Pricing Engine]
+PRE[Preflight Engine]
+INT[Production Intelligence]
+COMP[Compatibility Engine]
+MATCH[Matchmaker Engine]
+PNET[Printer Network]
+
+USER --> UI
+UI --> BPE
+UI --> PRE
+BPE --> INT
+PRE --> INT
+INT --> COMP
+COMP --> MATCH
+MATCH --> PNET
+:::
+
