@@ -5,6 +5,38 @@ const sidebars: SidebarsConfig = {
     'intro',
     {
       type: 'category',
+      label: 'Architecture',
+      items: [
+        'architecture/platform-architecture',
+        'architecture/state-of-the-art',
+        'architecture/preflight-diagnostic-contract',
+        'architecture/preflight-status-contract',
+        'architecture/preflight-artifact-contract',
+        'architecture/preflight-auth-contract',
+        'architecture/production-validation-checklist',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Repositories',
+      items: [
+        'repositories/ppos-preflight-engine',
+        'repositories/ppos-preflight-service',
+        'repositories/ppos-preflight-worker',
+        'repositories/preflight-app-bff',
+        'repositories/ppos-control-plane',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Phases',
+      items: [
+        'phases/phase-35-5-production-freeze',
+        'phases/phase-36-order-intake-file-governance',
+      ],
+    },
+    {
+      type: 'category',
       label: 'Platform',
       items: [
         'platform/overview',

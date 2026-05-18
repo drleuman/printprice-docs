@@ -39,7 +39,7 @@ const config: Config = {
         hashed: true,
         indexDocs: true,
         indexBlog: false,
-        docsRouteBasePath: '/',
+        docsRouteBasePath: 'docs',
       },
     ],
   ],
