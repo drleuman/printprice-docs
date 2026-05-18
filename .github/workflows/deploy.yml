@@ -23,6 +23,10 @@ jobs:
       - name: Install Dependencies
         run: yarn install --frozen-lockfile
 
+      - name: Apply Mermaid SSG Hotfix
+        run: |
+          find docs src -type f \( -name "*.md" -o -name "*.mdx" \) -print0 2>/dev/null | xargs -0 perl -0pi -e 's/```mermaid/```text/g'
+
       - name: Build Docusaurus Static Site
         run: yarn build
 

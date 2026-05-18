@@ -9,39 +9,30 @@ sidebar_label: Deployment Playbook
 This playbook defines the standardized, safe, and production-validated workflow for deploying the PrintPrice OS Docusaurus documentation to the live environment at `docs.printprice.pro`.
 
 :::important
-**REPRODUCIBILITY RECOMMENDATION**:
-The repository currently does not include a `package-lock.json` file. Because of this, reproducible and deterministic builds using `npm ci` will fail on the production server. Until a `package-lock.json` is generated and committed to the repository, all production deployments **must use `npm install`** as a fallback. 
-It is highly recommended to commit a `package-lock.json` file to the repository as soon as possible to enable faster, locked, and safer deployments.
+**PACKAGE MANAGER & ALIAS COMPATIBILITY**:
+The repository contains a `yarn.lock` file because it was built and structured using **Yarn**. Modern Docusaurus versions use npm package aliases (e.g. `"react-loadable": "npm:@docusaurus/react-loadable@6.0.0"`). 
+*   **The Issue**: If the production environment is running **npm v6.x** (or below), running `npm install` or `npm ci` will fail because npm v6 does not support package aliases. This causes the error: `No matching version found for react-loadable@6.0.0`.
+*   **The Solution**: We must build the site using **Yarn**. Since the server may not have Yarn installed globally (or lacks sudo privileges), the deployment script leverages **Node.js Corepack** (pre-bundled with Node 16.9+) to locally generate and run a standard Yarn executable shim without root access.
 :::
 
 ---
 
-## 1. Known Build Issue: Mermaid SSG Rendering Error
+## 1. Known Build Issues & Workarounds
 
-### Problem
+### A. Docusaurus spawn yarn ENOENT
+If `yarn.lock` is present in the repository, Docusaurus detects it and attempts to check the Yarn version by running `yarn --version`. If Yarn is not in the system's `PATH`, the build fails immediately with `spawn yarn ENOENT`.
+*   **Fix**: The deployment script uses Corepack to generate a local `yarn` binary and adds it to the active shell's `PATH` variable before building, ensuring Docusaurus finds it perfectly.
+
+### B. Mermaid SSG Rendering Error
 During the static site generation (SSG) step of the Docusaurus build process, the compilation can crash if Mermaid diagrams are rendered.
-
-### Symptom
-The build process terminates with the following error messages:
-```text
-Docusaurus static site generation failed
-Hook useColorMode is called outside the <ColorModeProvider>
-```
-This is caused by Docusaurus 3.9.2 attempting to compile `useColorMode` (which is invoked inside Docusaurus's Mermaid theme components) outside of the active React context during pre-rendering of raw Markdown pages containing ` ```mermaid ` blocks.
-
-### Temporary Production Workaround
-An emergency production-safe workaround is configured in our build workflow. Before running the compiler, we programmatically convert all Markdown/MDX code fences from ` ```mermaid ` to ` ```text `. This bypasses the rendering crash while preserving the diagrams in legible ASCII/text format.
-
-### Permanent Solution
-Either:
-1. Remove active Mermaid rendering plugins from `docusaurus.config.ts` and keep all diagrams as standard text/ASCII, or
-2. Configure Docusaurus Mermaid themes properly to ensure static generation does not call client-only hooks in a pre-rendering context.
+*   **Symptom**: The build terminates with `Hook useColorMode is called outside the <ColorModeProvider>`. This is caused by Docusaurus 3.9.2 pre-rendering raw markdown pages containing ` ```mermaid ` blocks.
+*   **Fix**: Before compiling, we programmatically convert all Markdown/MDX code fences from ` ```mermaid ` to ` ```text `. This bypasses the rendering crash while keeping the diagrams readable in plain text.
 
 ---
 
 ## 2. Safe Production Deployment Flow
 
-Below is the verified, safe, and production-ready script. It automates backups, performs timestamped parallel builds to avoid live-site downtime, handles lockfile checks, and runs the Mermaid SSG hotfix.
+Below is the verified, safe, and production-ready script. It automates backups, generates local Yarn shims using Corepack, handles lockfile-based deterministic installation, runs the Mermaid SSG hotfix, and deploys with zero live-site downtime.
 
 ```bash
 set -e
@@ -67,13 +58,13 @@ git status
 git rev-parse --abbrev-ref HEAD
 git rev-parse HEAD
 
-echo "=== INSTALL DEPENDENCIES ==="
-if [ -f package-lock.json ]; then
-  npm ci
-else
-  echo "No package-lock.json found. Falling back to npm install."
-  npm install
-fi
+echo "=== ENABLE LOCAL YARN VIA COREPACK ==="
+mkdir -p "$BUILD_DIR/bin"
+corepack enable --install-directory "$BUILD_DIR/bin"
+export PATH="$BUILD_DIR/bin:$PATH"
+
+echo "=== INSTALL DEPENDENCIES WITH YARN ==="
+yarn install --frozen-lockfile
 
 echo "=== TEMPORARY MERMAID SSG HOTFIX ==="
 grep -RIn "^\`\`\`mermaid" docs src 2>/dev/null || true
@@ -82,7 +73,7 @@ find docs src -type f \( -name "*.md" -o -name "*.mdx" \) -print0 2>/dev/null \
 grep -RIn "^\`\`\`mermaid" docs src 2>/dev/null || true
 
 echo "=== BUILD DOCUSAURUS ==="
-npm run build
+yarn build
 
 echo "=== VERIFY BUILD ==="
 test -f build/index.html
@@ -117,8 +108,8 @@ curl -I https://docs.printprice.pro/
 ## 4. Deployment Acceptance Criteria
 
 The deployment is considered fully valid and complete only if:
-1. **Dependency Installation**: `npm install` (or `npm ci` if `package-lock.json` is present) succeeds without critical package resolution failures.
-2. **Docusaurus compilation**: `npm run build` completes with an exit code of `0`.
+1. **Dependency Installation**: `yarn install --frozen-lockfile` succeeds cleanly using the Node Corepack-provided Yarn binary.
+2. **Docusaurus compilation**: `yarn build` completes with an exit code of `0`.
 3. **Build Target Verification**: The compiled file `build/index.html` exists and is populated.
 4. **Synchronization**: `rsync` completes cleanly and syncs all pre-rendered HTML/JS/CSS assets to `$DOCS_ROOT`.
 5. **Core HTTP Response**: Requesting `https://docs.printprice.pro/` returns a `200 OK` status.
