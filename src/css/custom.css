@@ -28,3 +28,95 @@
   --ifm-color-primary-lightest: #4fddbf;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
+
+/* Custom Premium Homepage Styles (Adaptive to Dark Mode) */
+.home-container {
+  padding: 60px 20px;
+  max-width: 900px;
+  margin: auto;
+}
+
+.home-header {
+  text-align: center;
+  margin-bottom: 40px;
+  border-bottom: 1px solid var(--ifm-toc-border-color, #eaecef);
+  padding-bottom: 30px;
+}
+
+.home-title {
+  font-size: 3rem;
+  margin-bottom: 10px;
+}
+
+.home-slogan {
+  font-size: 1.5rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: #e28743;
+  margin: 10px 0;
+}
+
+.home-badge {
+  display: inline-block;
+  background-color: var(--ifm-color-success-contrast-background, rgba(46, 125, 50, 0.15));
+  color: var(--ifm-color-success, #2e7d32);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.95rem;
+  border: 1px solid var(--ifm-color-success-dark, #a5d6a7);
+  margin-top: 10px;
+}
+
+:root {
+  --ifm-color-success-contrast-background: rgba(46, 125, 50, 0.1);
+}
+
+[data-theme='dark'] {
+  --ifm-color-success-contrast-background: rgba(37, 194, 160, 0.15);
+  --ifm-color-success: #25c2a0;
+  --ifm-color-success-dark: #21af90;
+}
+
+.home-card {
+  background-color: var(--ifm-background-color, #f8f9fa);
+  border-left: 5px solid var(--ifm-color-primary);
+  border-top: 1px solid var(--ifm-toc-border-color, #eaecef);
+  border-right: 1px solid var(--ifm-toc-border-color, #eaecef);
+  border-bottom: 1px solid var(--ifm-toc-border-color, #eaecef);
+  padding: 20px;
+  border-radius: 4px;
+  margin-bottom: 40px;
+}
+
+[data-theme='dark'] .home-card {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.home-btn-primary {
+  background-color: var(--ifm-color-primary);
+  color: #fff !important;
+  padding: 10px 18px;
+  border-radius: 4px;
+  text-decoration: none !important;
+  font-weight: bold;
+  font-size: 0.9rem;
+  transition: opacity 0.2s ease-in-out;
+}
+.home-btn-primary:hover {
+  opacity: 0.9;
+}
+
+.home-btn-secondary {
+  background-color: var(--ifm-color-success);
+  color: #fff !important;
+  padding: 10px 18px;
+  border-radius: 4px;
+  text-decoration: none !important;
+  font-weight: bold;
+  font-size: 0.9rem;
+  transition: opacity 0.2s ease-in-out;
+}
+.home-btn-secondary:hover {
+  opacity: 0.9;
+}

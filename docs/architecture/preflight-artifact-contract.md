@@ -27,7 +27,7 @@ Every physical asset in the preflight pipeline is categorized into one of five c
 
 ### `certified_pdf`
 *   **Canonical File Name**: `certified.pdf`
-*   **Operational Requirement**: Only present when a document is officially certified as printable by the engine.
+*   **Operational Requirement**: Only present when a document is officially validated as printable.
 *   **Security Constraint**: **Must not** be generated or promoted if the document contains blocking violations or preflight failures.
 
 ### `final_fixed_pdf`
@@ -35,7 +35,7 @@ Every physical asset in the preflight pipeline is categorized into one of five c
 *   **Resolution Priority**: When a downstream process requests the `final_fixed_pdf` alias, the system resolves it using the following strict priority:
     1.  `fixed.pdf` (Direct vector autofix result, if present)
     2.  `normalized.pdf` (Color-profile and bleed normalized PDF, if present)
-    3.  `certified.pdf` (The original certified document, if no repair was needed)
+    3.  `certified.pdf` (The original validated document, if no repair was needed)
 
 ### `fixed_pdf`
 *   **Canonical File Name**: `fixed.pdf`
@@ -52,7 +52,7 @@ Every physical asset in the preflight pipeline is categorized into one of five c
 For all **ANALYZE** execution jobs, the pipeline enforces strict artifact generation limits:
 
 *   **Primary Artifact**: The `analysis_report` (`report.json`) is the singular primary artifact. It must be generated and persisted for **every** completed run.
-*   **Certified PDF Gating**: The generation of `certified_pdf` (`certified.pdf`) is optional and must be tightly gated. 
+*   **Validated PDF Gating**: The generation of `certified_pdf` (`certified.pdf`) is optional and must be tightly gated. 
 *   **Degraded Mode Support**: A document that is non-certifiable (such as a file containing color violations) can still terminate with a `DEGRADED` or `COMPLETED_WITH_FINDINGS` status and successfully write its `analysis_report` (`report.json`), allowing pricing and review processes to proceed.
 
 ---
@@ -89,8 +89,9 @@ To prevent telemetry loss, the `ARTIFACT_NOT_FOUND` payload **must preserve** th
 }
 ```
 
-> [!WARNING]
-> **Anti-Collapse Rule**: Under no circumstances may the BFF or ControlPlane collapse these specific JSON error payloads into a generic "500 Internal Server Error" or generic stream failure. The detailed error envelope must be preserved and exposed to allow administrative diagnostics.
+:::warning
+**Anti-Collapse Rule**: Under no circumstances may the BFF/App or ControlPlane collapse these specific JSON error payloads into a generic "500 Internal Server Error" or generic stream failure. The detailed error envelope must be preserved and exposed to allow administrative diagnostics.
+:::
 
 ---
 

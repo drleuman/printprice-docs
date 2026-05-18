@@ -1,4 +1,10 @@
 
+---
+id: book-manufacturing-intelligence-graph
+title: Book Manufacturing Intelligence Graph
+sidebar_label: Manufacturing Intelligence Graph
+---
+
 # Book Manufacturing Intelligence Graph
 
 ```mermaid

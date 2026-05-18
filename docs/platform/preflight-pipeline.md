@@ -1,4 +1,10 @@
 
+---
+id: preflight-pipeline
+title: Preflight Processing Pipeline
+sidebar_label: Preflight Pipeline
+---
+
 # Preflight Processing Pipeline
 
 ```mermaid

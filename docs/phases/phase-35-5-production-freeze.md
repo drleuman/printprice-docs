@@ -25,7 +25,7 @@ BLOCKERS: NONE
 
 The **Phase 35.5 Production Freeze** marks the completion of our platform's diagnostic alignment objectives. 
 
-Every microservice, command-line utility, database schema, and dashboard component has been verified to conform to uniform data validation contracts. The production environment is certified as robust, stable, and ready to support customer-facing intake gates.
+Every microservice, command-line utility, database schema, and dashboard component has been verified to conform to uniform data validation contracts. The production environment is validated as robust, stable, and ready to support customer-facing intake gates.
 
 ---
 
@@ -37,13 +37,13 @@ The preflight diagnostic pipeline successfully operates across our isolated micr
 graph LR
     Engine[1. Preflight Engine] -->|Produces Truth| Service[2. Preflight Service]
     Service -->|Preserves Truth| Worker[3. Preflight Worker]
-    Worker -->|Executes & Persists Truth| BFF[4. BFF / UI App]
-    BFF -->|Displays Truth| CP[5. Control Plane]
+    Worker -->|Executes & Persists Truth| BFF[4. BFF/App]
+    BFF -->|Displays Truth| CP[5. ControlPlane]
     CP -->|Governs Truth| Engine
 ```
 
 *   **Engine produces truth**: Direct binary parsing analyzes layout and bleed structures without fabricating findings.
-*   **Service preserves truth**: Registry databases store raw engine JSON traces byte-for-byte under validated outcome categories.
+*   **Service preserves truth**: Registry databases store raw engine JSON traces without destructive semantic loss under validated outcome categories.
 *   **Worker executes and persists truth**: Background task processors manage queues, upload file artifacts, and track execution.
 *   **BFF displays truth**: Real-time dashboards render exact status badges and progress streams.
 *   **ControlPlane governs truth**: Central administration panels check node environments and orchestrate sync sweeps.
@@ -119,7 +119,33 @@ The following items are flagged for engineering observation during this freeze:
 
 ## 9. Next Phase: Phase 36 — Production Order Intake & File Governance
 
-> [!NOTE]
-> **DEVELOPMENT BLUEPRINT**: The upcoming Phase 36 modules are under design and are **not** part of the active frozen production deployment.
+:::note
+**DEVELOPMENT BLUEPRINT**: The upcoming Phase 36 modules are under design and are **not** part of the active frozen production deployment. Phase 36 starts after the Phase 35.5 production freeze.
+:::
 
 With the stabilization of our diagnostic contracts complete, the platform is positioned to execute **Phase 36: Production Order Intake & File Governance**. Phase 36 will bind marketplace selected offers directly to final PDF uploads, compute order readiness using preflight status, gate invoicing, and prepare standardized metadata handoffs for printhouses.
+
+---
+
+## 10. Last Production Validation Telemetry
+
+The last active inter-service execution has been verified in production and logged under the following records:
+
+### Validated Analyze Job
+*   **Job ID (`jobId`)**: `job_1779116602472_1d246`
+*   **Operational Status**: `DEGRADED`
+*   **Outcome Category**: `DEGRADED_ANALYSIS`
+*   **Progress**: `100`
+*   **Analysis Integrity**: `realExtraction = true`, `degradedMode = true`, `fallbackUsed = false`
+*   **Findings Count**: `5`
+*   **Artifact**: `report.json` (`analysis_report`)
+
+### Validated Autofix Job
+*   **Fix ID (`fixId`)**: `fix_1779116602946`
+*   **Source Job ID (`sourceJobId`)**: `job_1779116602472_1d246`
+*   **Operational Status**: `COMPLETED`
+*   **Repairs Count**: `4`
+*   **Applied Count**: `4`
+*   **Skipped Count**: `0`
+*   **Failed Count**: `0`
+*   **Repaired PDF Output**: `fixed.pdf` (`final_fixed_pdf`)

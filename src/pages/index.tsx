@@ -5,53 +5,31 @@ export default function Home(): JSX.Element {
   return (
     <Layout title="PrintPrice OS Docs">
 
-      <main style={{padding: "60px", maxWidth: "900px", margin: "auto"}}>
+      <main className="home-container">
 
-        <div style={{textAlign: "center", marginBottom: "40px", borderBottom: "1px solid #eaecef", paddingBottom: "30px"}}>
-          <h1 style={{fontSize: "3rem", color: "#1a1a1a", marginBottom: "10px"}}>PrintPrice OS</h1>
-          <p style={{fontSize: "1.5rem", fontWeight: "bold", letterSpacing: "1px", color: "#e28743", margin: "10px 0"}}>
+        <div className="home-header">
+          <h1 className="home-title">PrintPrice OS</h1>
+          <p className="home-slogan">
             PRICE IT. FIX IT. PRINT IT.
           </p>
-          <div style={{
-            display: "inline-block", 
-            backgroundColor: "#e8f5e9", 
-            color: "#2e7d32", 
-            padding: "8px 16px", 
-            borderRadius: "20px", 
-            fontWeight: "bold",
-            fontSize: "0.95rem",
-            border: "1px solid #a5d6a7",
-            marginTop: "10px"
-          }}>
-            ✓ Phase 10/35 Production Validation Certified
+          <div className="home-badge">
+            ✓ Phase 10/35 Production Validated
           </div>
         </div>
 
-        <div style={{backgroundColor: "#f8f9fa", borderLeft: "5px solid #0056b3", padding: "20px", borderRadius: "4px", marginBottom: "40px"}}>
+        <div className="home-card">
           <h3 style={{marginTop: 0}}>Production Truth Gateways</h3>
           <p>
             The system operates on the core platform decoupling promise: 
             <strong> Engine produces truth. Service preserves truth. Worker executes and persists truth. BFF displays truth. ControlPlane governs truth.</strong>
           </p>
           <div style={{display: "flex", gap: "20px", flexWrap: "wrap", marginTop: "15px"}}>
-            <a href="/docs/architecture/preflight-diagnostic-contract" style={{
-              backgroundColor: "#0056b3",
-              color: "#fff",
-              padding: "10px 18px",
-              borderRadius: "4px",
-              textDecoration: "none",
-              fontWeight: "bold",
-              fontSize: "0.9rem"
-            }}>Read Preflight Diagnostic Contract ➔</a>
-            <a href="/docs/phases/phase-36-order-intake-file-governance" style={{
-              backgroundColor: "#28a745",
-              color: "#fff",
-              padding: "10px 18px",
-              borderRadius: "4px",
-              textDecoration: "none",
-              fontWeight: "bold",
-              fontSize: "0.9rem"
-            }}>View Phase 36 Roadmap ➔</a>
+            <a href="/docs/architecture/preflight-diagnostic-contract" className="home-btn-primary">
+              Read Preflight Diagnostic Contract ➔
+            </a>
+            <a href="/docs/phases/phase-36-order-intake-file-governance" className="home-btn-secondary">
+              View Phase 36 Roadmap ➔
+            </a>
           </div>
         </div>
 

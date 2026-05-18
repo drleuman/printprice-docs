@@ -22,7 +22,7 @@ To prevent privilege escalation and credential leakage, the platform enforces st
 
 ```mermaid
 graph TD
-    User[Client / Admin Request] -->|Admin API Call| CP[Control Plane]
+    User[Client / Admin Request] -->|Admin API Call| CP[ControlPlane]
     CP -->|Validates PPOS_CONTROL_TOKEN| AdminGate[Admin API Boundary /api/admin/*]
     
     CP -->|Downstream Service Call| Gateway[Preflight Service Gateway]
@@ -36,7 +36,7 @@ graph TD
 ### `PPOS_CONTROL_TOKEN`
 *   **Purpose**: Authorizes global administrative control actions inside the **ControlPlane** application context.
 *   **Application Scope**: Restricted exclusively to ControlPlane admin endpoints matching `/api/admin/*`.
-*   **Security Boundary**: **Must never** be forwarded to the Preflight Service or Preflight BFF as an upstream Authorization bearer header. Downstream gateways will reject this token as invalid.
+*   **Security Boundary**: **Must never** be forwarded to the Preflight Service or BFF/App as an upstream Authorization bearer header. Downstream gateways will reject this token as invalid.
 
 ### `PREFLIGHT_JWT`
 *   **Purpose**: Authorizes discrete preflight jobs, policy retrievals, and diagnostic requests within processing services.
@@ -82,8 +82,9 @@ During the Phase 35.5 validation milestone, a critical integration bug was ident
 
 ## 4. Operational Rule
 
-> [!IMPORTANT]
-> **Token Isolation Principle**: Never forward a ControlPlane admin Authorization token directly to the Preflight Service or Preflight BFF. All downstream API calls must utilize an explicitly signed, short-lived `PREFLIGHT_JWT` bearing the exact tenant scope of the execution context.
+:::important
+**Token Isolation Principle**: Never forward a ControlPlane admin Authorization token directly to the Preflight Service or BFF/App. All downstream API calls must utilize an explicitly signed, short-lived `PREFLIGHT_JWT` bearing the exact tenant scope of the execution context.
+:::
 
 ---
 
@@ -93,7 +94,7 @@ The following `curl` command templates demonstrate how to validate token boundar
 
 *(Note: Real credentials are masked using variables. Replace variables with live environment values in secure shells.)*
 
-### A. Validate BFF Policies Ingestion Gate
+### A. Validate BFF/App Policies Ingestion Gate
 Verify that the Preflight BFF successfully reads preflight validation policies using a signed JWT:
 ```bash
 curl -X GET "https://bff.printprice.pro/api/preflight/jobs/policies" \

@@ -27,7 +27,7 @@ These states represent successfully completed analyses, even if document validat
 *   **`PASS`**: Mapped directly from print partner gates, confirming the document matches printer profiles.
 *   **`PASS_WITH_WARNINGS`**: The document is printable, but contains minor non-critical warnings.
 *   **`COMPLETED_WITH_FINDINGS`**: The file was fully inspected and preflight findings were extracted.
-*   **`DEGRADED`**: The analysis completed successfully, but some secondary CLI tools were unavailable on the host.
+*   **`DEGRADED`**: The analysis completed with reduced extraction fidelity or reduced diagnostic coverage. It does not imply mock fallback, and `realExtraction` may remain true.
 *   **`PARTIAL`**: Parsing succeeded partially, extracting subset attributes where possible.
 *   **`PARTIAL_ARTIFACTS`**: Telemetry reports exist, but certain optional file artifacts could not be generated.
 
@@ -53,7 +53,7 @@ To prevent ambiguity, every core terminal status is bound to a strict, non-negot
 
 *   **`COMPLETED`**: A clean run indicating the document successfully conformed to all physical quality gates (bleed limits, CMYK color space, embedded fonts).
 *   **`COMPLETED_WITH_FINDINGS`**: Indicates the preflight engine completed a **real, full extraction** of properties, but identified document violations (e.g. 5 errors). This is a successful analysis, **not** an infrastructure or network failure.
-*   **`DEGRADED`**: Indicates that while certain specialized optional CLI utilities (such as a separate spot-color parser) were missing from the host machine, the core parsing builders (such as `ReportBuilder.js`) successfully completed physical extraction. It represents a valid, usable diagnostic result and **must never** be classified as an environment failure.
+*   **`DEGRADED`**: Indicates that the analysis completed with reduced diagnostic coverage or reduced extraction fidelity. It does not imply mock fallback, and `realExtraction` may remain true. Although specialized optional CLI utilities (such as a separate spot-color parser) might be missing from the host, the core parsing builders successfully completed physical extraction. It represents a valid, usable diagnostic result and **must never** be classified as an environment failure.
 *   **`PARTIAL`**: Denotes a run that succeeded in extracting page parameters and metadata but encountered coordinate errors on complex vector layers. The extracted parameters are valid and remain highly useful for pricing and partner estimation.
 *   **`PARTIAL_ARTIFACTS`**: Mapped when database values are successfully persisted but an API interruption prevents writing specific optional summary files to persistent storage.
 *   **`FAILED_RUNTIME_ENVIRONMENT`**: Reserved strictly for absolute toolchain or infrastructure crashes (e.g. Node.js process out of memory, container termination by kernel). This is an infrastructure emergency requiring operator assistance.
@@ -65,7 +65,7 @@ To prevent ambiguity, every core terminal status is bound to a strict, non-negot
 Every layer must strictly adhere to the following evaluation rules when serializing job records:
 
 1.  **Tool Absence Separation**: The absence of an optional command-line parsing tool alone **must not** map the job to `FAILED_RUNTIME_ENVIRONMENT`. The engine must catch the exit code, mark the `degradedMode` flag, and finish processing.
-2.  **Extraction Validity**: If `analysisIntegrity.realExtraction` is `true`, it is mathematically impossible for the status to be `FAILED_RUNTIME_ENVIRONMENT`. The successful extraction of telemetry automatically certifies the status as `DEGRADED` or `PARTIAL`.
+2.  **Extraction Validity**: If `analysisIntegrity.realExtraction` is `true`, it is mathematically impossible for the status to be `FAILED_RUNTIME_ENVIRONMENT`. The successful extraction of telemetry automatically validates the status as `DEGRADED` or `PARTIAL`.
 3.  **Governance Drives**: Downstream automated routing systems must examine the `outcome_category` field (e.g., `DEGRADED_ANALYSIS` vs `FAILED_RUNTIME_ENVIRONMENT`) to determine whether the failure was structural (document error) or infrastructural (system error).
 4.  **Terminal Progress Gate**: For all terminal diagnostic statuses (including `DEGRADED` and `PARTIAL`), the `progress` field **must** be set to exactly `100`.
 

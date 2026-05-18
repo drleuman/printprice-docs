@@ -1,4 +1,10 @@
 
+---
+id: printer-capability-graph
+title: Printer Capability Graph
+sidebar_label: Capability Graph
+---
+
 # Printer Capability Graph
 
 ```mermaid

@@ -4,6 +4,10 @@ title: Phase 36 — Production Order Intake & File Governance
 sidebar_label: Phase 36 Specifications
 ---
 
+:::note
+**FUTURE ARCHITECTURAL BLUEPRINT**: This document represents a planning and design phase for future development. No invoice, payment, MES, or automatic production-routing behavior is considered production-complete. Phase 36 starts after the Phase 35.5 production freeze.
+:::
+
 # Phase 36 — Production Order Intake & File Governance
 
 This document presents the future architectural blueprint and operational roadmap for **Phase 36: Production Order Intake & File Governance**. 

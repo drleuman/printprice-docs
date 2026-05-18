@@ -1,4 +1,10 @@
 
+---
+id: production-intelligence
+title: Production Intelligence Engine
+sidebar_label: Production Intelligence
+---
+
 # Production Intelligence Engine
 
 ```mermaid

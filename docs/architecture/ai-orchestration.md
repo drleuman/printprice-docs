@@ -1,4 +1,10 @@
 
+---
+id: ai-orchestration
+title: AI Orchestration Layer
+sidebar_label: AI Orchestration
+---
+
 # AI Orchestration Layer
 
 ```mermaid

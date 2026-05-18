@@ -48,17 +48,16 @@ graph TD
 To maintain absolute system safety, features and metrics are strictly classified into clear stages of maturity.
 
 ### 1. Validated in Production (Phase 35.5 Status)
-The following capabilities have been fully stress-tested and certified in production:
+The following capabilities are production validated:
 *   **Five-Layer Diagnostic Flow**: Verification of preflight parsing, database serialization, asynchronous queue execution, and UI telemetry representation.
 *   **Graceful Engine Degradation**: The preflight parser isolates external tool failures, degrading to partial extraction modes without failing the execution context.
 *   **Security Decoupling**: Isolation of administrative gateway credentials from client-facing API channels.
 
 ### 2. Implemented but Active Watchpoint
-The following systems are running in production but require close operations monitoring:
-*   **Concurrent Autofix Load Limits**: Processing highly complex PDFs through the autofix tool can result in CPU spikes. Active concurrency throttles are placed at 5 simultaneous threads per worker node.
-*   **Storage Write Latency**: During peak volumes, writing massive finalized PDFs (`fixed.pdf`) to storage shows higher latency.
+The following systems are running in production but require operations monitoring:
+*   **Autofix CPU load and storage write latency**: Autofix CPU load and storage write latency remain operational watchpoints to measure under production load.
 
-### 3. Next Phase (Phase 36 Preview)
-The following features are under design and **NOT** yet present in production:
+### 3. Next Phase (Phase 36 Preview - Future Design)
+The following features represent future design blueprints scheduled to begin after the Phase 35.5 production freeze. No invoice, payment, MES, or automatic production-routing behavior is considered production-complete:
 *   **Order Intake File Governance**: Dynamically rejecting order flows before worker ingestion based on preflight contract warnings.
 *   **Policy-Enforced Auto-Routing**: Automatic routing rejection of orders violating print network partner constraints.
