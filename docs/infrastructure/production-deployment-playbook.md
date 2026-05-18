@@ -30,9 +30,31 @@ During the static site generation (SSG) step of the Docusaurus build process, th
 
 ---
 
-## 2. Safe Production Deployment Flow
+## 2. The Simplest Deployment Method: Automated Script (deploy.sh)
 
-Below is the verified, safe, and production-ready script. It automates backups, generates local Yarn shims using Corepack, handles lockfile-based deterministic installation, runs the Mermaid SSG hotfix, and deploys with zero live-site downtime.
+We have committed a fully automated deployment script named `deploy.sh` in the root of the repository. 
+
+### How to use it:
+1. **Connect via SSH** to your Plesk server.
+2. **Navigate** to your Git repository directory on the server:
+   ```bash
+   cd /var/www/vhosts/printprice.pro/builds/printprice-docs # (or your configured build/git folder)
+   ```
+3. **Pull the latest changes**:
+   ```bash
+   git pull origin main
+   ```
+4. **Execute the deploy script**:
+   ```bash
+   ./deploy.sh
+   ```
+This single script automatically handles backups, configures Corepack/Yarn, installs dependencies safely, hotfixes the Mermaid pre-rendering issue, compiles Docusaurus, and deploys the clean static files directly to `/var/www/vhosts/printprice.pro/docs.printprice.pro` in seconds with zero downtime!
+
+---
+
+## 3. Step-by-Step Manual Deployment Script (Reference)
+
+If you prefer to run the commands manually or want to inspect the exact steps, here is the full flow executed by `deploy.sh`:
 
 ```bash
 set -e
@@ -90,7 +112,7 @@ curl -s https://docs.printprice.pro/ | head -20
 
 ---
 
-## 3. Rollback Instructions
+## 4. Rollback Instructions
 
 If the verification step fails or any critical client issues occur, execute a rollback to restore the previous live state immediately:
 
@@ -105,7 +127,7 @@ curl -I https://docs.printprice.pro/
 
 ---
 
-## 4. Deployment Acceptance Criteria
+## 5. Deployment Acceptance Criteria
 
 The deployment is considered fully valid and complete only if:
 1. **Dependency Installation**: `yarn install --frozen-lockfile` succeeds cleanly using the Node Corepack-provided Yarn binary.
