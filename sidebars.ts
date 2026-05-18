@@ -74,6 +74,7 @@ const sidebars: SidebarsConfig = {
       label: 'Infrastructure',
       items: [
         'infrastructure/deployment-blueprint',
+        'infrastructure/production-deployment-playbook',
         'infrastructure/cloud-architecture',
         'infrastructure/security',
         'infrastructure/observability',
