@@ -3,9 +3,9 @@ import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
-  title: 'PrintPrice Documentation',
-  tagline: 'Production Intelligence Platform for the Print Industry',
-  favicon: 'img/favicon.ico',
+  title: 'PrintPrice OS Documentation',
+  tagline: 'Production Intelligence Platform & Control Plane for the Print Industry',
+  favicon: 'img/logo.svg',
 
   future: {
     v4: true,
@@ -63,12 +63,13 @@ const config: Config = {
   themeConfig: {
     image: 'img/docusaurus-social-card.jpg',
     colorMode: {
+      defaultMode: 'dark',
       respectPrefersColorScheme: true,
     },
     navbar: {
-      title: 'PrintPrice Docs',
+      title: 'PrintPrice OS',
       logo: {
-        alt: 'PrintPrice Logo',
+        alt: 'PrintPrice OS Logo',
         src: 'img/logo.svg',
       },
       items: [
@@ -79,8 +80,23 @@ const config: Config = {
           label: 'Documentation',
         },
         {
-          href: 'https://printprice.pro',
-          label: 'Main Site',
+          to: '/docs/repositories/ppos-control-plane',
+          label: 'Control Plane',
+          position: 'left',
+        },
+        {
+          to: '/docs/platform/paper-supplier-hub',
+          label: 'Paper Hub',
+          position: 'left',
+        },
+        {
+          to: '/docs/api/overview',
+          label: 'API & Contracts',
+          position: 'left',
+        },
+        {
+          href: 'https://control.printprice.pro',
+          label: 'Control Plane App ↗',
           position: 'right',
         },
         {
@@ -94,29 +110,66 @@ const config: Config = {
       style: 'dark',
       links: [
         {
-          title: 'Docs',
+          title: 'Core Systems',
           items: [
             {
-              label: 'Introduction',
-              to: '/',
+              label: 'Control Plane',
+              to: '/docs/repositories/ppos-control-plane',
+            },
+            {
+              label: 'Paper Supplier Hub',
+              to: '/docs/platform/paper-supplier-hub',
+            },
+            {
+              label: 'Book Pricing Engine',
+              to: '/docs/engines/book-pricing-engine',
+            },
+            {
+              label: 'Preflight Engine',
+              to: '/docs/engines/preflight-engine',
             },
           ],
         },
         {
-          title: 'Platform',
+          title: 'Architecture & APIs',
           items: [
             {
-              label: 'PrintPrice',
+              label: 'Platform Architecture',
+              to: '/docs/architecture/platform-architecture',
+            },
+            {
+              label: 'API Contracts',
+              to: '/docs/api/overview',
+            },
+            {
+              label: 'Preflight Diagnostic Contract',
+              to: '/docs/architecture/preflight-diagnostic-contract',
+            },
+            {
+              label: 'Production Pipeline',
+              to: '/docs/platform/production-pipeline',
+            },
+          ],
+        },
+        {
+          title: 'Ecosystem',
+          items: [
+            {
+              label: 'Control Plane Portal',
+              href: 'https://control.printprice.pro',
+            },
+            {
+              label: 'PrintPrice Official',
               href: 'https://printprice.pro',
             },
             {
-              label: 'Docs Repo',
+              label: 'Documentation Repository',
               href: 'https://github.com/drleuman/printprice-docs',
             },
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} PrintPrice`,
+      copyright: `Copyright © ${new Date().getFullYear()} PrintPrice OS. Production Intelligence Platform for the Print Industry.`,
     },
     prism: {
       theme: prismThemes.github,

@@ -40,6 +40,7 @@ const sidebars: SidebarsConfig = {
       label: 'Platform',
       items: [
         'platform/overview',
+        'platform/paper-supplier-hub',
         'platform/architecture',
         'platform/production-pipeline',
         'platform/system-data-model',

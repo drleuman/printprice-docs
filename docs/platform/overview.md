@@ -2,79 +2,56 @@
 title: Platform Overview
 ---
 
-# PrintPrice Platform Overview
+# PrintPrice OS Platform Overview
 
-PrintPrice is a **Production Intelligence Platform for the print industry**.
+PrintPrice OS is the **Production Intelligence Operating System for the commercial print and book manufacturing industry**.
 
-It combines:
+It coordinates:
 
-- Book Pricing Engine (BPE)
-- PDF Preflight
-- Production Intelligence
-- Capability Matching
-- Matchmaker Routing
+- **[Control Plane](../repositories/ppos-control-plane)** — Operations, multi-tenant RBAC, printhouse machine profiling, and commercial evidence governance.
+- **[Paper Supplier Hub](paper-supplier-hub)** — Substrate master catalog, self-service onboarding, and material linking.
+- **[Book Pricing Engine (BPE)](../engines/book-pricing-engine)** — Authoritative cost calculation and press imposition matrix.
+- **[PDF Preflight Engine](../engines/preflight-engine)** — Deterministic inspection pipeline preserving diagnostic truth.
+- **[Production Intelligence](../engines/production-intelligence)** — Intent detection and manufacturability verification.
+- **[Matchmaker Routing](../engines/matchmaker)** — Machine capability matching and multi-facility order routing.
 
-The platform transforms uploaded print files into **validated, manufacturable, and optimally routed production jobs**.
-
----
-
-## What PrintPrice Does
-
-PrintPrice automates the full path from print specification to manufacturing decision.
-
-Typical workflow:
-
-1. A user defines a print job
-2. The system calculates cost using the Book Pricing Engine
-3. The uploaded PDF is analyzed through deterministic preflight
-4. Production Intelligence detects intent and manufacturability
-5. Available printers are evaluated
-6. The Matchmaker selects the best production route
+The platform transforms uploaded print files and specifications into **validated, manufacturable, and commercially assured production jobs**.
 
 ---
 
-## Core Platform Layers
+## What PrintPrice OS Does
 
-### Book Pricing Engine
-Calculates production cost using paper, print method, binding, and machine rules.
+PrintPrice OS automates the complete lifecycle from initial quote inquiry to press-ready manufacturing dispatch:
 
-### Preflight Engine
-Analyzes PDFs for geometry, color, bleed, TAC, resolution, and print safety.
-
-### Production Intelligence
-Determines what the document is and whether it can be manufactured correctly.
-
-### Compatibility Engine
-Checks the document against real printer and machine constraints.
-
-### Matchmaker Engine
-Chooses the best printer using weighted physical, operational, and commercial scoring.
+1. **Job Definition & Specification**: User configures trim dimensions, page counts, paper stock, and binding style.
+2. **Deterministic Cost Resolution**: The Book Pricing Engine (BPE) computes sheet yields, plate costs, machine runtime, and paper requirements.
+3. **Autonomous Preflight Analysis**: Uploaded PDF artwork is analyzed deterministically against press profiles (TAC, bleed, fonts, resolutions).
+4. **Production Intent & Compatibility**: The system checks geometry and binding parameters against real-world manufacturing physics.
+5. **Paper Substrate Verification**: Substrates are validated against verified supplier stocks in the **Paper Supplier Hub**.
+6. **Matchmaker Press Routing**: The Matchmaker evaluates candidate printing facilities and assigns the job to the optimal press line.
+7. **Commercial Evidence Sealing**: An immutable `evidenceId` and `selectedVariantId` are attached to ensure reproducible, auditable quotes.
 
 ---
 
-## Strategic Positioning
+## Core Subsystems
 
-PrintPrice is not just a pricing tool or a PDF checker.
+### Control Plane
+The central operational cockpit. Manages multi-tenant authorization, printhouse machine digital twins (sheetfed offset, digital toner, web offset, inkjet), binding lines, margin multipliers, and system telemetry.
 
-It is a **Production Intelligence OS for the print ecosystem**.
+### Paper Supplier Hub
+A federated repository connecting paper manufacturers and merchants directly to printhouse cost estimators. Supports multilingual onboarding (ES, EN, DE) and automated tax identification checks.
 
-It connects:
+### Book Pricing Engine (BPE)
+Deterministic calculation solver resolving paper consumption, ink coverage, makeready setup times, run speeds, waste allowances, and finishing operations.
 
-- publishers
-- designers
-- manufacturers
-- print networks
+### Preflight Engine & Service
+High-throughput inspection engine that evaluates PDF geometry, color spaces, separations, and compliance, persisting an unmutated `canonicalPayload`.
 
-through a single decision pipeline.
+### Matchmaker & Capability Graph
+Evaluates print jobs against industrial machinery constraints, physical press boundaries, geographic proximity, and turnaround commitments.
 
 ---
 
-## Current Mission
+## Strategic Value
 
-The mission of PrintPrice is to reduce friction in print manufacturing by making production planning:
-
-- faster
-- safer
-- more explainable
-- more scalable
-
+PrintPrice OS replaces fragmented legacy spreadsheets, disjointed PDF checkers, and manual estimating tables with an integrated, deterministic production intelligence platform.
