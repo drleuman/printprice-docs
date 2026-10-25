@@ -70,7 +70,21 @@ Requires `X-Marketplace-Token: <PPOS_MARKETPLACE_INTAKE_TOKEN>` or `Authorizatio
 
 ---
 
-## 2. File Registration & Preflight Binding
+## 2. Offer Selection (`POST /api/marketplace/orders/:orderId/selected-offer`)
+
+Updates the order's chosen commercial print offer. Per `marketplaceOrders.js:252-257`, the backend accepts both wrapped (`selectedOffer`) and direct payload structures with either `offerId` or `id`:
+
+```json
+// Variant A: Wrapped with offerId
+{ "selectedOffer": { "offerId": "off_01j7b9e84k2", "totalPrice": 1650.00 } }
+
+// Variant B: Direct in body with offerId
+{ "offerId": "off_01j7b9e84k2", "totalPrice": 1650.00 }
+```
+
+---
+
+## 3. File Registration & Preflight Binding
 
 Once the order is initialized, client systems register uploaded file metadata and bind preflight jobs:
 

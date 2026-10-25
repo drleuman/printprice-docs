@@ -25,14 +25,16 @@ Evaluates the physical specifications of a book and returns ranked offers from e
 ### Request Body (JSON)
 | Field | Type | Required | Description |
 | :--- | :---: | :---: | :--- |
-| `copies` | Integer | **Yes** | Quantity of copies to print (must be > 0). |
-| `interior_pages` | Integer | **Yes** | Total interior page count (must be > 0). |
-| `format` | String | No | Trim size dimensions (e.g., `"148x210"`, `"A5"`). |
+| `copies` | Integer | **Yes** | Quantity of copies to print (evaluated by truthiness in controller; integer > 0 recommended). |
+| `interior_pages` | Integer | **Yes** | Total interior page count (evaluated by truthiness; integer > 0 recommended). |
+| `format` | String / Object | No | Standard format code (`"148x210"`, `"A5"`). Object dimensions `{width, height, unit}` represent a contract proposal (`[PROPUESTA DEV-02]`). |
 | `paper_inner` | String | No | Interior paper specification (e.g., `"offset_white_90"`). |
 | `paper_cover` | String | No | Cover paper specification (e.g., `"couche_gloss_250"`). |
-| `binding` | String | No | Binding method (e.g., `"softcover_pur"`, `"hardcover"`). |
+| `binding_method` | String | No | Binding method normalized by `pricingEngineClient.js:283` (`"perfect_bound"` → `"perfect bound"`, `"hard_cover"` → `"hardcover"`). |
+| `finishing_options` | String | No | Surface finishings normalized by `pricingEngineClient.js:287` (`"matt_lam_scratch"`, `"gloss_lam"`, `"soft_touch_lam"`). |
 | `colors_inner` | String | No | Interior color channels (e.g., `"1/1"`, `"4/4"`). |
 | `colors_cover` | String | No | Cover color channels (e.g., `"4/0"`). |
+| `delivery_country` | String | No | Destination ISO 3166-1 alpha-2 country code (e.g., `"ES"`). |
 
 #### Example Request (`curl`)
 ```bash
@@ -45,9 +47,11 @@ curl -X POST "http://localhost:3000/api/marketplace/offers" \
     "format": "148x210",
     "paper_inner": "offset_white_90",
     "paper_cover": "couche_gloss_250",
-    "binding": "softcover_pur",
+    "binding_method": "perfect_bound",
+    "finishing_options": "matt_lam_scratch",
     "colors_inner": "1/1",
-    "colors_cover": "4/0"
+    "colors_cover": "4/0",
+    "delivery_country": "ES"
   }'
 ```
 
@@ -56,7 +60,7 @@ curl -X POST "http://localhost:3000/api/marketplace/offers" \
 ## 2. Response Structure
 
 ### 200 OK — Successful Calculation
-Returns a structured array of print offers sorted with recommended flags:
+Returns a structured array of print offers sorted with recommended flags (note that `recommended_offer_id` and `raw_recommended_offer_id` can be `null` if no offer is recommended):
 
 ```json
 {

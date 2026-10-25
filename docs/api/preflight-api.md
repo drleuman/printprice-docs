@@ -55,7 +55,9 @@ Allows print houses to share a customer-safe, visual diagnostic of an uploaded P
     ]
   }
 }
-```
+:::note Error Handling
+In the current implementation (`publicPreflight.js:12`), missing snapshots (`SNAPSHOT_NOT_FOUND`) return **HTTP 400** because the service does not assign a custom `statusCode` before the `result.statusCode || 400` evaluation. Returning **HTTP 404** represents a target contract proposal (`[PROPUESTA DEV-02]`).
+:::
 
 ---
 
@@ -63,19 +65,19 @@ Allows print houses to share a customer-safe, visual diagnostic of an uploaded P
 
 When preflight detects blocking errors that require the client to supply new files, a time-limited customer remediation token is dispatched.
 
-### Security Validation
-1. **Cryptographic Hash:** The server computes `SHA-256(token)` and matches it against `order.metadata_json.customer_action.tokenHash`.
+### Security & Lifecycle Details
+1. **Hash Verification:** The server computes `SHA-256(token)` and matches it using string inequality `!==` ([`marketplaceCustomerActionService.js:522`](file:///c:/Users/KIKE/Downloads/ppos-control-plane-phase-10-intelligence-layer/src/api/services/marketplaceCustomerActionService.js#L522)) against `tokenHash`. Constant-time comparison (`crypto.timingSafeEqual`) is a recommended future hardening.
 2. **Expiration Enforcement:** Validates `expiresAt`. Expired links return **`HTTP 410 Gone`**.
-3. **Idempotent First-Visit Tracking:** Automatically flags the action as `VIEWED`.
+3. **Execution Sequence & State:** The endpoint returns `validation.action` as read from the database upon token validation. Therefore, on the first successful request, `status` is `"PENDING"`. The operation attempts an asynchronous, non-fatal database update to set `VIEWED` without blocking the 200 OK response. Subsequent queries will return `"VIEWED"`.
 
-### Response (200 OK)
+### Response (200 OK — Initial Request)
 ```json
 {
   "success": true,
   "orderId": "ord_9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
   "action": {
     "type": "REUPLOAD_REQUIRED",
-    "status": "VIEWED",
+    "status": "PENDING",
     "requiredFiles": ["INTERIOR_PDF"],
     "blockers": ["LOW_IMAGE_DPI_PAGE_45"],
     "message": "Por favor, sustituya el PDF interior con imágenes a 300 DPI.",
