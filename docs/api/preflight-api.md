@@ -1,141 +1,98 @@
 ---
-title: Preflight API
+title: Preflight & Shared Reports API
 ---
 
-# Preflight API
+# Preflight & Shared Reports API
 
-The Preflight API exposes deterministic technical analysis of print-ready PDF files.
+The Preflight API provides programmatic access to technical PDF inspection, production fact extraction, and sanitized customer-facing diagnostic reports.
 
-It is responsible for extracting measurable production facts and identifying technical issues before manufacturing decisions are made.
-
----
-
-## Purpose
-
-The Preflight API helps answer questions such as:
-
-- Is this file suitable for print production?
-- Does it contain bleed?
-- Are the page dimensions correct?
-- Are fonts embedded?
-- Are there color space or resolution risks?
-- Does the file comply with technical expectations?
-
-Its role is to turn uploaded PDFs into structured technical data.
+:::note Implementation Traceability
+The shared diagnostic report endpoint is implemented at [`src/api/routes/publicPreflight.js:6`](file:///c:/Users/KIKE/Downloads/ppos-control-plane-phase-10-intelligence-layer/src/api/routes/publicPreflight.js#L6) and served under `/api/public/preflight/human-report/:token`. Customer action handoff is implemented at [`src/api/routes/marketplacePublic.js:125`](file:///c:/Users/KIKE/Downloads/ppos-control-plane-phase-10-intelligence-layer/src/api/routes/marketplacePublic.js#L125).
+:::
 
 ---
 
-## Input
+## 1. Shared Preflight Human Report (`GET /api/public/preflight/human-report/:token`)
 
-The core input is a document file, typically a PDF.
+Allows print houses to share a customer-safe, visual diagnostic of an uploaded PDF without exposing internal server paths or operational logs.
 
-Associated metadata may also be provided, such as:
+### Authentication & Token Validation
+- **Token Format:** Signed JWT in path parameter (`:token`).
+- **Required Scope:** Must be signed with `HUMAN_REPORT_VIEW`.
+- **Database Isolation:** Enforces multitenant boundary matching `tenant_id`, `job_id`, and `id`.
 
-- declared trim size
-- product type
-- intended binding
-- expected color workflow
-- production profile
-
-These declarations help contextualize the analysis.
-
----
-
-## Processing Stages
-
-The Preflight API may include stages such as:
-
-- file ingestion
-- metadata extraction
-- page geometry analysis
-- bleed and trim inspection
-- color profile inspection
-- image resolution checks
-- font inspection
-- total ink coverage checks
-
-These stages rely on deterministic tooling rather than subjective interpretation.
-
----
-
-## Output
-
-A preflight response typically includes:
-
-- file facts
-- page count
-- dimensions
-- color information
-- image metrics
-- font status
-- issue list
-- warnings
-- pass or fail style indicators
-
-This output can be used directly by interfaces or passed into other engines.
+### Response (200 OK)
+```json
+{
+  "ok": true,
+  "job_id": "pf_job_8a7d6e5c-1234",
+  "snapshot_id": "snap_998877",
+  "tenant_id": "tenant_default",
+  "report": {
+    "outcome": "FIXED_REVIEW_REQUIRED",
+    "summary": {
+      "title": "Informe de Verificación de Archivos",
+      "description": "Se detectaron advertencias que requieren confirmación visual.",
+      "pages_analyzed": 192,
+      "color_space": "CMYK (FOGRA39)"
+    },
+    "artifact_recommendations": [
+      {
+        "artifact_id": "art_visual_diff_01",
+        "artifact_type": "VISUAL_DIFF_PAGE_12",
+        "label": "Comparativa de corrección en página 12 (resolución de imagen)",
+        "customer_visible": true,
+        "download_url": "/api/public/preflight/artifacts/art_visual_diff_01?token=..."
+      }
+    ],
+    "customer_actions": [
+      {
+        "action_id": "review_required",
+        "label": "Revisión requerida antes de imprimir",
+        "description": "El archivo corregido debe ser aprobado antes de enviar a planchas.",
+        "severity": "warning"
+      }
+    ]
+  }
+}
+```
 
 ---
 
-## Deterministic Analysis
+## 2. Customer Action Remediation Link (`GET /api/marketplace/orders/:orderId/customer-action/:token`)
 
-A core design goal of the Preflight API is deterministic repeatability.
+When preflight detects blocking errors that require the client to supply new files, a time-limited customer remediation token is dispatched.
 
-Equivalent files analyzed under the same rules should generate consistent technical output.
+### Security Validation
+1. **Cryptographic Hash:** The server computes `SHA-256(token)` and matches it against `order.metadata_json.customer_action.tokenHash`.
+2. **Expiration Enforcement:** Validates `expiresAt`. Expired links return **`HTTP 410 Gone`**.
+3. **Idempotent First-Visit Tracking:** Automatically flags the action as `VIEWED`.
 
-This is essential for trust and operational debugging.
-
----
-
-## Severity Model
-
-Issues may be classified into categories such as:
-
-- informational
-- warning
-- error
-- blocking issue
-
-This allows downstream systems to distinguish between advisory findings and true manufacturing blockers.
-
----
-
-## Role in the Platform
-
-The Preflight API is upstream of several major platform decisions.
-
-Its output may feed:
-
-- Production Intelligence
-- Compatibility Engine
-- Matchmaker
-- user-facing validation reports
-- correction workflows
-
-Without reliable preflight analysis, downstream routing becomes less trustworthy.
-
----
-
-## Typical Use Cases
-
-Typical use cases include:
-
-- validating uploaded files before quotation
-- generating technical production reports
-- checking print readiness before order creation
-- powering assistant explanations
-- supporting admin review workflows
-
----
-
-## Long-Term Evolution
-
-Future capabilities may include:
-
-- profile-specific validation presets
-- binding-aware checks
-- edition intent detection
-- automated correction suggestions
-- fix-and-retry workflows
-- partner-specific preflight rules
-
-These features would turn the Preflight API into a deeper production assurance layer.
+### Response (200 OK)
+```json
+{
+  "success": true,
+  "orderId": "ord_9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
+  "action": {
+    "type": "REUPLOAD_REQUIRED",
+    "status": "VIEWED",
+    "requiredFiles": ["INTERIOR_PDF"],
+    "blockers": ["LOW_IMAGE_DPI_PAGE_45"],
+    "message": "Por favor, sustituya el PDF interior con imágenes a 300 DPI.",
+    "expiresAt": "2026-11-01T23:59:59.000Z",
+    "createdAt": "2026-10-25T14:00:00.000Z"
+  },
+  "currentFiles": [
+    {
+      "file_id": "fil_int_01",
+      "role": "INTERIOR_PDF",
+      "status": "REJECTED",
+      "preflight_status": "FAILED",
+      "preflight_outcome_category": "REJECTED_RESOLUTION",
+      "findings_count": 3,
+      "version": 1
+    }
+  ],
+  "trace_id": "trace_99887766"
+}
+```

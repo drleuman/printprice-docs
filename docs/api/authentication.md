@@ -1,150 +1,90 @@
 ---
-title: Authentication
+title: Authentication & Security Models
 ---
 
-# Authentication
+# Authentication & Security Models
 
-The PrintPrice API uses authenticated access to protect platform services and ensure safe integration with external systems.
+PrintPrice OS implements dedicated authentication and authorization mechanisms adapted to each operational boundary: public B2B calculation, partner order intake, backoffice administration, and customer-facing shared diagnostic links.
 
-Authentication requirements may vary depending on the endpoint type, but the main goal is consistent access control.
-
----
-
-## Objectives
-
-Authentication exists to:
-
-- restrict access to authorized clients
-- protect production data
-- prevent abuse
-- enforce integration boundaries
-- support auditability
+:::info Scope & Identity Separation
+In accordance with the DEV-01B security audit, interactive backoffice user sessions (`jti` claim revocation) are strictly separated from machine-to-machine partner API tokens and ephemeral customer action links.
+:::
 
 ---
 
-## Supported Authentication Models
+## 1. Machine-to-Machine Intake Token (`PPOS_MARKETPLACE_INTAKE_TOKEN`)
 
-Typical integration models may include:
+Used by trusted e-commerce frontends, quoting widgets, and partner platforms for order creation and file registration via `requireMarketplaceOrAdmin` ([`marketplaceOrders.js:21-58`](file:///c:/Users/KIKE/Downloads/ppos-control-plane-phase-10-intelligence-layer/src/api/routes/marketplaceOrders.js#L21-L58)).
 
-- API keys
-- server-to-server authentication
-- internal service authentication
-- signed webhook verification
+### Header Convention
+The intake token can be supplied via either of the following standard headers:
 
-Different models may be applied depending on the risk profile of the endpoint.
+```http
+X-Marketplace-Token: your-intake-secret-token
+```
+or
+```http
+Authorization: Bearer your-intake-secret-token
+```
 
----
-
-## API Key Authentication
-
-For most server-side integrations, API key authentication is the most straightforward model.
-
-A client includes a secret key in the request headers.
-
-Example header:
-
-Authorization: Bearer YOUR_API_KEY
-
-The API validates the key before processing the request.
-
----
-
-## Recommended Header Patterns
-
-Typical authentication headers include:
-
-- Authorization
-- X-API-Key
-- X-Admin-Api-Key
-
-The exact header convention should remain stable across environments.
+When validated, the system grants the request the internal system identity:
+```json
+{
+  "id": "marketplace-token-actor",
+  "role": "SUPER_ADMIN",
+  "authMode": "MARKETPLACE"
+}
+```
 
 ---
 
-## Security Principles
+## 2. Operator & Administrator Bearer JWT
 
-Authentication should follow these principles:
+Used by backoffice operations, SCADA telemetry, and administrative endpoints.
 
-- never expose secret keys in frontend code
-- rotate keys periodically
-- scope keys by environment where possible
-- reject missing or invalid credentials deterministically
-- log authentication failures safely
+### Header Convention
+```http
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
 
----
-
-## Unauthorized Requests
-
-When authentication fails, the API should return a structured error response.
-
-Typical cases include:
-
-- missing credentials
-- invalid credentials
-- expired credentials
-- insufficient privileges
-
-Example response pattern:
-
-- ok: false
-- error: UNAUTHORIZED
-- message: Authentication failed
+The JWT is signed with the cluster's `JWT_SECRET` and validated by `requireAdmin`. Missing or invalid tokens return:
+```json
+{
+  "ok": false,
+  "error": "UNAUTHORIZED",
+  "message": "Authentication required."
+}
+```
 
 ---
 
-## Environment Separation
+## 3. Ephemeral Signed URL Tokens (Zero-Auth Customer Access)
 
-Production and non-production environments should use separate credentials.
+To allow authors, print buyers, and external collaborators to inspect preflight reports or re-upload files without registering accounts, the API employs cryptographic, time-bound URL tokens:
 
-This reduces the risk of accidental cross-environment access and improves operational control.
+### A. Shared Preflight Human Report (`GET /api/public/preflight/human-report/:token`)
+- **Mechanism:** Signed JWT embedded directly in the URL path.
+- **Mandatory Scope:** `payload.scope === 'HUMAN_REPORT_VIEW'`.
+- **Payload Claims:** Contains `{ jobId, snapshotId, tenantId }`.
+- **Tenant Isolation:** Enforces database-level tenant isolation:
+  ```sql
+  SELECT * FROM control_plane_preflight_human_reports 
+  WHERE tenant_id = ? AND job_id = ? AND id = ?
+  ```
 
----
-
-## Internal Service Security
-
-Where multiple internal services communicate, authentication should also apply between trusted services.
-
-This helps protect:
-
-- pricing services
-- preflight services
-- orchestration endpoints
-- admin workflows
-
----
-
-## Webhook Verification
-
-Webhook endpoints should not rely only on source IP trust.
-
-Recommended verification patterns include:
-
-- shared secret signatures
-- timestamp validation
-- replay protection
-- strict payload verification
+### B. Customer Action Re-upload Token (`GET /api/marketplace/orders/:orderId/customer-action/:token`)
+- **Mechanism:** High-entropy token string whose SHA-256 hash is compared against the stored hash:
+  ```javascript
+  const providedHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+  if (providedHash !== action.tokenHash) return 403;
+  ```
+- **Expiration:** Validated against `action.expiresAt`. If expired, returns **`HTTP 410 Gone`** with code `TOKEN_EXPIRED`.
+- **Idempotency:** The first successful visit automatically marks the customer action as `VIEWED`.
 
 ---
 
-## Best Practices
+## 4. Security & Cryptographic Best Practices
 
-Recommended implementation practices:
-
-- store secrets in environment variables
-- avoid committing credentials to the repository
-- use HTTPS only
-- rate-limit sensitive endpoints
-- monitor repeated authentication failures
-
----
-
-## Long-Term Direction
-
-As the platform expands, authentication may evolve toward more granular models such as:
-
-- partner-scoped credentials
-- role-based access
-- signed requests
-- tenant-aware access policies
-
-These patterns become increasingly important as PrintPrice grows into a multi-party production platform.
+- **Never Commit Secrets:** `PPOS_MARKETPLACE_INTAKE_TOKEN` and `JWT_SECRET` must be injected exclusively through secure environment variables.
+- **Production TLS Validation:** In automated tests, certificate checking must never be disabled in production environments (`check_hostname=True`, `CERT_REQUIRED`).
+- **No Production Probing with Mutations:** Never run automated vulnerability or contract tests that execute `POST /api/marketplace/orders` against live production databases.
