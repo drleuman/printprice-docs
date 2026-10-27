@@ -1,0 +1,637 @@
+openapi: 3.1.0
+info:
+  title: PrintPrice OS — Pricing & Marketplace Orders API
+  version: 1.0.0
+  description: |
+    # PrintPrice OS — Pricing & Marketplace Orders API
+    API para cotización determinista de libros mediante el Book Pricing Engine (BPE),
+    ingesta formal de pedidos de producción en estado DRAFT, registro de metadatos de archivos y evaluación de viabilidad de fabricación (readiness).
+    
+    - **Servidor Gateway:** `https://api.printprice.pro`
+    - **Simulador Local (Prism):** `http://localhost:4010`
+    - **Salvaguarda Operativa:** Las mutaciones interactivas directas en producción están inhabilitadas sin credenciales de partner certificadas.
+  contact:
+    name: PrintPrice Architecture & Security Team
+    email: api-support@printprice.pro
+    url: https://docs.printprice.pro
+  license:
+    name: Proprietary / Partner Integration Only
+    identifier: Proprietary
+
+servers:
+  - url: https://api.printprice.pro
+    description: Servidor de Producción (Requiere credenciales y autorización comercial)
+
+tags:
+  - name: Pricing & Offers
+    description: Cotización algorítmica de libros e imprentas candidatas mediante BPE.
+  - name: Orders & File Governance
+    description: Formalización de pedidos, fijación de ofertas, registro de archivos y evaluación de readiness.
+
+paths:
+  /api/marketplace/offers:
+    post:
+      tags:
+        - Pricing & Offers
+      summary: Solicitar ofertas y cotizaciones de talleres de imprenta
+      description: |
+        Calcula deterministamente el coste de fabricación y devuelve ofertas competitivas de imprentas adscritas en base a las especificaciones técnicas de un libro.
+      operationId: requestMarketplaceOffers
+      security:
+        - {}
+        - ApiKeyAuth: []
+      parameters:
+        - name: x-trace-id
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Identificador de correlación distribuida. Si se omite, el gateway genera automáticamente un identificador único.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OfferRequestPayload'
+            example:
+              copies: 500
+              interior_pages: 192
+              format: "148x210"
+              paper_inner: "offset_white_90"
+              paper_cover: "couche_gloss_250"
+              binding_method: "perfect_bound"
+              finishing_options: "matt_lam_scratch"
+              colors_inner: "1/1"
+              colors_cover: "4/0"
+              delivery_country: "ES"
+      responses:
+        '200':
+          description: Ofertas calculadas con éxito o respuesta degradada controlada si BPE no está disponible.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OffersResponse'
+              examples:
+                success:
+                  summary: Ofertas calculadas exitosamente
+                  value:
+                    success: true
+                    recommended_offer_id: "off_01j7b9e84k2"
+                    raw_recommended_offer_id: "ph_valencia_01"
+                    trace_id: "trace_demo_12345"
+                    offers:
+                      - id: "off_01j7b9e84k2"
+                        offer_id: "off_01j7b9e84k2"
+                        house_id: "ph_valencia_01"
+                        printer_id: "ph_valencia_01"
+                        print_house_id: "ph_valencia_01"
+                        print_house: "Talleres Gráficos Levante"
+                        total_cost: 1240.50
+                        total_price: 1650.00
+                        currency: "EUR"
+                        margin: 409.50
+                        margin_percent: 24.82
+                        estimated_delivery_time: "5-7 días laborables"
+                        lead_time_days: 6
+                        breakdown:
+                          - label: "Papel interior"
+                            amount: 420.00
+                          - label: "Impresión y planchas"
+                            amount: 380.50
+                          - label: "Encuadernación rústica"
+                            amount: 310.00
+                          - label: "Embalaje y paletizado"
+                            amount: 130.00
+                        recommended: true
+                        checkout_allowed: true
+                        source: "BPE_MARKETPLACE_NATIVE"
+        '400':
+          description: Petición inválida por omisión de campos requeridos (copies o interior_pages).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                message: "Missing required parameters: copies and interior_pages are mandatory."
+                error_code: "INVALID_PAYLOAD"
+
+  /api/marketplace/orders:
+    post:
+      tags:
+        - Orders & File Governance
+      summary: Crear pedido de fabricación en estado DRAFT
+      description: |
+        Registra la intención formal de compra de un libro vinculando la sesión de precios y reservando los slots obligatorios de archivo (`INTERIOR_PDF` y `COVER_PDF`).
+      operationId: createMarketplaceOrder
+      security:
+        - MarketplaceToken: []
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderPayload'
+            example:
+              pricingSessionId: "sess_89f7a6e1-9876"
+              selectedOfferId: "off_01j7b9e84k2"
+              customer:
+                name: "Editorial Minerva S.L."
+                email: "produccion@editorialminerva.es"
+                phone: "+34 912 345 678"
+                address:
+                  street: "Calle Gran Vía 28, 4º"
+                  city: "Madrid"
+                  postal_code: "28013"
+                  country: "ES"
+              bookSpec:
+                copies: 500
+                interior_pages: 192
+                format: "148x210"
+                paper_inner: "offset_white_90"
+                paper_cover: "couche_gloss_250"
+                binding: "softcover_pur"
+                colors_inner: "1/1"
+                colors_cover: "4/0"
+      responses:
+        '201':
+          description: Pedido creado exitosamente en estado borrador.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderCreatedResponse'
+              example:
+                ok: true
+                orderId: "ord_9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d"
+                status: "DRAFT"
+                requiredFiles:
+                  - "INTERIOR_PDF"
+                  - "COVER_PDF"
+                readiness:
+                  ready: false
+                  blockers:
+                    - "MISSING_REQUIRED_FILE_INTERIOR_PDF"
+                    - "MISSING_REQUIRED_FILE_COVER_PDF"
+        '400':
+          description: Datos de pedido inválidos o incompletos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Token de autenticación ausente o inválido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/marketplace/orders/{orderId}:
+    get:
+      tags:
+        - Orders & File Governance
+      summary: Consultar detalle y readiness de un pedido
+      operationId: getMarketplaceOrder
+      security:
+        - MarketplaceToken: []
+        - BearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Identificador UUID del pedido.
+      responses:
+        '200':
+          description: Detalle completo del pedido, archivos vinculados y estado de preparación.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDetailResponse'
+        '404':
+          description: Pedido no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/marketplace/orders/{orderId}/selected-offer:
+    post:
+      tags:
+        - Orders & File Governance
+      summary: Fijar o actualizar la oferta comercial del pedido
+      operationId: selectOrderOffer
+      security:
+        - MarketplaceToken: []
+        - BearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                selectedOffer:
+                  type: object
+                  properties:
+                    offerId:
+                      type: string
+                    totalPrice:
+                      type: number
+                offerId:
+                  type: string
+                totalPrice:
+                  type: number
+            example:
+              offerId: "off_01j7b9e84k2"
+              totalPrice: 1650.00
+      responses:
+        '200':
+          description: Oferta comercial fijada con éxito.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  orderId:
+                    type: string
+                  selectedOfferId:
+                    type: string
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/marketplace/orders/{orderId}/files/register:
+    post:
+      tags:
+        - Orders & File Governance
+      summary: Registrar metadatos de un archivo PDF subido
+      operationId: registerOrderFile
+      security:
+        - MarketplaceToken: []
+        - BearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - role
+                - originalName
+                - mimeType
+                - sizeBytes
+                - checksumSha256
+                - storagePath
+              properties:
+                role:
+                  type: string
+                  enum: [INTERIOR_PDF, COVER_PDF]
+                originalName:
+                  type: string
+                mimeType:
+                  type: string
+                  default: "application/pdf"
+                sizeBytes:
+                  type: integer
+                checksumSha256:
+                  type: string
+                storagePath:
+                  type: string
+            example:
+              role: "INTERIOR_PDF"
+              originalName: "manuscrito_final.pdf"
+              mimeType: "application/pdf"
+              sizeBytes: 15420310
+              checksumSha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+              storagePath: "orders/ord_123/interior_v1.pdf"
+      responses:
+        '201':
+          description: Archivo registrado exitosamente.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  fileId:
+                    type: string
+                  orderId:
+                    type: string
+                  role:
+                    type: string
+                  status:
+                    type: string
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/marketplace/orders/{orderId}/files/{fileId}/preflight-bind:
+    post:
+      tags:
+        - Orders & File Governance
+      summary: Vincular archivo a un trabajo de inspección Preflight
+      operationId: bindPreflightJob
+      security:
+        - MarketplaceToken: []
+        - BearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: fileId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - preflightJobId
+              properties:
+                preflightJobId:
+                  type: string
+            example:
+              preflightJobId: "pf_job_8a7d6e5c-1234"
+      responses:
+        '200':
+          description: Archivo vinculado al trabajo de preflight.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  fileId:
+                    type: string
+                  preflightJobId:
+                    type: string
+                  boundAt:
+                    type: string
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/marketplace/orders/{orderId}/readiness/recompute:
+    post:
+      tags:
+        - Orders & File Governance
+      summary: Reevaluar deterministamente la preparación de fabricación (Readiness)
+      operationId: recomputeOrderReadiness
+      security:
+        - MarketplaceToken: []
+        - BearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Estado de preparación evaluado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  orderId:
+                    type: string
+                  status:
+                    type: string
+                    enum: [READY, BLOCKED]
+                  readiness:
+                    type: object
+                    properties:
+                      ready:
+                        type: boolean
+                      blockers:
+                        type: array
+                        items:
+                          type: string
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Clave API con prefijo ppos_live_ o ppos_test_.
+    MarketplaceToken:
+      type: apiKey
+      in: header
+      name: X-Marketplace-Token
+      description: Token secreto M2M de ingesta de pedidos.
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    OfferRequestPayload:
+      type: object
+      required:
+        - copies
+        - interior_pages
+      properties:
+        copies:
+          type: integer
+          minimum: 1
+          description: Cantidad total de ejemplares a imprimir.
+        interior_pages:
+          type: integer
+          minimum: 1
+          description: Número de páginas del bloque interior (múltiplo de 4 o 2 según encuadernación).
+        format:
+          type: string
+          example: "148x210"
+        paper_inner:
+          type: string
+          example: "offset_white_90"
+        paper_cover:
+          type: string
+          example: "couche_gloss_250"
+        binding_method:
+          type: string
+          example: "perfect_bound"
+        finishing_options:
+          type: string
+          example: "matt_lam_scratch"
+        colors_inner:
+          type: string
+          example: "1/1"
+        colors_cover:
+          type: string
+          example: "4/0"
+        delivery_country:
+          type: string
+          example: "ES"
+
+    OffersResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        offers:
+          type: array
+          items:
+            $ref: '#/components/schemas/OfferItem'
+        recommended_offer_id:
+          type:
+            - string
+            - "null"
+        raw_recommended_offer_id:
+          type:
+            - string
+            - "null"
+        trace_id:
+          type: string
+
+    OfferItem:
+      type: object
+      properties:
+        id:
+          type: string
+        offer_id:
+          type: string
+        house_id:
+          type: string
+        printer_id:
+          type: string
+        print_house_id:
+          type: string
+        print_house:
+          type: string
+        total_cost:
+          type: number
+        total_price:
+          type: number
+        currency:
+          type: string
+          example: "EUR"
+        margin:
+          type: number
+        margin_percent:
+          type: number
+        estimated_delivery_time:
+          type: string
+        lead_time_days:
+          type: integer
+        breakdown:
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                type: string
+              amount:
+                type: number
+        recommended:
+          type: boolean
+        checkout_allowed:
+          type: boolean
+        source:
+          type: string
+
+    CreateOrderPayload:
+      type: object
+      required:
+        - pricingSessionId
+        - selectedOfferId
+        - customer
+        - bookSpec
+      properties:
+        pricingSessionId:
+          type: string
+        selectedOfferId:
+          type: string
+        customer:
+          type: object
+          properties:
+            name:
+              type: string
+            email:
+              type: string
+            phone:
+              type: string
+            address:
+              type: object
+        bookSpec:
+          type: object
+
+    OrderCreatedResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        orderId:
+          type: string
+        status:
+          type: string
+        requiredFiles:
+          type: array
+          items:
+            type: string
+        readiness:
+          type: object
+          properties:
+            ready:
+              type: boolean
+            blockers:
+              type: array
+              items:
+                type: string
+
+    OrderDetailResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        order:
+          type: object
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        ok:
+          type: boolean
+        message:
+          type: string
+        error_code:
+          type: string
+        error:
+          type: string
+
+  responses:
+    ErrorResponse:
+      description: Error en la solicitud o fallo de validación
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
