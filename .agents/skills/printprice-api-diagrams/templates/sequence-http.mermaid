@@ -1,0 +1,21 @@
+%% ============================================================================
+%% PrintPrice OS — Standard Synchronous HTTP API Sequence
+%% Visual Identity: Red #E53935 | Dark Surface #151820 | Slate #64748B
+%% ============================================================================
+sequenceDiagram
+    autonumber
+    actor Client as Partner Client
+    participant GW as API Perimeter (api.printprice.pro)
+    participant Router as Fastify Controller
+    participant Service as Domain Service
+    participant DB as MySQL Database
+
+    Client->>GW: POST /api/endpoint (Authorization, x-trace-id)
+    GW->>Router: Validate TLS & Reverse Proxy
+    Router->>Router: Verify Scope & Token Claims
+    Router->>Service: Execute Business Logic
+    Service->>DB: Query / Mutation Transaction
+    DB-->>Service: Commit Confirmed
+    Service-->>Router: Domain Result DTO
+    Router-->>GW: Enforce Standard Response Envelope
+    GW-->>Client: 200 OK / 201 Created (data, meta)

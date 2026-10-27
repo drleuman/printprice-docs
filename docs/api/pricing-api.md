@@ -10,6 +10,59 @@ The Pricing & Offers API provides programmatic access to deterministic cost calc
 This contract is implemented in the Control Plane at [`src/api/routes/marketplacePublic.js:16`](file:///c:/Users/KIKE/Downloads/ppos-control-plane-phase-10-intelligence-layer/src/api/routes/marketplacePublic.js#L16) and served under `/api/marketplace/offers`.
 :::
 
+```mermaid
+flowchart TD
+    subgraph InputStage ["1. INGESTION & VALIDATION"]
+        Req["POST /api/marketplace/offers\nPayload: copies, interior_pages,\nformat, binding_method, postal_code"]
+        Validate["Fastify Schema Validator\nHeader x-trace-id Verification"]
+        Req --> Validate
+    end
+
+    subgraph CalculationEngine ["2. BOOK PRICING ENGINE (BPE :8004)"]
+        direction TB
+        BPE_Entry["BPE Controller"]
+        Imposition["Imposition & Sheet Geometry\nSignature breakdown (8/16/32pp) & Bleed trims"]
+        PressSelection["Press Profile Evaluation\nSpeed, setup waste, click cost & plate consumption"]
+        Finishing["Finishing Operations\nFolding, gathering, sewing/PUR glue & 3-knife trim"]
+        Packaging["Packaging & Logistics\nVolumetric weight & shipping zone SLA"]
+
+        BPE_Entry --> Imposition
+        Imposition --> PressSelection
+        PressSelection --> Finishing
+        Finishing --> Packaging
+    end
+
+    subgraph EconomicDecoupling ["3. ECONOMIC DECOUPLING"]
+        direction TB
+        DirectCost["Direct Manufacturing Cost\n(Paper + Press + Finishing + Logistics)"]
+        Multiplier["Tenant Margin Multiplier\nPlatform Multipliers & SLA Rules"]
+        FinalPrice["Commercial Suggested Price\n(Strict separation: total_cost vs total_price)"]
+
+        DirectCost --> Multiplier
+        Multiplier --> FinalPrice
+    end
+
+    subgraph OutputStage ["4. DETERMINISTIC RESPONSE"]
+        EvidenceGen["Cryptographic Evidence Generator\nevidenceId & selectedVariantId"]
+        Response["200 OK Response\nPayload: offers[], breakdown, currency,\nvalid_until, evidenceId"]
+        EvidenceGen --> Response
+    end
+
+    Validate --> BPE_Entry
+    Packaging --> DirectCost
+    FinalPrice --> EvidenceGen
+
+    classDef inputNode fill:#151820,stroke:#64748B,stroke-width:1.5px,color:#FFFFFF;
+    classDef bpeNode fill:#1A1E29,stroke:#E53935,stroke-width:2px,color:#FFFFFF;
+    classDef econNode fill:#151820,stroke:#FF5252,stroke-width:1.5px,color:#FFFFFF;
+    classDef outNode fill:#151820,stroke:#B71C1C,stroke-width:2px,color:#FFFFFF;
+
+    class Req,Validate inputNode;
+    class BPE_Entry,Imposition,PressSelection,Finishing,Packaging bpeNode;
+    class DirectCost,Multiplier,FinalPrice econNode;
+    class EvidenceGen,Response outNode;
+```
+
 ---
 
 ## 1. Request Offers (`POST /api/marketplace/offers`)

@@ -12,6 +12,51 @@ The Preflight API provides programmatic access to technical PDF inspection, prod
 - **Customer Action Remediation:** Implemented at [`src/api/routes/marketplacePublic.js:125`](file:///c:/Users/KIKE/Downloads/ppos-control-plane-phase-10-intelligence-layer/src/api/routes/marketplacePublic.js#L125) under `/api/marketplace/orders/:orderId/customer-action/:token`.
 :::
 
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Client as Integrator / Publishing Client
+    participant GW as API Gateway (api.printprice.pro)
+    participant PF as Preflight Service (:8001)
+    participant Worker as Async Preflight Worker
+    participant Storage as File Storage Cluster
+
+    Note over Client,GW: 1. Capabilities Discovery
+    Client->>GW: GET /api/preflight/capabilities
+    GW->>PF: Route capabilities request
+    PF-->>Client: 200 OK (Supported profiles: PDF/X-1a, PDF/X-4, limits: 2GB)
+
+    Note over Client,Worker: 2. Multipart Upload & Job Creation
+    Client->>GW: POST /api/preflight/jobs (Multipart File up to 2GB)
+    GW->>PF: Stream upload with Bearer JWT
+    PF->>Storage: Persist original binary
+    PF->>Worker: Enqueue background inspection task
+    PF-->>Client: 201 Created (jobId: "job_948f...", status: "PROCESSING")
+
+    Note over Worker,Storage: 3. Deep Geometric & Color Analysis
+    Worker->>Storage: Read file streams
+    Worker->>Worker: Check TrimBox, BleedBox & SafeZone margins
+    Worker->>Worker: Verify Font Embedding & Vector Outlines
+    Worker->>Worker: Calculate Total Area Coverage (TAC <= 300%)
+    Worker->>Worker: Check image DPI (>= 300 DPI for print)
+    Worker->>PF: Store inspection report & status: "COMPLETED"
+
+    Note over Client,PF: 4. Inspection Report Retrieval
+    Client->>GW: GET /api/preflight/jobs/:id
+    GW->>PF: Fetch job state
+    PF-->>Client: 200 OK (issues[], readiness, human_report_token)
+
+    opt Client triggers automatic remediation
+        Note over Client,Worker: 5. Preflight Autofix Engine
+        Client->>GW: POST /api/preflight/jobs/:id/actions/fix
+        GW->>PF: Dispatch fix instruction (e.g. embed fonts, downsample TAC)
+        PF->>Worker: Execute automated remediation
+        Worker->>Storage: Persist normalized fixed PDF
+        Worker-->>PF: Fix completed
+        PF-->>Client: 200 OK (fixed_file_id, diff_summary, download_url)
+    end
+```
+
 ---
 
 ## 1. Capabilities Discovery (`GET /api/preflight/capabilities`)

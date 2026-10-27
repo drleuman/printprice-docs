@@ -1,0 +1,97 @@
+/* ==========================================================================
+   PrintPrice OS — Mermaid Global Theme & CSS Classes
+   Strict Visual Identity:
+   - Primary Red Accent: #E53935 (Glow: #FF5252, Dark Red: #B71C1C)
+   - Dark Canvas: #0B0D12
+   - Card/Node Surface: #151820
+   - Border Default: #262B36
+   - Slate Neutrals: #64748B, #94A3B8, #CBD5E1
+   - Zero Blue / Zero Cyan
+   ========================================================================== */
+
+/* Mermaid Container Hardening for Docusaurus */
+.docusaurus-mermaid-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: var(--ppos-card-bg);
+  border: 1px solid var(--ifm-border-color);
+  border-radius: var(--ppos-radius-lg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+}
+
+[data-theme='dark'] .docusaurus-mermaid-container {
+  background: #0f1218;
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+.docusaurus-mermaid-container svg {
+  max-width: 100% !important;
+  height: auto !important;
+  font-family: var(--ifm-font-family-base) !important;
+}
+
+/* Node Styles */
+.docusaurus-mermaid-container .node rect,
+.docusaurus-mermaid-container .node circle,
+.docusaurus-mermaid-container .node polygon {
+  transition: all 0.2s ease;
+}
+
+.docusaurus-mermaid-container .node:hover rect,
+.docusaurus-mermaid-container .node:hover circle,
+.docusaurus-mermaid-container .node:hover polygon {
+  filter: brightness(1.12);
+  stroke: #FF5252 !important;
+}
+
+/* Edge & Arrow Lines */
+.docusaurus-mermaid-container .flowchart-link,
+.docusaurus-mermaid-container .edgePath .path {
+  stroke: #64748B !important;
+  stroke-width: 1.5px !important;
+}
+
+.docusaurus-mermaid-container #flowchart-pointEnd,
+.docusaurus-mermaid-container .marker {
+  fill: #64748B !important;
+  stroke: #64748B !important;
+}
+
+/* Sequence Diagram Overrides */
+.docusaurus-mermaid-container .actor {
+  stroke: #E53935 !important;
+  fill: #151820 !important;
+  color: #FFFFFF !important;
+}
+
+.docusaurus-mermaid-container text.actor > tspan {
+  fill: #FFFFFF !important;
+}
+
+.docusaurus-mermaid-container .messageLine0,
+.docusaurus-mermaid-container .messageLine1 {
+  stroke: #E53935 !important;
+  stroke-width: 1.5px !important;
+}
+
+.docusaurus-mermaid-container #arrowhead path {
+  fill: #E53935 !important;
+  stroke: #E53935 !important;
+}
+
+.docusaurus-mermaid-container .note {
+  stroke: #334155 !important;
+  fill: #1E293B !important;
+  color: #F8FAFC !important;
+}
+
+.docusaurus-mermaid-container .noteText > tspan {
+  fill: #F8FAFC !important;
+}

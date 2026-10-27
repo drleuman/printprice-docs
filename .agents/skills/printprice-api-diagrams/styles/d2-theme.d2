@@ -1,0 +1,57 @@
+# ==============================================================================
+# PrintPrice OS — D2 Styling Guide & Palette Specification
+# Visual Identity: Red #E53935 | Dark Surface #151820 | Slate #64748B
+# ==============================================================================
+
+# Global D2 Theme Variables
+vars: {
+  red-primary: "#E53935"
+  red-glow: "#FF5252"
+  red-deep: "#B71C1C"
+  dark-bg: "#0B0D12"
+  card-bg: "#151820"
+  card-border: "#262B36"
+  text-white: "#FFFFFF"
+  text-slate: "#94A3B8"
+  slate-line: "#64748B"
+}
+
+# Standard Node Template
+classes: {
+  core-service: {
+    shape: rectangle
+    style: {
+      fill: "${card-bg}"
+      stroke: "${red-primary}"
+      stroke-width: 2
+      font-color: "${text-white}"
+      border-radius: 6
+    }
+  }
+  gateway: {
+    shape: hexagon
+    style: {
+      fill: "${card-bg}"
+      stroke: "${red-glow}"
+      stroke-width: 2
+      font-color: "${text-white}"
+    }
+  }
+  database: {
+    shape: cylinder
+    style: {
+      fill: "#11141C"
+      stroke: "${red-deep}"
+      stroke-dash: 4
+      font-color: "#F8FAFC"
+    }
+  }
+  client: {
+    shape: person
+    style: {
+      fill: "#0F1218"
+      stroke: "${slate-line}"
+      font-color: "${text-slate}"
+    }
+  }
+}
