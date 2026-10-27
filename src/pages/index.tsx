@@ -159,7 +159,7 @@ console.log("Ofertas obtenidas:", data.offers.length, "Total:", data.offers[0].t
           {/* Card 4: Webhooks */}
           <Link to="/docs/api/webhooks" className="pillar-card">
             <div className="pillar-header">
-              <span className="pillar-badge" style={{ background: 'rgba(6, 182, 212, 0.12)', color: '#06b6d4', border: '1px solid rgba(6, 182, 212, 0.3)' }}>
+              <span className="pillar-badge" style={{ background: 'rgba(229, 57, 53, 0.12)', color: '#FF5252', border: '1px solid rgba(229, 57, 53, 0.3)' }}>
                 HMAC-SHA256 PUSH
               </span>
               <span className="pillar-icon">🔔</span>

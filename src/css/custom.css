@@ -1,21 +1,27 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap');
 
 /**
- * PrintPrice OS Documentation - Design System v2.0
- * Aesthetic: Premium Industrial / Developer Infrastructure
- * Color Palette: Azul Noche (#070b14, #0b1329), Azul Eléctrico (#2563eb, #3b82f6), Grises Neutros (#64748b, #94a3b8, #e2e8f0)
+ * PrintPrice OS Documentation - Design System v2.1 (Red Identity)
+ * Aesthetic: Industrial Technical / Control Plane Canon
+ * Palette:
+ *   - Acento principal: #E53935
+ *   - Hover: #FF5252
+ *   - Rojo profundo: #B71C1C
+ *   - Fondos oscuros: #0B0D12
+ *   - Superficies oscuras: #151820
+ *   - Texto: blanco y grises neutros (#FFFFFF, #F8FAFC, #94A3B8, #64748B)
  */
 
 :root {
-  /* Brand Core - Electric Royal Blue */
-  --ifm-color-primary: #1d4ed8;
-  --ifm-color-primary-dark: #1e40af;
-  --ifm-color-primary-darker: #1e3a8a;
-  --ifm-color-primary-darkest: #172554;
-  --ifm-color-primary-light: #2563eb;
-  --ifm-color-primary-lighter: #3b82f6;
-  --ifm-color-primary-lightest: #60a5fa;
-  --ifm-color-primary-contrast-background: rgba(37, 99, 235, 0.08);
+  /* Brand Core - PrintPrice Red */
+  --ifm-color-primary: #E53935;
+  --ifm-color-primary-dark: #d32f2f;
+  --ifm-color-primary-darker: #c62828;
+  --ifm-color-primary-darkest: #B71C1C;
+  --ifm-color-primary-light: #ef5350;
+  --ifm-color-primary-lighter: #e57373;
+  --ifm-color-primary-lightest: #FF5252;
+  --ifm-color-primary-contrast-background: rgba(229, 57, 53, 0.08);
 
   /* Typography */
   --ifm-font-family-base: 'Plus Jakarta Sans', 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -31,25 +37,25 @@
   --ifm-color-content-secondary: #475569;
   --ifm-border-color: #e2e8f0;
   --ifm-toc-border-color: #e2e8f0;
-  --ifm-navbar-background-color: rgba(255, 255, 255, 0.85);
+  --ifm-navbar-background-color: rgba(255, 255, 255, 0.9);
   --ifm-navbar-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
-  --ifm-footer-background-color: #070b14;
+  --ifm-footer-background-color: #0B0D12;
   --ifm-footer-color: #94a3b8;
   --ifm-footer-link-color: #f8fafc;
 
-  /* Industrial Design Tokens */
-  --ppos-electric-blue: #2563eb;
-  --ppos-electric-cyan: #06b6d4;
-  --ppos-electric-glow: rgba(37, 99, 235, 0.2);
-  --ppos-night-bg: #070b14;
-  --ppos-night-surface: #0b1329;
-  --ppos-night-card: #0f1a36;
+  /* Industrial Design Tokens - Light */
+  --ppos-red-primary: #E53935;
+  --ppos-red-hover: #FF5252;
+  --ppos-red-deep: #B71C1C;
+  --ppos-red-glow: rgba(229, 57, 53, 0.2);
+  --ppos-dark-bg: #0B0D12;
+  --ppos-dark-surface: #151820;
   --ppos-card-bg: #ffffff;
   --ppos-card-border: #e2e8f0;
-  --ppos-card-hover-border: #2563eb;
-  --ppos-tag-bg: #eff6ff;
-  --ppos-tag-text: #1d4ed8;
-  --ppos-tag-border: #bfdbfe;
+  --ppos-card-hover-border: #E53935;
+  --ppos-tag-bg: rgba(229, 57, 53, 0.07);
+  --ppos-tag-text: #B71C1C;
+  --ppos-tag-border: rgba(229, 57, 53, 0.22);
   --ppos-code-bg: #f8fafc;
   --ppos-code-border: #e2e8f0;
   --ppos-radius-sm: 4px;
@@ -58,40 +64,41 @@
 }
 
 [data-theme='dark'] {
-  /* Brand Core - Vibrant Electric Blue */
-  --ifm-color-primary: #3b82f6;
-  --ifm-color-primary-dark: #2563eb;
-  --ifm-color-primary-darker: #1d4ed8;
-  --ifm-color-primary-darkest: #1e3a8a;
-  --ifm-color-primary-light: #60a5fa;
-  --ifm-color-primary-lighter: #93c5fd;
-  --ifm-color-primary-lightest: #bfdbfe;
-  --ifm-color-primary-contrast-background: rgba(59, 130, 246, 0.12);
+  /* Brand Core - Dark Mode Red */
+  --ifm-color-primary: #E53935;
+  --ifm-color-primary-dark: #d32f2f;
+  --ifm-color-primary-darker: #c62828;
+  --ifm-color-primary-darkest: #B71C1C;
+  --ifm-color-primary-light: #FF5252;
+  --ifm-color-primary-lighter: #ff7979;
+  --ifm-color-primary-lightest: #ff9e9e;
+  --ifm-color-primary-contrast-background: rgba(229, 57, 53, 0.12);
 
-  /* Surfaces & Layout (Dark Mode - Azul Noche Industrial) */
-  --ifm-background-color: #070b14;
-  --ifm-background-surface-color: #0b1329;
+  /* Surfaces & Layout (Dark Mode: #0B0D12 & #151820) */
+  --ifm-background-color: #0B0D12;
+  --ifm-background-surface-color: #151820;
   --ifm-color-content: #f8fafc;
   --ifm-color-content-secondary: #94a3b8;
   --ifm-border-color: rgba(255, 255, 255, 0.08);
   --ifm-toc-border-color: rgba(255, 255, 255, 0.08);
-  --ifm-navbar-background-color: rgba(7, 11, 20, 0.85);
-  --ifm-footer-background-color: #04070d;
+  --ifm-navbar-background-color: rgba(11, 13, 18, 0.88);
+  --ifm-footer-background-color: #07080c;
   --ifm-footer-color: #64748b;
   --ifm-footer-link-color: #e2e8f0;
 
   /* Industrial Design Tokens - Dark */
-  --ppos-electric-blue: #3b82f6;
-  --ppos-electric-cyan: #38bdf8;
-  --ppos-electric-glow: rgba(59, 130, 246, 0.25);
-  --ppos-card-bg: #0c1427;
-  --ppos-card-border: rgba(59, 130, 246, 0.16);
-  --ppos-card-hover-border: #3b82f6;
-  --ppos-tag-bg: rgba(37, 99, 235, 0.16);
-  --ppos-tag-text: #93c5fd;
-  --ppos-tag-border: rgba(59, 130, 246, 0.3);
-  --ppos-code-bg: #090e1a;
-  --ppos-code-border: rgba(255, 255, 255, 0.1);
+  --ppos-red-primary: #E53935;
+  --ppos-red-hover: #FF5252;
+  --ppos-red-deep: #B71C1C;
+  --ppos-red-glow: rgba(229, 57, 53, 0.28);
+  --ppos-card-bg: #151820;
+  --ppos-card-border: rgba(255, 255, 255, 0.08);
+  --ppos-card-hover-border: #FF5252;
+  --ppos-tag-bg: rgba(229, 57, 53, 0.14);
+  --ppos-tag-text: #FF5252;
+  --ppos-tag-border: rgba(229, 57, 53, 0.28);
+  --ppos-code-bg: #0e1017;
+  --ppos-code-border: rgba(255, 255, 255, 0.08);
 }
 
 /* Base Smoothing & Scrollbars */
@@ -112,7 +119,7 @@ html {
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--ifm-color-primary);
+  background: var(--ppos-red-primary);
 }
 
 /* ==========================================================================
@@ -156,11 +163,11 @@ html {
 
 .navbar__item:hover,
 .navbar__link:hover {
-  color: var(--ifm-color-primary);
+  color: var(--ppos-red-hover);
 }
 
 .navbar__link--active {
-  color: var(--ifm-color-primary) !important;
+  color: var(--ppos-red-primary) !important;
   font-weight: 600;
   position: relative;
 }
@@ -193,16 +200,16 @@ html {
 
 .menu__link:hover {
   background: var(--ifm-color-primary-contrast-background);
-  color: var(--ifm-color-primary);
+  color: var(--ppos-red-hover);
 }
 
 .menu__link--active:not(.menu__link--sublist) {
-  color: var(--ifm-color-primary) !important;
+  color: var(--ppos-red-primary) !important;
   background: var(--ifm-color-primary-contrast-background);
   font-weight: 600;
-  border-left: 3px solid var(--ifm-color-primary);
+  border-left: 3px solid var(--ppos-red-primary);
   border-radius: 0 var(--ppos-radius-sm) var(--ppos-radius-sm) 0;
-  box-shadow: inset 1px 0 0 rgba(37, 99, 235, 0.2);
+  box-shadow: inset 1px 0 0 rgba(229, 57, 53, 0.2);
 }
 
 .menu__list-item-collapsible {
@@ -228,7 +235,7 @@ code {
   border-radius: var(--ppos-radius-sm);
   border: 1px solid var(--ppos-code-border);
   background-color: var(--ppos-code-bg);
-  color: var(--ifm-color-primary);
+  color: var(--ppos-red-primary);
   font-weight: 500;
 }
 
@@ -290,9 +297,9 @@ pre code {
 }
 
 .badge-http-post {
-  background: rgba(37, 99, 235, 0.12);
-  color: #3b82f6;
-  border: 1px solid rgba(37, 99, 235, 0.3);
+  background: rgba(229, 57, 53, 0.12);
+  color: #E53935;
+  border: 1px solid rgba(229, 57, 53, 0.3);
 }
 
 .badge-http-put {
@@ -308,7 +315,7 @@ pre code {
 }
 
 /* ==========================================================================
-   Admonitions & Callouts
+   Admonitions & Callouts (Distinct Status Colors, Never Indiscriminate Red)
    ========================================================================== */
 .alert {
   border-radius: var(--ppos-radius-md);
@@ -321,13 +328,15 @@ pre code {
   line-height: 1.6;
 }
 
+/* Info: Neutral Slate / Dark Technical (Never Blue, Never Fake Red) */
 .alert--info {
-  background-color: rgba(37, 99, 235, 0.08);
-  border-color: rgba(37, 99, 235, 0.25);
-  border-left-color: #2563eb;
+  background-color: rgba(100, 116, 139, 0.08);
+  border-color: rgba(100, 116, 139, 0.25);
+  border-left-color: #64748b;
   color: var(--ifm-color-content);
 }
 
+/* Success: Clear Emerald Green */
 .alert--success {
   background-color: rgba(16, 185, 129, 0.08);
   border-color: rgba(16, 185, 129, 0.25);
@@ -335,6 +344,7 @@ pre code {
   color: var(--ifm-color-content);
 }
 
+/* Warning: Clear Amber */
 .alert--warning {
   background-color: rgba(245, 158, 11, 0.08);
   border-color: rgba(245, 158, 11, 0.25);
@@ -342,10 +352,11 @@ pre code {
   color: var(--ifm-color-content);
 }
 
+/* Danger / Error: Authority Corporate Red */
 .alert--danger {
-  background-color: rgba(239, 68, 68, 0.08);
-  border-color: rgba(239, 68, 68, 0.25);
-  border-left-color: #ef4444;
+  background-color: rgba(229, 57, 53, 0.08);
+  border-color: rgba(229, 57, 53, 0.25);
+  border-left-color: #E53935;
   color: var(--ifm-color-content);
 }
 
@@ -412,11 +423,11 @@ tr:hover td {
 }
 
 .table-of-contents__link:hover {
-  color: var(--ifm-color-primary);
+  color: var(--ppos-red-hover);
 }
 
 .table-of-contents__link--active {
-  color: var(--ifm-color-primary) !important;
+  color: var(--ppos-red-primary) !important;
   font-weight: 600;
 }
 
@@ -427,12 +438,12 @@ tr:hover td {
 }
 
 .breadcrumbs__item--active .breadcrumbs__link {
-  color: var(--ifm-color-primary);
+  color: var(--ppos-red-primary);
   font-weight: 600;
 }
 
 /* ==========================================================================
-   Redesigned Homepage (Industrial Theme)
+   Redesigned Homepage (Industrial Red Identity)
    ========================================================================== */
 .portal-hero {
   padding: 4.5rem 1.5rem 3rem;
@@ -442,7 +453,7 @@ tr:hover td {
   position: relative;
 }
 
-/* Hero Background Glows */
+/* Hero Background Glows - Deep Red Ambient */
 .portal-hero::before {
   content: '';
   position: absolute;
@@ -450,13 +461,13 @@ tr:hover td {
   left: 20%;
   width: 600px;
   height: 350px;
-  background: radial-gradient(circle, rgba(37, 99, 235, 0.12) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(229, 57, 53, 0.1) 0%, transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
 
 [data-theme='dark'] .portal-hero::before {
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(229, 57, 53, 0.14) 0%, transparent 70%);
 }
 
 .portal-hero > * {
@@ -487,12 +498,12 @@ tr:hover td {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background-color: var(--ifm-color-primary);
-  box-shadow: 0 0 8px var(--ifm-color-primary);
-  animation: pulse-glow 2s infinite ease-in-out;
+  background-color: var(--ppos-red-primary);
+  box-shadow: 0 0 8px var(--ppos-red-primary);
+  animation: pulse-glow-red 2s infinite ease-in-out;
 }
 
-@keyframes pulse-glow {
+@keyframes pulse-glow-red {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.4; transform: scale(0.85); }
 }
@@ -508,7 +519,7 @@ tr:hover td {
 }
 
 .portal-title-highlight {
-  background: linear-gradient(135deg, var(--ifm-color-primary) 0%, #38bdf8 100%);
+  background: linear-gradient(135deg, #E53935 0%, #FF5252 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -537,8 +548,8 @@ tr:hover td {
 }
 
 .portal-search-bar:hover {
-  border-color: var(--ifm-color-primary);
-  box-shadow: 0 8px 24px var(--ppos-electric-glow);
+  border-color: var(--ppos-red-primary);
+  box-shadow: 0 8px 24px var(--ppos-red-glow);
   transform: translateY(-1px);
 }
 
@@ -581,21 +592,22 @@ tr:hover td {
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
-  background: linear-gradient(135deg, var(--ifm-color-primary) 0%, var(--ifm-color-primary-dark) 100%);
+  background: linear-gradient(135deg, #E53935 0%, #B71C1C 100%);
   color: #ffffff !important;
   font-weight: 600;
   font-size: 0.925rem;
   padding: 0.75rem 1.5rem;
   border-radius: var(--ppos-radius-md);
   text-decoration: none !important;
-  box-shadow: 0 4px 14px var(--ppos-electric-glow);
+  box-shadow: 0 4px 14px var(--ppos-red-glow);
   transition: all 0.2s ease;
 }
 
 .portal-btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 22px var(--ppos-electric-glow);
-  filter: brightness(1.08);
+  background: linear-gradient(135deg, #FF5252 0%, #E53935 100%);
+  box-shadow: 0 8px 22px var(--ppos-red-glow);
+  filter: brightness(1.06);
 }
 
 .portal-btn-secondary {
@@ -614,14 +626,14 @@ tr:hover td {
 }
 
 .portal-btn-secondary:hover {
-  border-color: var(--ifm-color-primary);
-  color: var(--ifm-color-primary) !important;
+  border-color: var(--ppos-red-primary);
+  color: var(--ppos-red-primary) !important;
   background: var(--ifm-color-primary-contrast-background);
   transform: translateY(-1px);
 }
 
 /* ==========================================================================
-   The 4 Core Pillars (Primary Industrial Cards)
+   The 4 Core Pillars (Primary Industrial Cards - Red Accents)
    ========================================================================== */
 .portal-section-header {
   border-top: 1px solid var(--ifm-border-color);
@@ -634,7 +646,7 @@ tr:hover td {
   font-family: var(--ifm-font-family-monospace);
   font-size: 0.725rem;
   font-weight: 700;
-  color: var(--ifm-color-primary);
+  color: var(--ppos-red-primary);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin-bottom: 0.5rem;
@@ -684,19 +696,19 @@ tr:hover td {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--ifm-color-primary), #38bdf8);
+  background: linear-gradient(90deg, #E53935, #FF5252);
   opacity: 0;
   transition: opacity 0.25s ease;
 }
 
 .pillar-card:hover {
-  border-color: var(--ppos-card-hover-border);
+  border-color: var(--ppos-red-hover);
   transform: translateY(-3px);
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06);
 }
 
 [data-theme='dark'] .pillar-card:hover {
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), 0 0 20px var(--ppos-electric-glow);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), 0 0 20px var(--ppos-red-glow);
 }
 
 .pillar-card:hover::before {
@@ -724,7 +736,7 @@ tr:hover td {
 
 .pillar-icon {
   font-size: 1.25rem;
-  color: var(--ifm-color-primary);
+  color: var(--ppos-red-primary);
 }
 
 .pillar-title {
@@ -749,7 +761,7 @@ tr:hover td {
   gap: 0.4rem;
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--ifm-color-primary);
+  color: var(--ppos-red-primary);
   border-top: 1px solid var(--ifm-border-color);
   padding-top: 1rem;
 }
@@ -767,8 +779,8 @@ tr:hover td {
 }
 
 [data-theme='dark'] .quickstart-section {
-  background: var(--ppos-night-surface);
-  border-color: rgba(59, 130, 246, 0.2);
+  background: var(--ppos-dark-surface);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 .quickstart-header {
@@ -796,7 +808,7 @@ tr:hover td {
 .quickstart-cta-link {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--ifm-color-primary);
+  color: var(--ppos-red-primary);
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -804,16 +816,17 @@ tr:hover td {
 }
 
 .quickstart-cta-link:hover {
+  color: var(--ppos-red-hover);
   text-decoration: underline;
 }
 
 /* Terminal Box */
 .terminal-box {
-  background: #060a12;
-  border: 1px solid #1e293b;
+  background: #080a0f;
+  border: 1px solid #1a1e28;
   border-radius: var(--ppos-radius-md);
   overflow: hidden;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
 }
 
 .terminal-header {
@@ -821,8 +834,8 @@ tr:hover td {
   align-items: center;
   justify-content: space-between;
   padding: 0.65rem 1rem;
-  background: #0b1120;
-  border-bottom: 1px solid #1e293b;
+  background: #0e121a;
+  border-bottom: 1px solid #1a1e28;
 }
 
 .terminal-dots {
@@ -857,8 +870,9 @@ tr:hover td {
 }
 
 .terminal-tab.active {
-  background: #1e293b;
-  color: #38bdf8;
+  background: rgba(229, 57, 53, 0.16);
+  color: #FF5252;
+  border: 1px solid rgba(229, 57, 53, 0.35);
   font-weight: 600;
 }
 
@@ -916,7 +930,7 @@ tr:hover td {
 }
 
 .portal-matrix-col a:hover {
-  color: var(--ifm-color-primary);
+  color: var(--ppos-red-hover);
   transform: translateX(2px);
 }
 
