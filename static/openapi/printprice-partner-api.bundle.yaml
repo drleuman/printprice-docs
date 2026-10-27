@@ -21,10 +21,8 @@ info:
     identifier: Proprietary
 
 servers:
-  - url: http://localhost:4010
-    description: Servidor Mock Local (Prism / Simulación Determinista Fuera de Línea)
-  - url: http://localhost:3000
-    description: Servidor de Desarrollo Local Control Plane (Sin Certificación de Staging ni Producción)
+  - url: https://api.printprice.pro
+    description: Servidor de Producción PrintPrice OS (Requiere credenciales emitidas por soporte)
 
 tags:
   - name: Marketplace Offers
@@ -46,8 +44,6 @@ paths:
       x-ppos-lifecycle: IMPLEMENTED_IN_CODE
       x-ppos-controller: src/api/routes/marketplacePublic.js:16
       x-ppos-runtime-status: PENDING_RUNTIME_VERIFICATION
-      x-ppos-proposed-request-schema:
-        $ref: '#/components/schemas/ProposedOfferRequestPayload'
       security: []
       parameters:
         - name: x-trace-id
@@ -734,8 +730,6 @@ paths:
       x-ppos-lifecycle: IMPLEMENTED_IN_CODE
       x-ppos-controller: src/api/routes/publicPreflight.js:6
       x-ppos-runtime-status: PENDING_RUNTIME_VERIFICATION
-      x-ppos-proposed-response-404:
-        $ref: '#/components/schemas/ProposedPreflightReport404Response'
       security: []
       parameters:
         - name: token
@@ -1475,63 +1469,3 @@ components:
             - type: string
               format: date-time
             - type: "null"
-
-    ProposedOfferRequestPayload:
-      type: object
-      description: |
-        [CONTRATO OBJETIVO PROPUESTO DEV-02]: Esquema propuesto para futuras versiones del endpoint de cotizaciones.
-        A diferencia del contrato activo en ejecución (`OfferRequestPayload`), esta propuesta:
-        1. Exige estrictamente `type: integer` con `minimum: 1` para `copies` e `interior_pages`.
-        2. Admite objeto dimensional `{ width, height, unit }` para formatos no estándar.
-      required:
-        - copies
-        - interior_pages
-      properties:
-        copies:
-          type: integer
-          minimum: 1
-          example: 500
-        interior_pages:
-          type: integer
-          minimum: 1
-          example: 192
-        format:
-          description: Formato estándar en cadena u objeto dimensional explícito.
-          oneOf:
-            - type: string
-              example: "148x210"
-            - type: object
-              required:
-                - width
-                - height
-              properties:
-                width:
-                  type: number
-                  example: 148
-                height:
-                  type: number
-                  example: 210
-                unit:
-                  type: string
-                  default: "mm"
-                  example: "mm"
-
-    ProposedPreflightReport404Response:
-      type: object
-      description: |
-        [CONTRATO OBJETIVO PROPUESTO DEV-02]: Respuesta propuesta ante capturas de informe inexistentes.
-        Actualmente `src/api/routes/publicPreflight.js:12` responde HTTP 400 por `result.statusCode || 400`.
-        Esta propuesta define la respuesta semántica futura con código HTTP 404.
-      required:
-        - ok
-        - error
-      properties:
-        ok:
-          type: boolean
-          example: false
-        error:
-          type: string
-          example: "SNAPSHOT_NOT_FOUND"
-        message:
-          type: string
-          example: "The report snapshot no longer exists."

@@ -18,8 +18,6 @@ info:
     identifier: Proprietary
 
 servers:
-  - url: http://localhost:4010
-    description: Servidor Mock Local (Prism / Simulación Fuera de Línea)
   - url: https://api.printprice.pro
     description: Servidor de Producción Gateway
 

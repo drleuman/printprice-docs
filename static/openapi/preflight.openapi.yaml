@@ -18,10 +18,8 @@ info:
     identifier: Proprietary
 
 servers:
-  - url: http://localhost:4010
-    description: Servidor Mock Local (Prism / Simulación Fuera de Línea)
   - url: https://api.printprice.pro
-    description: Servidor de Producción Gateway
+    description: Servidor de Producción PrintPrice OS (Preflight Engine)
 
 tags:
   - name: Preflight Capabilities
@@ -60,6 +58,8 @@ paths:
                   - "ISO_216_A_SERIES"
                   - "STANDARD_BOOK_SIZES"
                 maxUploadSizeBytes: 2147483648
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
 
   /api/preflight/jobs:
     post:
@@ -203,6 +203,10 @@ paths:
                   status:
                     type: string
                     example: "FIXING"
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/ErrorResponse'
 
   /api/preflight/jobs/{id}/artifacts/{artifactId}:
     get:
@@ -284,3 +288,22 @@ components:
           type: boolean
         job:
           type: object
+
+    ErrorResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          example: false
+        error:
+          type: string
+        message:
+          type: string
+
+  responses:
+    ErrorResponse:
+      description: Error en la solicitud o fallo de validación
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'

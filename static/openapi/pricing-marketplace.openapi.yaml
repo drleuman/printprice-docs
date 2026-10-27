@@ -19,8 +19,6 @@ info:
     identifier: Proprietary
 
 servers:
-  - url: http://localhost:4010
-    description: Servidor Mock Local (Prism / Simulación Determinista Fuera de Línea)
   - url: https://api.printprice.pro
     description: Servidor de Producción (Requiere credenciales y autorización comercial)
 
@@ -268,6 +266,8 @@ paths:
                     type: string
                   selectedOfferId:
                     type: string
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
 
   /api/marketplace/orders/{orderId}/files/register:
     post:
@@ -337,6 +337,8 @@ paths:
                     type: string
                   status:
                     type: string
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
 
   /api/marketplace/orders/{orderId}/files/{fileId}/preflight-bind:
     post:
@@ -387,6 +389,8 @@ paths:
                     type: string
                   boundAt:
                     type: string
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
 
   /api/marketplace/orders/{orderId}/readiness/recompute:
     post:
@@ -427,6 +431,8 @@ paths:
                         type: array
                         items:
                           type: string
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
 
 components:
   securitySchemes:
@@ -495,11 +501,13 @@ components:
           items:
             $ref: '#/components/schemas/OfferItem'
         recommended_offer_id:
-          type: string
-          nullable: true
+          type:
+            - string
+            - "null"
         raw_recommended_offer_id:
-          type: string
-          nullable: true
+          type:
+            - string
+            - "null"
         trace_id:
           type: string
 
@@ -513,6 +521,8 @@ components:
         house_id:
           type: string
         printer_id:
+          type: string
+        print_house_id:
           type: string
         print_house:
           type: string
@@ -617,3 +627,11 @@ components:
           type: string
         error:
           type: string
+
+  responses:
+    ErrorResponse:
+      description: Error en la solicitud o fallo de validación
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
