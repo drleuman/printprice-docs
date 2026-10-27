@@ -29,9 +29,15 @@ try:
     if res3.returncode != 0:
         print("[FAIL] test_mobile_hamburger.py failed!")
         sys.exit(1)
+
+    print("\n>>> RUNNING test_final_adjustments.py...")
+    res4 = subprocess.run([sys.executable, "scripts/test_final_adjustments.py"], cwd=docs_dir)
+    if res4.returncode != 0:
+        print("[FAIL] test_final_adjustments.py failed!")
+        sys.exit(1)
         
     print("\n==========================================")
-    print("ALL 3 SUITES PASSED FLAWLESSLY!")
+    print("ALL 4 SUITES PASSED FLAWLESSLY!")
     print("==========================================")
 finally:
     server.terminate()

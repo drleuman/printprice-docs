@@ -12,21 +12,32 @@ This contract is implemented in the Control Plane at `src/api/routes/marketplace
 
 ```mermaid
 flowchart LR
-    Req["1. POST /api/marketplace/offers<br/>x-trace-id correlation header"] --> Val["Fastify Schema Validator<br/>Validates payload presence"]
-    Val --> BPE["2. Book Pricing Engine (:8004)<br/>Calculates imposition, press & waste"]
-    BPE --> Decouple["3. Margin Governance<br/>Decouples total_cost vs total_price"]
-    Decouple --> Evidence["4. Cryptographic Anchor<br/>Binds immutable evidenceId"]
-    Evidence --> Resp["200 OK Response<br/>Itemized offers[] breakdown"]
+    subgraph S1 ["Stage 1 · Ingestion & Validation"]
+        direction TB
+        Req["1. POST /api/marketplace/offers<br/>x-trace-id header"] --> Val["Fastify Schema Validator<br/>Validates payload presence"]
+    end
 
-    classDef stageNode fill:#151820,stroke:#64748B,stroke-width:1.5px,color:#FFFFFF;
-    classDef bpeNode fill:#1A1E29,stroke:#E53935,stroke-width:2px,color:#FFFFFF;
-    classDef econNode fill:#151820,stroke:#FF5252,stroke-width:1.5px,color:#FFFFFF;
-    classDef outNode fill:#151820,stroke:#10B981,stroke-width:1.5px,color:#FFFFFF;
+    subgraph S2 ["Stage 2 · Algorithmic Pricing"]
+        direction TB
+        BPE["2. Book Pricing Engine (:8004)<br/>Calculates imposition & waste"] --> Decouple["3. Margin Governance<br/>Decouples cost vs price"]
+    end
 
-    class Req,Val stageNode;
-    class BPE bpeNode;
-    class Decouple econNode;
-    class Evidence,Resp outNode;
+    subgraph S3 ["Stage 3 · Proof & Settlement"]
+        direction TB
+        Evidence["4. Cryptographic Anchor<br/>Binds immutable evidenceId"] --> Resp["200 OK Response<br/>Itemized offers[] breakdown"]
+    end
+
+    S1 --> S2 --> S3
+
+    classDef stageBox fill:#0E1118,stroke:#334155,stroke-width:1px,color:#94A3B8;
+    classDef defaultNode fill:#151820,stroke:#64748B,stroke-width:1.5px,color:#FFFFFF;
+    classDef bpeNode fill:#1E1717,stroke:#E53935,stroke-width:2px,color:#FFFFFF;
+    classDef successNode fill:#10221B,stroke:#10B981,stroke-width:1.5px,color:#FFFFFF;
+
+    class S1,S2,S3 stageBox;
+    class Req,Val defaultNode;
+    class BPE,Decouple bpeNode;
+    class Evidence,Resp successNode;
 ```
 
 ---

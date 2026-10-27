@@ -18,9 +18,13 @@ function DiagramModal({
   onClose: () => void;
   triggerRef: React.RefObject<HTMLButtonElement>;
 }) {
-  const [zoom, setZoom] = useState(1);
+  const [zoom, setZoom] = useState(1); // Standard 100% baseline zoom
+  const [isDragging, setIsDragging] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const dragStartRef = useRef({ x: 0, y: 0, scrollLeft: 0, scrollTop: 0 });
+  const isDraggingRef = useRef(false);
 
   useEffect(() => {
     // Focus close button on mount
@@ -63,8 +67,60 @@ function DiagramModal({
   }, [onClose, triggerRef]);
 
   const handleZoomIn = () => setZoom((z) => Math.min(3, Math.round((z + 0.25) * 100) / 100));
-  const handleZoomOut = () => setZoom((z) => Math.max(0.5, Math.round((z - 0.25) * 100) / 100));
-  const handleZoomReset = () => setZoom(1);
+  const handleZoomOut = () => setZoom((z) => Math.max(0.6, Math.round((z - 0.25) * 100) / 100));
+  const handleZoomReset = () => {
+    setZoom(1);
+    if (bodyRef.current) {
+      bodyRef.current.scrollLeft = (bodyRef.current.scrollWidth - bodyRef.current.clientWidth) / 2;
+      bodyRef.current.scrollTop = 0;
+    }
+  };
+
+  // Real Drag-to-Pan Implementation
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.button !== 0 || !bodyRef.current) return;
+    isDraggingRef.current = true;
+    setIsDragging(true);
+    dragStartRef.current = {
+      x: e.pageX,
+      y: e.pageY,
+      scrollLeft: bodyRef.current.scrollLeft,
+      scrollTop: bodyRef.current.scrollTop,
+    };
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isDraggingRef.current || !bodyRef.current) return;
+    e.preventDefault();
+    const dx = e.pageX - dragStartRef.current.x;
+    const dy = e.pageY - dragStartRef.current.y;
+    bodyRef.current.scrollLeft = dragStartRef.current.scrollLeft - dx;
+    bodyRef.current.scrollTop = dragStartRef.current.scrollTop - dy;
+  };
+
+  const handleMouseUpOrLeave = () => {
+    isDraggingRef.current = false;
+    setIsDragging(false);
+  };
+
+  // Accessible Arrow Key Panning
+  const handleCanvasKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!bodyRef.current) return;
+    const step = 60;
+    if (e.key === 'ArrowRight') {
+      bodyRef.current.scrollLeft += step;
+      e.preventDefault();
+    } else if (e.key === 'ArrowLeft') {
+      bodyRef.current.scrollLeft -= step;
+      e.preventDefault();
+    } else if (e.key === 'ArrowDown') {
+      bodyRef.current.scrollTop += step;
+      e.preventDefault();
+    } else if (e.key === 'ArrowUp') {
+      bodyRef.current.scrollTop -= step;
+      e.preventDefault();
+    }
+  };
 
   if (typeof document === 'undefined') return null;
 
@@ -132,13 +188,23 @@ function DiagramModal({
           </div>
         </div>
 
-        <div className="diagram-modal-body" tabIndex={0} aria-label="Navigable diagram canvas">
+        <div
+          ref={bodyRef}
+          className={`diagram-modal-body ${isDragging ? 'is-dragging' : ''}`}
+          tabIndex={0}
+          aria-label="Navigable diagram canvas. Drag or use arrow keys to pan."
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUpOrLeave}
+          onMouseLeave={handleMouseUpOrLeave}
+          onKeyDown={handleCanvasKeyDown}
+        >
           <div
             className="diagram-modal-svg-wrapper"
             style={{
               transform: `scale(${zoom})`,
               transformOrigin: 'top center',
-              transition: 'transform 0.15s ease-out',
+              transition: isDragging ? 'none' : 'transform 0.15s ease-out',
             }}
             // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{ __html: svg }}
@@ -146,7 +212,7 @@ function DiagramModal({
         </div>
 
         <div className="diagram-modal-footer">
-          <span>Use arrow keys or drag to pan · Press <kbd>Esc</kbd> to close</span>
+          <span>Drag canvas or use arrow keys to pan · Click + / − to zoom · Press <kbd>Esc</kbd> to close</span>
         </div>
       </div>
     </div>,
