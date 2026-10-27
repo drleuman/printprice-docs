@@ -73,7 +73,7 @@ function DiagramModal({
       className="diagram-modal-overlay"
       role="dialog"
       aria-modal="true"
-      aria-label="Diagrama ampliado en alta resolución"
+      aria-label="High-resolution enlarged diagram"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           onClose();
@@ -85,7 +85,7 @@ function DiagramModal({
         <div className="diagram-modal-header">
           <div className="diagram-modal-title">
             <span className="diagram-modal-dot"></span>
-            <span>Inspección Técnica de Arquitectura</span>
+            <span>Technical Architecture Inspection</span>
           </div>
 
           <div className="diagram-modal-controls">
@@ -93,8 +93,8 @@ function DiagramModal({
               type="button"
               className="diagram-modal-btn"
               onClick={handleZoomOut}
-              aria-label="Reducir zoom"
-              title="Reducir zoom"
+              aria-label="Zoom out"
+              title="Zoom out"
             >
               −
             </button>
@@ -102,8 +102,8 @@ function DiagramModal({
               type="button"
               className="diagram-modal-btn diagram-modal-btn-reset"
               onClick={handleZoomReset}
-              aria-label="Restablecer zoom al 100%"
-              title="Restablecer zoom al 100%"
+              aria-label="Reset zoom to 100%"
+              title="Reset zoom to 100%"
             >
               {Math.round(zoom * 100)}%
             </button>
@@ -111,8 +111,8 @@ function DiagramModal({
               type="button"
               className="diagram-modal-btn"
               onClick={handleZoomIn}
-              aria-label="Aumentar zoom"
-              title="Aumentar zoom"
+              aria-label="Zoom in"
+              title="Zoom in"
             >
               +
             </button>
@@ -124,15 +124,15 @@ function DiagramModal({
                 onClose();
                 triggerRef.current?.focus();
               }}
-              aria-label="Cerrar ampliación (Esc)"
-              title="Cerrar ampliación (Esc)"
+              aria-label="Close enlarged view (Esc)"
+              title="Close enlarged view (Esc)"
             >
-              ✕ Cerrar
+              ✕ Close
             </button>
           </div>
         </div>
 
-        <div className="diagram-modal-body" tabIndex={0} aria-label="Lienzo de diagrama navegable">
+        <div className="diagram-modal-body" tabIndex={0} aria-label="Navigable diagram canvas">
           <div
             className="diagram-modal-svg-wrapper"
             style={{
@@ -146,7 +146,7 @@ function DiagramModal({
         </div>
 
         <div className="diagram-modal-footer">
-          <span>Usa las teclas de flecha o el ratón para desplazar · <kbd>Esc</kbd> para cerrar</span>
+          <span>Use arrow keys or drag to pan · Press <kbd>Esc</kbd> to close</span>
         </div>
       </div>
     </div>,
@@ -173,14 +173,14 @@ function MermaidRenderResult({
   return (
     <div className="diagram-card-wrapper">
       <div className="diagram-toolbar">
-        <span className="diagram-toolbar-badge">SVG Mermaid Interactivo</span>
+        <span className="diagram-toolbar-badge">Interactive Mermaid SVG</span>
         <button
           ref={zoomBtnRef}
           type="button"
           className="diagram-zoom-trigger"
           onClick={() => setIsModalOpen(true)}
-          aria-label="Ampliar diagrama en modal de alta resolución"
-          title="Ampliar diagrama a pantalla completa"
+          aria-label="Enlarge diagram in high-resolution modal"
+          title="Enlarge diagram to full screen modal"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <circle cx="11" cy="11" r="8"></circle>
@@ -188,7 +188,7 @@ function MermaidRenderResult({
             <line x1="11" y1="8" x2="11" y2="14"></line>
             <line x1="8" y1="11" x2="14" y2="11"></line>
           </svg>
-          <span>Ampliar Diagrama</span>
+          <span>Expand Diagram</span>
         </button>
       </div>
 
@@ -197,7 +197,7 @@ function MermaidRenderResult({
         className={`${MermaidContainerClassName} diagram-svg-viewport`}
         tabIndex={0}
         role="region"
-        aria-label="Diagrama técnico renderizado en SVG"
+        aria-label="Technical diagram rendered in SVG"
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: renderResult.svg }}
       />

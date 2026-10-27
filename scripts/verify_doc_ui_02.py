@@ -77,8 +77,8 @@ async def run_verifications():
         await copy_btn.click()
         await page.wait_for_timeout(300)
         btn_text = await copy_btn.inner_text()
-        assert "Copiado" in btn_text, f"El botón de copiar no mostró estado 'Copiado': {btn_text}"
-        print("  -> PASS: Botón de copiar verificado con feedback reactivo 'Copiado'.", flush=True)
+        assert "Copied" in btn_text or "Copiado" in btn_text, f"El botón de copiar no mostró estado 'Copied': {btn_text}"
+        print("  -> PASS: Botón de copiar verificado con feedback reactivo 'Copied'.", flush=True)
 
         # Capture desktop light screenshot
         await page.screenshot(path=os.path.join(OUT_DIR, "desktop_home_light.png"))

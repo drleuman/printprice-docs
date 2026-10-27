@@ -85,10 +85,10 @@ The following core contracts have been verified against active controller implem
 
 <div className="table-scroll-indicator">
   <span className="table-scroll-icon">↔</span>
-  <span>Tabla completa con 6 columnas. Desplaza horizontalmente para inspeccionar autenticación, servicio responsable y estado de verificación · Navegable con teclado (<kbd>Tab</kbd> + flechas).</span>
+  <span>Full 6-column specification table. Scroll horizontally to inspect authentication, responsible service, and verification status · Keyboard navigable (<kbd>Tab</kbd> + arrow keys).</span>
 </div>
 
-<div className="table-responsive-wrapper" tabIndex={0} role="region" aria-label="Inventario de endpoints públicos de PrintPrice OS, autenticación y estado de verificación">
+<div className="table-responsive-wrapper" tabIndex={0} role="region" aria-label="PrintPrice OS public endpoint inventory, authentication, and verification status">
 
 | Domain | Method | Effective Path | Authentication | Responsible Service | Production & Verification Status |
 | :--- | :---: | :--- | :--- | :--- | :--- |

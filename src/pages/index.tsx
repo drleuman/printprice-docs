@@ -5,7 +5,7 @@ import Link from '@docusaurus/Link';
 interface SearchItem {
   title: string;
   path: string;
-  category: 'API' | 'Contratos' | 'Guía' | 'Seguridad' | 'Plataforma';
+  category: 'API' | 'Contracts' | 'Guide' | 'Security' | 'Platform';
   desc: string;
   badge?: string;
 }
@@ -15,70 +15,70 @@ const SEARCH_SUGGESTIONS: SearchItem[] = [
     title: 'Pricing & Offers API',
     path: '/docs/api/pricing-api',
     category: 'API',
-    desc: 'Cotización algorítmica de libros en milisegundos con Book Pricing Engine (BPE)',
+    desc: 'Algorithmic book pricing in milliseconds with the Book Pricing Engine (BPE)',
     badge: 'POST /api/marketplace/offers',
   },
   {
     title: 'Preflight PDF Diagnostics',
     path: '/docs/api/preflight-api',
     category: 'API',
-    desc: 'Inspección técnica asíncrona de archivos PDF hasta 2GB y normalización',
+    desc: 'Asynchronous technical inspection of PDF files up to 2GB and automated normalization',
     badge: 'POST /api/preflight/jobs',
   },
   {
     title: 'Marketplace & Order Intake',
     path: '/docs/api/integration-contracts',
     category: 'API',
-    desc: 'Ingesta formal de pedidos, vinculación de archivos y cálculo de readiness',
+    desc: 'Formal order ingestion, file asset binding, and workshop readiness computation',
     badge: 'POST /api/marketplace/orders',
   },
   {
     title: 'Outgoing Event Webhooks',
     path: '/docs/api/webhooks',
     category: 'API',
-    desc: 'Notificaciones push con firma criptográfica HMAC-SHA256 y reintentos',
+    desc: 'Push notifications with HMAC-SHA256 cryptographic signature and retry engine',
     badge: 'HMAC-SHA256 PUSH',
   },
   {
     title: 'API Overview & Architecture',
     path: '/docs/api/overview',
-    category: 'Contratos',
-    desc: 'Superficies públicas, inventario de endpoints y contratos OpenAPI 3.1',
+    category: 'Contracts',
+    desc: 'Public surfaces, comprehensive endpoint inventory, and OpenAPI 3.1 contracts',
     badge: 'OpenAPI 3.1',
   },
   {
-    title: 'Quickstart: Cotiza en 3 Líneas',
+    title: 'Quickstart: Quote in 3 Lines',
     path: '/docs/api/quickstart',
-    category: 'Guía',
-    desc: 'Guía rápida de inicio para desarrolladores e integradores de imprenta',
+    category: 'Guide',
+    desc: 'Quick start guide for book publishers and print house software integrators',
     badge: 'REST JSON',
   },
   {
-    title: 'Autenticación & Seguridad',
+    title: 'Authentication & Security',
     path: '/docs/api/authentication',
-    category: 'Seguridad',
-    desc: 'Tokens de ingesta M2M, JWT para partners y tokens efímeros de reporte',
+    category: 'Security',
+    desc: 'M2M intake tokens, partner JWT credentials, and ephemeral customer report tokens',
     badge: 'Bearer JWT',
   },
   {
-    title: 'Códigos de Error & Rate Limits',
+    title: 'Error Codes & Rate Limits',
     path: '/docs/api/errors-and-limits',
-    category: 'Contratos',
-    desc: 'Catálogo exhaustivo de errores HTTP RFC 7807 y límites de peticiones',
+    category: 'Contracts',
+    desc: 'Exhaustive catalog of RFC 7807 HTTP problem details and rate limit headers',
     badge: 'RFC 7807',
   },
   {
     title: 'Control Plane Architecture',
     path: '/docs/repositories/ppos-control-plane',
-    category: 'Plataforma',
-    desc: 'Cockpit operacional, multi-tenancy, RBAC y gemelos digitales de taller',
+    category: 'Platform',
+    desc: 'Operational cockpit, multi-tenancy governance, RBAC, and workshop digital twins',
     badge: 'Control Plane',
   },
   {
     title: 'Paper Supplier Hub',
     path: '/docs/platform/paper-supplier-hub',
-    category: 'Plataforma',
-    desc: 'Ecosistema de sustratos, onboarding multilingüe y catálogo de papel',
+    category: 'Platform',
+    desc: 'Substrate master ecosystem, multilingual partner onboarding, and paper catalog',
     badge: 'Substrate Hub',
   },
 ];
@@ -120,7 +120,7 @@ export default function Home(): React.ReactNode {
 });
 
 const data = await response.json();
-console.log("Ofertas obtenidas:", data.offers.length, "Total:", data.offers[0].total_price);`;
+console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].total_price);`;
 
   const handleCopyCode = async () => {
     const codeToCopy = activeTab === 'curl' ? curlCode : jsCode;
@@ -214,7 +214,7 @@ console.log("Ofertas obtenidas:", data.offers.length, "Total:", data.offers[0].t
   return (
     <Layout
       title="PrintPrice OS — Production Intelligence Platform"
-      description="Documentación oficial de APIs y arquitectura de PrintPrice OS: cotización determinista, diagnóstico PDF de preflight y gobernanza de pedidos."
+      description="Official API documentation and technical architecture for PrintPrice OS: deterministic quoting, preflight PDF diagnostics, and order governance."
     >
       <main className="portal-hero">
         {/* Technical Status Badge */}
@@ -225,12 +225,12 @@ console.log("Ofertas obtenidas:", data.offers.length, "Total:", data.offers[0].t
 
         {/* Hero Title & Subtitle */}
         <h1 className="portal-title">
-          Documentación de APIs &amp;{' '}
-          <span className="portal-title-highlight">Inteligencia Gráfica</span>
+          API Documentation &amp;{' '}
+          <span className="portal-title-highlight">Print Intelligence</span>
         </h1>
 
         <p className="portal-subtitle">
-          Plataforma de APIs deterministas para la industria editorial y comercial. Cotización algorítmica de libros en milisegundos, diagnóstico asíncrono de PDFs con Preflight, ingesta gobernada de pedidos y webhooks con firma HMAC.
+          Deterministic API platform for commercial and book printing. Algorithmic quotes in milliseconds with the Book Pricing Engine, asynchronous PDF diagnostics with Preflight, governed order intake, and HMAC-signed webhooks.
         </p>
 
         {/* Interactive Direct Search Bar with Live Panel */}
@@ -260,8 +260,8 @@ console.log("Ofertas obtenidas:", data.offers.length, "Total:", data.offers[0].t
               }}
               onFocus={() => setIsSearchOpen(true)}
               onKeyDown={handleSearchKeyDown}
-              placeholder="Buscar endpoints, esquemas OpenAPI, guías y playbooks..."
-              aria-label="Buscar en la documentación de PrintPrice OS"
+              placeholder="Search endpoints, OpenAPI schemas, guides, and playbooks..."
+              aria-label="Search PrintPrice OS documentation"
               aria-autocomplete="list"
               aria-expanded={isSearchOpen}
             />
@@ -274,22 +274,22 @@ console.log("Ofertas obtenidas:", data.offers.length, "Total:", data.offers[0].t
                   setSearchQuery('');
                   searchInputRef.current?.focus();
                 }}
-                aria-label="Limpiar búsqueda"
+                aria-label="Clear search query"
               >
                 ✕
               </button>
             )}
-            <span className="portal-search-kbd" title="Presiona Ctrl+K para buscar">
+            <span className="portal-search-kbd" title="Press Ctrl+K to search">
               <kbd>Ctrl</kbd> <kbd>K</kbd>
             </span>
           </div>
 
           {/* Live Search Suggestions Dropdown Panel */}
           {isSearchOpen && (
-            <div className="portal-search-dropdown" role="listbox" aria-label="Sugerencias de búsqueda">
+            <div className="portal-search-dropdown" role="listbox" aria-label="Search suggestions">
               <div className="portal-search-dropdown-header">
-                <span>{searchQuery ? `Resultados sugeridos para "${searchQuery}"` : 'Accesos directos recomendados'}</span>
-                <span className="portal-search-dropdown-hint"><kbd>↑</kbd> <kbd>↓</kbd> navegar · <kbd>Enter</kbd> abrir</span>
+                <span>{searchQuery ? `Suggested results for "${searchQuery}"` : 'Recommended quick links'}</span>
+                <span className="portal-search-dropdown-hint"><kbd>↑</kbd> <kbd>↓</kbd> navigate · <kbd>Enter</kbd> open</span>
               </div>
 
               <div className="portal-search-dropdown-list">
@@ -315,13 +315,13 @@ console.log("Ofertas obtenidas:", data.offers.length, "Total:", data.offers[0].t
                   ))
                 ) : (
                   <div className="portal-search-empty">
-                    <p>No se encontraron resultados directos para &ldquo;{searchQuery}&rdquo;</p>
+                    <p>No direct results found for &ldquo;{searchQuery}&rdquo;</p>
                     <Link
                       to={`/search?q=${encodeURIComponent(searchQuery)}`}
                       className="portal-search-empty-link"
                       onClick={() => setIsSearchOpen(false)}
                     >
-                      Buscar &ldquo;{searchQuery}&rdquo; en todo el índice de documentación ➔
+                      Search &ldquo;{searchQuery}&rdquo; in global documentation index ➔
                     </Link>
                   </div>
                 )}
@@ -333,7 +333,7 @@ console.log("Ofertas obtenidas:", data.offers.length, "Total:", data.offers[0].t
                     to={`/search?q=${encodeURIComponent(searchQuery)}`}
                     onClick={() => setIsSearchOpen(false)}
                   >
-                    Ver todos los resultados para &ldquo;{searchQuery}&rdquo; en el buscador global ➔
+                    View all results for &ldquo;{searchQuery}&rdquo; in global search ➔
                   </Link>
                 </div>
               )}
@@ -344,10 +344,10 @@ console.log("Ofertas obtenidas:", data.offers.length, "Total:", data.offers[0].t
         {/* Primary CTA Buttons */}
         <div className="portal-cta-group">
           <Link to="/docs/api/quickstart" className="portal-btn-primary">
-            Empezar a integrar ➔
+            Start Integrating ➔
           </Link>
           <Link to="/docs/api/overview" className="portal-btn-secondary">
-            Ver Contratos OpenAPI
+            View OpenAPI Contracts
           </Link>
           <Link to="/docs/repositories/ppos-control-plane" className="portal-btn-secondary">
             Control Plane Architecture
@@ -358,10 +358,10 @@ console.log("Ofertas obtenidas:", data.offers.length, "Total:", data.offers[0].t
         {/* 4 Main Pillar Cards */}
         {/* ================================================================= */}
         <div className="portal-section-header">
-          <span className="portal-section-tag">Superficies de Integración</span>
-          <h2 className="portal-section-title">Contratos y Motores Principales</h2>
+          <span className="portal-section-tag">Integration Surfaces</span>
+          <h2 className="portal-section-title">Core Contracts &amp; Processing Engines</h2>
           <p className="portal-section-desc">
-            Cuatro módulos desacoplados con especificaciones OpenAPI 3.1 modulares y garantías deterministas de cálculo y validación.
+            Four decoupled modules featuring modular OpenAPI 3.1 specifications with deterministic calculation and validation guarantees.
           </p>
         </div>
 
@@ -378,10 +378,10 @@ console.log("Ofertas obtenidas:", data.offers.length, "Total:", data.offers[0].t
             </div>
             <h3 className="pillar-title">Pricing &amp; BPE Engine</h3>
             <p className="pillar-desc">
-              Cálculo algorítmico de costes de fabricación en milisegundos mediante el Book Pricing Engine (BPE). Evalúa pliegos, encuadernación, mermas por tirada y perfiles de máquina.
+              Algorithmic manufacturing cost calculations in milliseconds via the Book Pricing Engine (BPE). Evaluates signatures, binding, run-length waste, and machine profiles.
             </p>
             <div className="pillar-footer">
-              <span>Explorar Pricing API &amp; BPE</span>
+              <span>Explore Pricing API &amp; BPE</span>
               <span>➔</span>
             </div>
           </Link>
@@ -398,10 +398,10 @@ console.log("Ofertas obtenidas:", data.offers.length, "Total:", data.offers[0].t
             </div>
             <h3 className="pillar-title">Preflight PDF Diagnostics</h3>
             <p className="pillar-desc">
-              Inspección técnica asíncrona de archivos PDF de hasta 2GB. Verificación geométrica de TrimBox/BleedBox, cobertura de tinta TAC, fuentes incrustadas y normalización asistida.
+              Asynchronous technical inspection for PDF files up to 2GB. Geometric validation of TrimBox/BleedBox, TAC ink limits, embedded fonts, and automated normalization.
             </p>
             <div className="pillar-footer">
-              <span>Explorar Preflight &amp; Autofix</span>
+              <span>Explore Preflight &amp; Autofix</span>
               <span>➔</span>
             </div>
           </Link>
@@ -420,10 +420,10 @@ console.log("Ofertas obtenidas:", data.offers.length, "Total:", data.offers[0].t
             </div>
             <h3 className="pillar-title">Marketplace &amp; Orders</h3>
             <p className="pillar-desc">
-              Ingesta estructurada de pedidos de fabricación, vinculación de archivos mediante tokens, trazabilidad inmutable y evaluación determinista de viabilidad de taller (Readiness).
+              Structured manufacturing order ingestion, token-gated asset binding, immutable audit traceability, and deterministic workshop readiness evaluation.
             </p>
             <div className="pillar-footer">
-              <span>Explorar Ciclo de Pedidos</span>
+              <span>Explore Order Lifecycle</span>
               <span>➔</span>
             </div>
           </Link>
@@ -443,10 +443,10 @@ console.log("Ofertas obtenidas:", data.offers.length, "Total:", data.offers[0].t
             </div>
             <h3 className="pillar-title">Event Outbox Webhooks</h3>
             <p className="pillar-desc">
-              Notificaciones push asíncronas con firma criptográfica en cabecera <code>X-PPOS-Signature</code>. Entrega garantizada con reintentos para eventos <code>order.ready</code> y <code>preflight.completed</code>.
+              Asynchronous push notifications with cryptographic verification via the <code>X-PPOS-Signature</code> header. Guaranteed delivery with retries for <code>order.ready</code> and <code>preflight.completed</code>.
             </p>
             <div className="pillar-footer">
-              <span>Explorar Webhooks &amp; Eventos</span>
+              <span>Explore Webhooks &amp; Events</span>
               <span>➔</span>
             </div>
           </Link>
@@ -458,23 +458,23 @@ console.log("Ofertas obtenidas:", data.offers.length, "Total:", data.offers[0].t
         <section className="quickstart-section">
           <div className="quickstart-header">
             <div className="quickstart-title-wrap">
-              <span className="portal-section-tag">Activación Rápida</span>
-              <h3>Cotiza tu primer libro en 3 líneas de código</h3>
-              <p>Sin SDKs propietarios ni dependencias complejas. REST estándar con payloads JSON nativos.</p>
+              <span className="portal-section-tag">Quickstart</span>
+              <h3>Quote your first book in 3 lines of code</h3>
+              <p>No proprietary SDKs or complex dependencies. Standard REST with native JSON payloads.</p>
             </div>
             <Link to="/docs/api/quickstart" className="quickstart-cta-link">
-              Ver Guía Quickstart Completa ➔
+              View Full Quickstart Guide ➔
             </Link>
           </div>
 
-          <div className="terminal-box" role="region" aria-label="Consola interactiva de código de cotización rápida">
+          <div className="terminal-box" role="region" aria-label="Interactive quick quoting code console">
             <div className="terminal-header">
               <div className="terminal-dots" aria-hidden="true">
                 <span className="terminal-dot terminal-dot-red"></span>
                 <span className="terminal-dot terminal-dot-yellow"></span>
                 <span className="terminal-dot terminal-dot-green"></span>
               </div>
-              <div className="terminal-tabs" role="tablist" aria-label="Lenguajes de ejemplo">
+              <div className="terminal-tabs" role="tablist" aria-label="Example code languages">
                 <button
                   type="button"
                   role="tab"
@@ -499,15 +499,15 @@ console.log("Ofertas obtenidas:", data.offers.length, "Total:", data.offers[0].t
                 type="button"
                 className="terminal-copy-btn"
                 onClick={handleCopyCode}
-                aria-label={copied ? 'Código copiado al portapapeles' : 'Copiar código al portapapeles'}
-                title="Copiar código"
+                aria-label={copied ? 'Code copied to clipboard' : 'Copy code to clipboard'}
+                title="Copy code"
               >
                 {copied ? (
                   <>
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
-                    <span style={{ color: '#10b981' }}>Copiado</span>
+                    <span style={{ color: '#10b981' }}>Copied</span>
                   </>
                 ) : (
                   <>
@@ -515,12 +515,12 @@ console.log("Ofertas obtenidas:", data.offers.length, "Total:", data.offers[0].t
                       <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                       <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                     </svg>
-                    <span>Copiar</span>
+                    <span>Copy</span>
                   </>
                 )}
               </button>
             </div>
-            <pre className="terminal-body" tabIndex={0} aria-label={`Ejemplo de código en ${activeTab === 'curl' ? 'cURL' : 'JavaScript'}`}>
+            <pre className="terminal-body" tabIndex={0} aria-label={`Code example in ${activeTab === 'curl' ? 'cURL' : 'JavaScript'}`}>
               <code>{activeTab === 'curl' ? curlCode : jsCode}</code>
             </pre>
           </div>
@@ -530,10 +530,10 @@ console.log("Ofertas obtenidas:", data.offers.length, "Total:", data.offers[0].t
         {/* Deep Systems & Architecture Grid */}
         {/* ================================================================= */}
         <div className="portal-section-header">
-          <span className="portal-section-tag">Ecosistema Técnico</span>
-          <h2 className="portal-section-title">Pilares Arquitectónicos</h2>
+          <span className="portal-section-tag">Technical Ecosystem</span>
+          <h2 className="portal-section-title">Architectural Pillars</h2>
           <p className="portal-section-desc">
-            Subsistemas desacoplados que operan con verdad productiva autoritativa y cálculo determinista.
+            Decoupled subsystems operating with authoritative production truth and deterministic computation.
           </p>
         </div>
 
@@ -550,10 +550,10 @@ console.log("Ofertas obtenidas:", data.offers.length, "Total:", data.offers[0].t
             </div>
             <h3 className="pillar-title">Control Plane</h3>
             <p className="pillar-desc">
-              Hub de gobernanza multi-tenant, autorización RBAC estricta, configuración de talleres gemelos digitales, materias primas y multiplicadores de margen.
+              Multi-tenant governance hub, strict RBAC authorization, workshop digital twin configurations, raw materials, and margin multipliers.
             </p>
             <div className="pillar-footer">
-              <span>Ver Especificaciones Control Plane</span>
+              <span>View Control Plane Specs</span>
               <span>➔</span>
             </div>
           </Link>
@@ -573,10 +573,10 @@ console.log("Ofertas obtenidas:", data.offers.length, "Total:", data.offers[0].t
             </div>
             <h3 className="pillar-title">Paper Supplier Hub</h3>
             <p className="pillar-desc">
-              Base de datos maestra de sustratos, onboarding multilingüe (ES, EN, DE), verificación fiscal automática y vinculación en tiempo real con talleres de imprenta.
+              Master substrate database, multilingual onboarding (EN, ES, DE), automated fiscal verification, and real-time print shop paper binding.
             </p>
             <div className="pillar-footer">
-              <span>Explorar Paper Supplier Hub</span>
+              <span>Explore Paper Supplier Hub</span>
               <span>➔</span>
             </div>
           </Link>
@@ -593,10 +593,10 @@ console.log("Ofertas obtenidas:", data.offers.length, "Total:", data.offers[0].t
             </div>
             <h3 className="pillar-title">Matchmaker Engine</h3>
             <p className="pillar-desc">
-              Enrutamiento inteligente evaluando dimensiones físicas del libro contra grafos de capacidad de imprenta, zonas geográficas, SLAs y carga operativa.
+              Intelligent routing evaluating physical book dimensions against print house capacity graphs, geographical zones, SLAs, and shop floor load.
             </p>
             <div className="pillar-footer">
-              <span>Descubrir Matchmaker</span>
+              <span>Discover Matchmaker</span>
               <span>➔</span>
             </div>
           </Link>
@@ -612,12 +612,12 @@ console.log("Ofertas obtenidas:", data.offers.length, "Total:", data.offers[0].t
                 </svg>
               </span>
             </div>
-            <h3 className="pillar-title">Trazabilidad de Evidencias</h3>
+            <h3 className="pillar-title">Evidence Traceability</h3>
             <p className="pillar-desc">
-              Trazabilidad inmutable de <code>evidenceId</code> y <code>selectedVariantId</code> en cada cotización y orden, garantizando reproducibilidad y validez legal.
+              Immutable traceability of <code>evidenceId</code> and <code>selectedVariantId</code> across every quote and order, ensuring reproducibility and legal validity.
             </p>
             <div className="pillar-footer">
-              <span>Explorar Contratos de Arquitectura</span>
+              <span>Explore Architecture Contracts</span>
               <span>➔</span>
             </div>
           </Link>
@@ -627,30 +627,30 @@ console.log("Ofertas obtenidas:", data.offers.length, "Total:", data.offers[0].t
         {/* Knowledge Base & Documentation Map Matrix */}
         {/* ================================================================= */}
         <div className="portal-section-header">
-          <span className="portal-section-tag">Mapa de Navegación</span>
-          <h2 className="portal-section-title">Directorio Completo de Documentación</h2>
+          <span className="portal-section-tag">Navigation Map</span>
+          <h2 className="portal-section-title">Complete Documentation Directory</h2>
           <p className="portal-section-desc">
-            Acceso directo a todos los sistemas, contratos, playbooks operativos y guías de infraestructura.
+            Direct access to all systems, contracts, operational playbooks, and infrastructure guides.
           </p>
         </div>
 
         <div className="portal-matrix">
           <div className="portal-matrix-col">
-            <h4>API &amp; Integración</h4>
+            <h4>API &amp; Integration</h4>
             <ul>
-              <li><Link to="/docs/api/overview">Visión General &amp; Arquitectura</Link></li>
-              <li><Link to="/docs/api/quickstart">Guía de Inicio Rápido</Link></li>
-              <li><Link to="/docs/api/authentication">Autenticación &amp; Seguridad</Link></li>
+              <li><Link to="/docs/api/overview">Overview &amp; Architecture</Link></li>
+              <li><Link to="/docs/api/quickstart">Quickstart Guide</Link></li>
+              <li><Link to="/docs/api/authentication">Authentication &amp; Security</Link></li>
               <li><Link to="/docs/api/pricing-api">Book Pricing Engine (BPE)</Link></li>
-              <li><Link to="/docs/api/integration-contracts">Ciclo de Pedidos &amp; Archivos</Link></li>
+              <li><Link to="/docs/api/integration-contracts">Order Lifecycle &amp; Files</Link></li>
               <li><Link to="/docs/api/preflight-api">Preflight PDF &amp; Autofix</Link></li>
-              <li><Link to="/docs/api/webhooks">Webhooks con Firma HMAC</Link></li>
-              <li><Link to="/docs/api/errors-and-limits">Códigos de Error &amp; Límites</Link></li>
+              <li><Link to="/docs/api/webhooks">HMAC Signed Webhooks</Link></li>
+              <li><Link to="/docs/api/errors-and-limits">Error Codes &amp; Limits</Link></li>
             </ul>
           </div>
 
           <div className="portal-matrix-col">
-            <h4>Arquitectura</h4>
+            <h4>Architecture</h4>
             <ul>
               <li><Link to="/docs/architecture/platform-architecture">Platform Architecture</Link></li>
               <li><Link to="/docs/architecture/state-of-the-art">State of the Art Mechanics</Link></li>
@@ -661,7 +661,7 @@ console.log("Ofertas obtenidas:", data.offers.length, "Total:", data.offers[0].t
           </div>
 
           <div className="portal-matrix-col">
-            <h4>Control &amp; Motores</h4>
+            <h4>Control &amp; Engines</h4>
             <ul>
               <li><Link to="/docs/platform/overview">Platform Overview</Link></li>
               <li><Link to="/docs/platform/paper-supplier-hub">Paper Supplier Hub</Link></li>
@@ -673,7 +673,7 @@ console.log("Ofertas obtenidas:", data.offers.length, "Total:", data.offers[0].t
           </div>
 
           <div className="portal-matrix-col">
-            <h4>Operaciones &amp; DevOps</h4>
+            <h4>Operations &amp; DevOps</h4>
             <ul>
               <li><Link to="/docs/infrastructure/deployment-blueprint">Deployment Blueprint</Link></li>
               <li><Link to="/docs/infrastructure/production-deployment-playbook">Production Playbook</Link></li>
