@@ -8,8 +8,8 @@ The Preflight API provides programmatic access to technical PDF inspection, prod
 
 :::note Architecture & Implementation Traceability
 - **Core Inspection Engine:** Executed by `ppos-preflight-service` (listening on port 8001) and proxied through the Control Plane at `/api/preflight/*`.
-- **Shared Diagnostic Link:** Implemented at [`src/api/routes/publicPreflight.js:6`](file:///c:/Users/KIKE/Downloads/ppos-control-plane-phase-10-intelligence-layer/src/api/routes/publicPreflight.js#L6) under `/api/public/preflight/human-report/:token`.
-- **Customer Action Remediation:** Implemented at [`src/api/routes/marketplacePublic.js:125`](file:///c:/Users/KIKE/Downloads/ppos-control-plane-phase-10-intelligence-layer/src/api/routes/marketplacePublic.js#L125) under `/api/marketplace/orders/:orderId/customer-action/:token`.
+- **Shared Diagnostic Link:** Implemented in `src/api/routes/publicPreflight.js:6` (`ppos-control-plane`) under `/api/public/preflight/human-report/:token`.
+- **Customer Action Remediation:** Implemented in `src/api/routes/marketplacePublic.js:125` (`ppos-control-plane`) under `/api/marketplace/orders/:orderId/customer-action/:token`.
 :::
 
 ```mermaid

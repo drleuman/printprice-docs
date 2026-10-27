@@ -14,7 +14,7 @@ In accordance with the DEV-01B security audit, interactive backoffice user sessi
 
 ## 1. Machine-to-Machine Intake Token (`PPOS_MARKETPLACE_INTAKE_TOKEN`)
 
-Used by trusted e-commerce frontends, quoting widgets, and partner platforms for order creation and file registration via `requireMarketplaceOrAdmin` ([`marketplaceOrders.js:21-58`](file:///c:/Users/KIKE/Downloads/ppos-control-plane-phase-10-intelligence-layer/src/api/routes/marketplaceOrders.js#L21-L58)).
+Used by trusted e-commerce frontends, quoting widgets, and partner platforms for order creation and file registration via `requireMarketplaceOrAdmin` (`marketplaceOrders.js:21-58` in `ppos-control-plane`).
 
 ### Header Convention
 The intake token can be supplied via either of the following standard headers:
@@ -62,7 +62,7 @@ Used by backoffice operations, SCADA telemetry, and administrative endpoints.
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
-The JWT is signed with the cluster's `JWT_SECRET` and validated by `requireAdmin` ([`auth.js:266-270`](file:///c:/Users/KIKE/Downloads/ppos-control-plane-phase-10-intelligence-layer/src/api/middleware/auth.js#L266-L270)). Missing or invalid tokens return:
+The JWT is signed with the cluster's `JWT_SECRET` and validated by `requireAdmin` (`auth.js:266-270` in `ppos-control-plane`). Missing or invalid tokens return:
 ```json
 {
   "ok": false,
@@ -95,8 +95,8 @@ To allow authors, print buyers, and external collaborators to inspect preflight 
   const providedHash = hashToken(rawToken);
   if (providedHash !== action.tokenHash) return { ok: false, error: 'INVALID_TOKEN' };
   ```
-- **Lifecycle & Initial Status:** The customer action is created with status **`PENDING_NOTIFICATION`** and type `FILE_REUPLOAD_REQUIRED` ([`marketplaceCustomerActionService.js:165`](file:///c:/Users/KIKE/Downloads/ppos-control-plane-phase-10-intelligence-layer/src/api/services/marketplaceCustomerActionService.js#L165)).
-- **Execution Sequence & State in Handler:** In [`marketplacePublic.js:125-165`](file:///c:/Users/KIKE/Downloads/ppos-control-plane-phase-10-intelligence-layer/src/api/routes/marketplacePublic.js#L125-L165):
+- **Lifecycle & Initial Status:** The customer action is created with status **`PENDING_NOTIFICATION`** and type `FILE_REUPLOAD_REQUIRED` (`marketplaceCustomerActionService.js:165` in `ppos-control-plane`).
+- **Execution Sequence & State in Handler:** In `marketplacePublic.js:125-165` (`ppos-control-plane`):
   1. `validateCustomerToken` validates the hash and expiration date, loading the action snapshot directly from the database.
   2. The controller executes `await customerActionService.markCustomerActionViewed(orderId, token)` **before** sending the response. This call is awaited, but wrapped in a non-fatal `try/catch` so that database update failures do not prevent the client from receiving the remediation instructions.
   3. The response payload returns `action: validation.action` (the snapshot retrieved during step 1). Therefore, on initial access the payload reflects the database status at validation time (**`PENDING_NOTIFICATION`**, not `PENDING`).

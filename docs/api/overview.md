@@ -83,21 +83,30 @@ flowchart TB
 
 The following core contracts have been verified against active controller implementations:
 
+<div className="table-scroll-indicator">
+  <span className="table-scroll-icon">↔</span>
+  <span>Full 6-column specification table. Scroll horizontally to inspect authentication, responsible service, and verification status · Keyboard navigable (<kbd>Tab</kbd> + arrow keys).</span>
+</div>
+
+<div className="table-responsive-wrapper" tabIndex={0} role="region" aria-label="PrintPrice OS public endpoint inventory, authentication, and verification status">
+
 | Domain | Method | Effective Path | Authentication | Responsible Service | Production & Verification Status |
-| :--- | :---: | :--- | :--- | :--- | :---: |
-| **Preflight Capabilities** | `GET` | `/api/preflight/capabilities` | Public Unauthenticated | Preflight Service (Proxy) | `CONFIRMED_IN_PRODUCTION` |
-| **Preflight Job Submission** | `POST` | `/api/preflight/jobs` | JWT / Scope `preflight:write` | Preflight Service (Proxy) | `CONFIRMED_IN_PRODUCTION` |
-| **Preflight Job Inspection** | `GET` | `/api/preflight/jobs/:id` | JWT / Scope `jobs:read` | Preflight Service (Proxy) | `CONFIRMED_IN_PRODUCTION` |
-| **Outgoing Webhooks** | `POST` | Push to Partner HTTPS Endpoint | HMAC-SHA256 (`X-PPOS-Signature`) | Control Plane Outbox Worker | `CONFIRMED_IN_PRODUCTION` |
-| **Marketplace Offers** | `POST` | `/api/marketplace/offers` | Public Ingest (`x-trace-id`) or API Key | Control Plane (`ppos-control-plane`) | `VERIFIED_IN_CODE` *(Pending live partner smoke test)* |
-| **Order Intake** | `POST` | `/api/marketplace/orders` | `X-Marketplace-Token` / Bearer JWT | Control Plane (`ppos-control-plane`) | `VERIFIED_IN_CODE` *(Pending live partner smoke test)* |
-| **Order Details & Readiness** | `GET` | `/api/marketplace/orders/:orderId` | `X-Marketplace-Token` / Bearer JWT | Control Plane (`ppos-control-plane`) | `VERIFIED_IN_CODE` *(Pending live partner smoke test)* |
-| **Offer Selection** | `POST` | `/api/marketplace/orders/:orderId/selected-offer` | `X-Marketplace-Token` / Bearer JWT | Control Plane (`ppos-control-plane`) | `VERIFIED_IN_CODE` *(Pending live partner smoke test)* |
-| **File Metadata Registration** | `POST` | `/api/marketplace/orders/:orderId/files/register` | `X-Marketplace-Token` / Bearer JWT | Control Plane (`ppos-control-plane`) | `VERIFIED_IN_CODE` *(Pending live partner smoke test)* |
-| **Preflight Job Binding** | `POST` | `/api/marketplace/orders/:orderId/files/:fileId/preflight-bind` | `X-Marketplace-Token` / Bearer JWT | Control Plane (`ppos-control-plane`) | `VERIFIED_IN_CODE` *(Pending live partner smoke test)* |
-| **Readiness Recompute** | `POST` | `/api/marketplace/orders/:orderId/readiness/recompute` | `X-Marketplace-Token` / Bearer JWT | Control Plane (`ppos-control-plane`) | `VERIFIED_IN_CODE` *(Pending live partner smoke test)* |
-| **Shared Preflight Report** | `GET` | `/api/public/preflight/human-report/:token` | Signed JWT (`HUMAN_REPORT_VIEW`) | Control Plane (`ppos-control-plane`) | `VERIFIED_IN_CODE` *(Pending live partner smoke test)* |
-| **Customer Action Handoff** | `GET` | `/api/marketplace/orders/:orderId/customer-action/:token` | Ephemeral SHA-256 Token | Control Plane (`ppos-control-plane`) | `VERIFIED_IN_CODE` *(Pending live partner smoke test)* |
+| :--- | :---: | :--- | :--- | :--- | :--- |
+| **Preflight Capabilities** | `GET` | `/api/preflight/capabilities` | `Public Unauthenticated` | Preflight Service (Proxy) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| **Preflight Job Submission** | `POST` | `/api/preflight/jobs` | `JWT (preflight:write)` | Preflight Service (Proxy) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| **Preflight Job Inspection** | `GET` | `/api/preflight/jobs/:id` | `JWT (jobs:read)` | Preflight Service (Proxy) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| **Outgoing Webhooks** | `POST` | `Partner HTTPS Endpoint` | `HMAC-SHA256 (X-PPOS-Signature)` | Control Plane Outbox Worker | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| **Marketplace Offers** | `POST` | `/api/marketplace/offers` | `x-trace-id / API Key` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-code">VERIFIED_IN_CODE</span> |
+| **Order Intake** | `POST` | `/api/marketplace/orders` | `X-Marketplace-Token / Bearer JWT` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-code">VERIFIED_IN_CODE</span> |
+| **Order Details & Readiness** | `GET` | `/api/marketplace/orders/:orderId` | `X-Marketplace-Token / Bearer JWT` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-code">VERIFIED_IN_CODE</span> |
+| **Offer Selection** | `POST` | `/api/marketplace/orders/:orderId/selected-offer` | `X-Marketplace-Token / Bearer JWT` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-code">VERIFIED_IN_CODE</span> |
+| **File Metadata Registration** | `POST` | `/api/marketplace/orders/:orderId/files/register` | `X-Marketplace-Token / Bearer JWT` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-code">VERIFIED_IN_CODE</span> |
+| **Preflight Job Binding** | `POST` | `/api/marketplace/orders/:orderId/files/:fileId/preflight-bind` | `X-Marketplace-Token / Bearer JWT` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-code">VERIFIED_IN_CODE</span> |
+| **Readiness Recompute** | `POST` | `/api/marketplace/orders/:orderId/readiness/recompute` | `X-Marketplace-Token / Bearer JWT` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-code">VERIFIED_IN_CODE</span> |
+| **Shared Preflight Report** | `GET` | `/api/public/preflight/human-report/:token` | `Signed JWT (HUMAN_REPORT_VIEW)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-code">VERIFIED_IN_CODE</span> |
+| **Customer Action Handoff** | `GET` | `/api/marketplace/orders/:orderId/customer-action/:token` | `Ephemeral SHA-256 Token` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-code">VERIFIED_IN_CODE</span> |
+
+</div>
 
 :::note Surface Exclusions & Roadmapped Features
 - **Administrative Routes:** All endpoints under `/api/admin/*`, `/api/printhouse/*`, `/api/federation/*`, and global order inspection (`GET /api/marketplace/orders`) are strictly administrative and excluded from public integration contracts.
