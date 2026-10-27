@@ -135,6 +135,71 @@ html {
   transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
+/* Fix containing-block trapping for position:fixed mobile sidebar in Docusaurus */
+.navbar.navbar-sidebar--show {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Mobile Navigation Sidebar Drawer */
+.navbar-sidebar {
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.45) !important;
+}
+
+[data-theme='dark'] .navbar-sidebar {
+  background-color: #0b0d12 !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme='light'] .navbar-sidebar {
+  background-color: #ffffff !important;
+  border-right: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+[data-theme='dark'] .navbar-sidebar__brand {
+  background-color: #07090e !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme='light'] .navbar-sidebar__brand {
+  background-color: #f8fafc !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+.navbar-sidebar__backdrop {
+  height: 100dvh !important;
+  background-color: rgba(0, 0, 0, 0.65) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+}
+
+.navbar-sidebar__items {
+  height: calc(100dvh - var(--ifm-navbar-height)) !important;
+  padding: 0.5rem 0 !important;
+}
+
+.navbar-sidebar__item .menu__link {
+  font-size: 0.95rem !important;
+  font-weight: 500 !important;
+  padding: 0.65rem 1rem !important;
+  border-radius: 6px !important;
+  margin: 0.15rem 0.5rem !important;
+}
+
+[data-theme='dark'] .navbar-sidebar__item .menu__link:hover,
+[data-theme='dark'] .navbar-sidebar__item .menu__link--active {
+  background: rgba(229, 57, 53, 0.12) !important;
+  color: var(--ppos-red-primary) !important;
+}
+
+[data-theme='light'] .navbar-sidebar__item .menu__link:hover,
+[data-theme='light'] .navbar-sidebar__item .menu__link--active {
+  background: rgba(229, 57, 53, 0.08) !important;
+  color: var(--ppos-red-primary) !important;
+}
+
 .navbar__brand {
   font-weight: 800;
   letter-spacing: -0.03em;
