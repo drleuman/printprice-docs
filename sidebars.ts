@@ -5,62 +5,8 @@ const sidebars: SidebarsConfig = {
     'intro',
     {
       type: 'category',
-      label: 'Architecture',
-      items: [
-        'architecture/platform-architecture',
-        'architecture/state-of-the-art',
-        'architecture/preflight-diagnostic-contract',
-        'architecture/preflight-status-contract',
-        'architecture/preflight-artifact-contract',
-        'architecture/preflight-auth-contract',
-        'architecture/production-validation-checklist',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Repositories',
-      items: [
-        'repositories/ppos-preflight-engine',
-        'repositories/ppos-preflight-service',
-        'repositories/ppos-preflight-worker',
-        'repositories/preflight-app-bff',
-        'repositories/ppos-control-plane',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Phases',
-      items: [
-        'phases/phase-35-5-production-freeze',
-        'phases/phase-36-order-intake-file-governance',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Platform',
-      items: [
-        'platform/overview',
-        'platform/paper-supplier-hub',
-        'platform/architecture',
-        'platform/production-pipeline',
-        'platform/system-data-model',
-        'platform/print-network',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Engines',
-      items: [
-        'engines/book-pricing-engine',
-        'engines/preflight-engine',
-        'engines/production-intelligence',
-        'engines/compatibility-engine',
-        'engines/matchmaker',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'API',
+      label: 'API & Integration Contracts',
+      collapsed: false,
       items: [
         'api/overview',
         'api/quickstart',
@@ -74,7 +20,62 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
-      label: 'Infrastructure',
+      label: 'Platform & Engines',
+      collapsed: true,
+      items: [
+        'platform/overview',
+        'platform/paper-supplier-hub',
+        'platform/architecture',
+        'platform/production-pipeline',
+        'platform/system-data-model',
+        'platform/print-network',
+        'engines/book-pricing-engine',
+        'engines/preflight-engine',
+        'engines/production-intelligence',
+        'engines/compatibility-engine',
+        'engines/matchmaker',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Architecture & Contracts',
+      collapsed: true,
+      items: [
+        'architecture/platform-architecture',
+        'architecture/state-of-the-art',
+        'architecture/preflight-diagnostic-contract',
+        'architecture/preflight-status-contract',
+        'architecture/preflight-artifact-contract',
+        'architecture/preflight-auth-contract',
+        'architecture/production-validation-checklist',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Repositories & Systems',
+      collapsed: true,
+      items: [
+        'repositories/ppos-control-plane',
+        'repositories/ppos-preflight-engine',
+        'repositories/ppos-preflight-service',
+        'repositories/ppos-preflight-worker',
+        'repositories/preflight-app-bff',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Production Pipeline',
+      collapsed: true,
+      items: [
+        'pipeline/pdf-analysis',
+        'pipeline/production-routing',
+        'pipeline/cost-optimization',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Infrastructure & DevOps',
+      collapsed: true,
       items: [
         'infrastructure/deployment-blueprint',
         'infrastructure/production-deployment-playbook',
@@ -85,16 +86,17 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
-      label: 'Pipeline',
+      label: 'Phases & Milestones',
+      collapsed: true,
       items: [
-        'pipeline/pdf-analysis',
-        'pipeline/production-routing',
-        'pipeline/cost-optimization',
+        'phases/phase-35-5-production-freeze',
+        'phases/phase-36-order-intake-file-governance',
       ],
     },
     {
       type: 'category',
-      label: 'Engineering',
+      label: 'Engineering Standards',
+      collapsed: true,
       items: [
         'engineering/coding-standards',
         'engineering/repository-structure',
@@ -105,16 +107,11 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
-      label: 'Roadmap',
+      label: 'Strategy & Roadmap',
+      collapsed: true,
       items: [
         'roadmap/product-roadmap',
         'roadmap/future-vision',
-      ],
-    },
-    {
-      type: 'category',
-      label: 'Strategy',
-      items: [
         'strategy/strategic-moat',
         'strategy/future-vision',
       ],
