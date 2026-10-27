@@ -7,7 +7,7 @@ title: Outgoing Event Webhooks
 PrintPrice OS provides a secure, push-based webhook delivery engine to notify partner systems when manufacturing, pricing, or preflight events occur in real time.
 
 :::info Implementation Traceability
-Event dispatch is managed by the central outbox engine implemented in [`src/api/services/outgoingWebhookService.js`](file:///c:/Users/KIKE/Downloads/ppos-control-plane-phase-10-intelligence-layer/src/api/services/outgoingWebhookService.js).
+Event dispatch is managed by the central outbox engine implemented in `src/api/services/outgoingWebhookService.js` (`ppos-control-plane`).
 :::
 
 ---

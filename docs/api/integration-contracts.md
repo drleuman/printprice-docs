@@ -7,7 +7,7 @@ title: Order Intake & File Governance Contracts
 This contract governs the transition from quoting to production: formalizing a customer order, registering production PDF files, binding technical Preflight verification jobs, and automatically evaluating manufacturing readiness.
 
 :::note Implementation Traceability
-This contract is implemented in the Control Plane at [`src/api/routes/marketplaceOrders.js`](file:///c:/Users/KIKE/Downloads/ppos-control-plane-phase-10-intelligence-layer/src/api/routes/marketplaceOrders.js) and served under `/api/marketplace/orders`.
+This contract is implemented in the Control Plane at `src/api/routes/marketplaceOrders.js` (`ppos-control-plane`) and served under `/api/marketplace/orders`.
 :::
 
 ---
@@ -72,7 +72,7 @@ Requires `X-Marketplace-Token: <PPOS_MARKETPLACE_INTAKE_TOKEN>` or `Authorizatio
 
 ## 2. Offer Selection (`POST /api/marketplace/orders/:orderId/selected-offer`)
 
-Updates the order's chosen commercial print offer. Per [`marketplaceOrders.js:252-257`](file:///c:/Users/KIKE/Downloads/ppos-control-plane-phase-10-intelligence-layer/src/api/routes/marketplaceOrders.js#L252-L257), the backend evaluates `req.body.selectedOffer || req.body`:
+Updates the order's chosen commercial print offer. Per `marketplaceOrders.js:252-257` (`ppos-control-plane`), the backend evaluates `req.body.selectedOffer || req.body`:
 
 ```json
 // Variant A: Wrapped with offerId
