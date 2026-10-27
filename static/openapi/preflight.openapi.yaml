@@ -1,0 +1,286 @@
+openapi: 3.1.0
+info:
+  title: PrintPrice OS — Preflight Inspection & Normalization API
+  version: 1.0.0
+  description: |
+    # PrintPrice OS — Preflight API
+    API de inspección técnica automatizada de archivos PDF para artes gráficas, extracción de cajas de página (TrimBox, BleedBox),
+    validación de resolución de imágenes, perfiles de color CMYK y corrección automática (autofix) de geometrías.
+    
+    - **Servicio Responsable:** `ppos-preflight-service`
+    - **Punto de Entrada en Gateway:** `https://api.printprice.pro/api/preflight/*`
+  contact:
+    name: PrintPrice Architecture & Security Team
+    email: api-support@printprice.pro
+    url: https://docs.printprice.pro
+  license:
+    name: Proprietary / Partner Integration Only
+    identifier: Proprietary
+
+servers:
+  - url: http://localhost:4010
+    description: Servidor Mock Local (Prism / Simulación Fuera de Línea)
+  - url: https://api.printprice.pro
+    description: Servidor de Producción Gateway
+
+tags:
+  - name: Preflight Capabilities
+    description: Descubrimiento público de reglas y perfiles soportados.
+  - name: Preflight Jobs
+    description: Procesamiento asíncrono de inspección, análisis y normalización de archivos PDF.
+
+paths:
+  /api/preflight/capabilities:
+    get:
+      tags:
+        - Preflight Capabilities
+      summary: Consultar catálogo de capacidades, reglas y límites de preflight
+      description: Devuelve la lista de reglas de validación soportadas, operaciones de corrección (autofix) disponibles y el límite de subida.
+      operationId: getPreflightCapabilities
+      security: []
+      responses:
+        '200':
+          description: Capacidades técnicas del motor de preflight.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CapabilitiesResponse'
+              example:
+                supportedRules:
+                  - "GEOMETRY_TRIMBOX_VALIDATION"
+                  - "BLEED_3MM_ENFORCEMENT"
+                  - "IMAGE_RESOLUTION_300DPI"
+                  - "COLOR_CMYK_ONLY"
+                  - "FONTS_EMBEDDED_CHECK"
+                availableFixes:
+                  - "NORMALIZE_PAGE_BOXES"
+                  - "GENERATE_SYNTHETIC_BLEED"
+                  - "RGB_TO_FOGRA39_CONVERSION"
+                geometryPolicies:
+                  - "ISO_216_A_SERIES"
+                  - "STANDARD_BOOK_SIZES"
+                maxUploadSizeBytes: 2147483648
+
+  /api/preflight/jobs:
+    post:
+      tags:
+        - Preflight Jobs
+      summary: Enviar archivo PDF para inspección técnica
+      description: |
+        Sube un archivo PDF (hasta 2GB) mediante multipart/form-data y encola un trabajo de análisis en los workers de Preflight.
+      operationId: submitPreflightJob
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Archivo PDF a inspeccionar.
+      responses:
+        '200':
+          description: Trabajo encolado exitosamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobCreatedResponse'
+              example:
+                ok: true
+                jobId: "pf_job_8a7d6e5c-1234"
+                status: "QUEUED"
+                filename: "manuscrito_interior.pdf"
+                sizeBytes: 15420310
+        '400':
+          description: Petición inválida o archivo no proporcionado.
+        '413':
+          description: El archivo excede el tamaño máximo permitido de 2GB.
+        '429':
+          description: Concurrencia máxima del tenant alcanzada.
+
+  /api/preflight/jobs/{id}:
+    get:
+      tags:
+        - Preflight Jobs
+      summary: Consultar resultado y hallazgos de un trabajo de inspección
+      operationId: getPreflightJob
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Identificador del trabajo (pf_job_...).
+      responses:
+        '200':
+          description: Estado del trabajo y reporte técnico detallado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobDetailResponse'
+              example:
+                ok: true
+                job:
+                  id: "pf_job_8a7d6e5c-1234"
+                  status: "COMPLETED"
+                  outcome: "PASSED_WITH_WARNINGS"
+                  filename: "manuscrito_interior.pdf"
+                  report:
+                    pageCount: 192
+                    trimBox: { widthPt: 419.53, heightPt: 595.28, widthMm: 148, heightMm: 210 }
+                    bleedBox: { widthMm: 154, heightMm: 216, bleedMm: 3 }
+                    colorProfile: "FOGRA39 (ISO 12647-2)"
+                    hasRgbElements: false
+                    lowestImageDpi: 240
+                    findings:
+                      - code: "IMAGE_DPI_SUBOPTIMAL"
+                        severity: "warning"
+                        page: 45
+                        message: "Imagen en página 45 cuenta con 240 DPI (mínimo recomendado: 300 DPI)."
+                  artifacts:
+                    - id: "art_rep_01"
+                      type: "report_json"
+                      name: "report.json"
+                    - id: "art_norm_pdf"
+                      type: "normalized_pdf"
+                      name: "normalized.pdf"
+        '404':
+          description: Trabajo no encontrado o no pertenece al tenant autenticado.
+
+  /api/preflight/jobs/{id}/actions/fix:
+    post:
+      tags:
+        - Preflight Jobs
+      summary: Ejecutar corrección automática (autofix) sobre un trabajo inspeccionado
+      operationId: triggerPreflightFix
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                autoFixOptions:
+                  type: object
+                  properties:
+                    normalizeBoxes:
+                      type: boolean
+                      default: true
+                    generateBleed:
+                      type: boolean
+                      default: true
+                    convertRgbToCmyk:
+                      type: boolean
+                      default: true
+      responses:
+        '200':
+          description: Corrección iniciada.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  fixJobId:
+                    type: string
+                  status:
+                    type: string
+                    example: "FIXING"
+
+  /api/preflight/jobs/{id}/artifacts/{artifactId}:
+    get:
+      tags:
+        - Preflight Jobs
+      summary: Descargar un archivo de artefacto generado
+      operationId: downloadPreflightArtifact
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: artifactId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Archivo binario (PDF normalizado, informe JSON, etc.).
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Artefacto no encontrado.
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    CapabilitiesResponse:
+      type: object
+      properties:
+        supportedRules:
+          type: array
+          items:
+            type: string
+        availableFixes:
+          type: array
+          items:
+            type: string
+        geometryPolicies:
+          type: array
+          items:
+            type: string
+        maxUploadSizeBytes:
+          type: integer
+
+    JobCreatedResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        jobId:
+          type: string
+        status:
+          type: string
+        filename:
+          type: string
+        sizeBytes:
+          type: integer
+
+    JobDetailResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        job:
+          type: object

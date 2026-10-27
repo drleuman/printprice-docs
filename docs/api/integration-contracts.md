@@ -72,7 +72,7 @@ Requires `X-Marketplace-Token: <PPOS_MARKETPLACE_INTAKE_TOKEN>` or `Authorizatio
 
 ## 2. Offer Selection (`POST /api/marketplace/orders/:orderId/selected-offer`)
 
-Updates the order's chosen commercial print offer. Per `marketplaceOrders.js:252-257`, the backend accepts both wrapped (`selectedOffer`) and direct payload structures with either `offerId` or `id`:
+Updates the order's chosen commercial print offer. Per [`marketplaceOrders.js:252-257`](file:///c:/Users/KIKE/Downloads/ppos-control-plane-phase-10-intelligence-layer/src/api/routes/marketplaceOrders.js#L252-L257), the backend evaluates `req.body.selectedOffer || req.body`:
 
 ```json
 // Variant A: Wrapped with offerId
@@ -80,7 +80,19 @@ Updates the order's chosen commercial print offer. Per `marketplaceOrders.js:252
 
 // Variant B: Direct in body with offerId
 { "offerId": "off_01j7b9e84k2", "totalPrice": 1650.00 }
+
+// Variant C: Combination payload (controller prioritizes selectedOffer)
+{
+  "selectedOffer": { "offerId": "off_A", "totalPrice": 1650.00 },
+  "offerId": "off_B"
+}
 ```
+
+:::warning Precedence & Validation Edge Cases
+1. **Precedence:** When both `selectedOffer` and root `offerId`/`id` are provided, the controller strictly prioritizes `selectedOffer`.
+2. **Invalid Wrapped Payloads:** If `selectedOffer` is provided as an empty object `{}` or with empty identifier strings (`""`), the controller evaluates it first and rejects with **`HTTP 400 INVALID_OFFER`**, even if root contains an alternative identifier.
+3. **Empty Identifiers:** Blank strings (`""`) fail truthiness and length requirements and return HTTP 400.
+:::
 
 ---
 
@@ -115,3 +127,19 @@ Links the file slot to an active Preflight analysis worker job:
 Triggers a deterministic rule evaluation over all attached files and their preflight status:
 - If all required slots (`INTERIOR_PDF`, `COVER_PDF`) are uploaded and pass preflight without blocking findings, status transitions to `READY`.
 - If blocking errors persist (e.g., low DPI, missing bleed, font embedding failure), the order remains blocked with an itemized `blockers` list.
+
+---
+
+## 4. Administrative Surface Exclusion Notice
+
+:::warning Security Boundary: GET /api/marketplace/orders
+The endpoint `GET /api/marketplace/orders` is an **administrative cross-tenant endpoint** strictly restricted to platform operators (`SUPER_ADMIN`). It is intentionally excluded from the partner API contract to prevent data leakage between tenants.
+:::
+
+---
+
+## 5. Contract Specification
+
+Download the formal OpenAPI 3.1 specification for this domain:
+- **[Pricing & Marketplace Orders OpenAPI 3.1 Specification](/openapi/pricing-marketplace.openapi.yaml)**
+

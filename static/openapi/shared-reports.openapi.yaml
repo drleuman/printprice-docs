@@ -1,0 +1,170 @@
+openapi: 3.1.0
+info:
+  title: PrintPrice OS — Customer Shared Diagnostic & Remediation API
+  version: 1.0.0
+  description: |
+    # PrintPrice OS — Customer Shared Diagnostic & Remediation API
+    Endpoints con tokens efímeros y URLs firmadas diseñados para el acceso directo y seguro de autores,
+    editores y clientes finales sin necesidad de credenciales interactivas de plataforma.
+    
+    - **Informe Visual Preflight:** Permite a la imprenta compartir un informe comprensible de verificación técnica.
+    - **Acción de Subsanación:** Permite al cliente sustituir un archivo erróneo tras una detección de fallos bloqueantes en preflight.
+  contact:
+    name: PrintPrice Architecture & Security Team
+    email: api-support@printprice.pro
+    url: https://docs.printprice.pro
+  license:
+    name: Proprietary / Partner Integration Only
+    identifier: Proprietary
+
+servers:
+  - url: http://localhost:4010
+    description: Servidor Mock Local (Prism / Simulación Fuera de Línea)
+  - url: https://api.printprice.pro
+    description: Servidor de Producción Gateway
+
+tags:
+  - name: Customer Shared Reports
+    description: Diagnósticos amigables y subsanación guiada de archivos para clientes.
+
+paths:
+  /api/public/preflight/human-report/{token}:
+    get:
+      tags:
+        - Customer Shared Reports
+      summary: Consultar informe visual compartido de preflight
+      description: |
+        Acceso mediante token JWT firmado (`scope: HUMAN_REPORT_VIEW`). Devuelve el informe amigable del PDF sin exponer rutas internas de servidor ni datos de infraestructura.
+      operationId: getSharedHumanReport
+      security: []
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Token JWT criptográficamente firmado con la autorización de visualización.
+      responses:
+        '200':
+          description: Informe visual recuperado con éxito.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HumanReportResponse'
+              example:
+                ok: true
+                job_id: "pf_job_8a7d6e5c-1234"
+                snapshot_id: "snap_998877"
+                tenant_id: "tenant_default"
+                report:
+                  outcome: "FIXED_REVIEW_REQUIRED"
+                  summary:
+                    title: "Informe de Verificación de Archivos"
+                    description: "Se detectaron advertencias que requieren confirmación visual."
+                    pages_analyzed: 192
+                    color_space: "CMYK (FOGRA39)"
+                  artifact_recommendations:
+                    - artifact_id: "art_visual_diff_01"
+                      artifact_type: "VISUAL_DIFF_PAGE_12"
+                      label: "Comparativa de corrección en página 12 (resolución de imagen)"
+                      customer_visible: true
+                      download_url: "/api/public/preflight/artifacts/art_visual_diff_01?token=..."
+                  customer_actions:
+                    - action_id: "review_required"
+                      label: "Revisión requerida antes de imprimir"
+                      description: "El archivo corregido debe ser aprobado antes de enviar a planchas."
+                      severity: "warning"
+        '400':
+          description: Snapshot no encontrado en la base de datos (código devuelto actualmente).
+        '401':
+          description: Token inválido, manipulado o expirado.
+
+  /api/marketplace/orders/{orderId}/customer-action/{token}:
+    get:
+      tags:
+        - Customer Shared Reports
+      summary: Consultar instrucciones y estado para subsanación / re-subida de archivos
+      description: |
+        Valida el token SHA-256 de subsanación y devuelve los archivos requeridos, errores detectados y enlace para subir la nueva versión.
+      operationId: getCustomerActionHandoff
+      security: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Identificador del pedido.
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Token efímero de subsanación.
+      responses:
+        '200':
+          description: Instrucciones de subsanación recuperadas con éxito.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerActionResponse'
+              example:
+                success: true
+                orderId: "ord_9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d"
+                action:
+                  type: "FILE_REUPLOAD_REQUIRED"
+                  status: "PENDING_NOTIFICATION"
+                  requiredFiles:
+                    - "INTERIOR_PDF"
+                  blockers:
+                    - "LOW_IMAGE_DPI_PAGE_45"
+                  message: "Por favor, sustituya el PDF interior con imágenes a 300 DPI."
+                  expiresAt: "2026-11-01T23:59:59.000Z"
+                  createdAt: "2026-10-25T14:00:00.000Z"
+                currentFiles:
+                  - file_id: "fil_int_01"
+                    role: "INTERIOR_PDF"
+                    status: "REJECTED"
+                    preflight_status: "FAILED"
+                    preflight_outcome_category: "REJECTED_RESOLUTION"
+                    findings_count: 3
+                    version: 1
+                trace_id: "trace_99887766"
+        '403':
+          description: Token inválido o no coincide con el hash del pedido.
+        '404':
+          description: Pedido no encontrado.
+        '410':
+          description: El enlace de subsanación ha expirado.
+
+components:
+  schemas:
+    HumanReportResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        job_id:
+          type: string
+        snapshot_id:
+          type: string
+        tenant_id:
+          type: string
+        report:
+          type: object
+
+    CustomerActionResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        orderId:
+          type: string
+        action:
+          type: object
+        currentFiles:
+          type: array
+          items:
+            type: object
+        trace_id:
+          type: string

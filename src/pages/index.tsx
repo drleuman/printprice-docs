@@ -2,7 +2,7 @@ import React from 'react';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 
-export default function Home(): JSX.Element {
+export default function Home(): React.ReactNode {
   return (
     <Layout
       title="PrintPrice OS — Production Intelligence Platform"

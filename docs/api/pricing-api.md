@@ -25,9 +25,9 @@ Evaluates the physical specifications of a book and returns ranked offers from e
 ### Request Body (JSON)
 | Field | Type | Required | Description |
 | :--- | :---: | :---: | :--- |
-| `copies` | Integer | **Yes** | Quantity of copies to print (evaluated by truthiness in controller; integer > 0 recommended). |
-| `interior_pages` | Integer | **Yes** | Total interior page count (evaluated by truthiness; integer > 0 recommended). |
-| `format` | String / Object | No | Standard format code (`"148x210"`, `"A5"`). Object dimensions `{width, height, unit}` represent a contract proposal (`[PROPUESTA DEV-02]`). |
+| `copies` | Integer / String | **Yes** | Quantity of copies to print. Current controller checks presence/truthiness (`!payload.copies`); strict `type: integer, minimum: 1` is a target proposal (`[PROPUESTA DEV-02]`). |
+| `interior_pages` | Integer / String | **Yes** | Total interior page count. Current controller checks presence/truthiness (`!payload.interior_pages`); strict `type: integer, minimum: 1` is a target proposal (`[PROPUESTA DEV-02]`). |
+| `format` | String | No | Standard format code (`"148x210"`, `"A5"`). Current BPE processes strings only. Object dimensions `{width, height, unit}` represent a separate contract proposal (`[PROPUESTA DEV-02]`). |
 | `paper_inner` | String | No | Interior paper specification (e.g., `"offset_white_90"`). |
 | `paper_cover` | String | No | Cover paper specification (e.g., `"couche_gloss_250"`). |
 | `binding_method` | String | No | Binding method normalized by `pricingEngineClient.js:283` (`"perfect_bound"` → `"perfect bound"`, `"hard_cover"` → `"hardcover"`). |
@@ -52,7 +52,29 @@ curl -X POST "http://localhost:3000/api/marketplace/offers" \
     "colors_inner": "1/1",
     "colors_cover": "4/0",
     "delivery_country": "ES"
-  }'
+#### Example Request (`Node.js fetch`)
+```javascript
+const response = await fetch("https://api.printprice.pro/api/marketplace/offers", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "x-trace-id": "trace_demo_12345"
+  },
+  body: JSON.stringify({
+    copies: 500,
+    interior_pages: 192,
+    format: "148x210",
+    paper_inner: "offset_white_90",
+    paper_cover: "couche_gloss_250",
+    binding_method: "perfect_bound",
+    finishing_options: "matt_lam_scratch",
+    colors_inner: "1/1",
+    colors_cover: "4/0",
+    delivery_country: "ES"
+  })
+});
+const data = await response.json();
+console.log(data);
 ```
 
 ---
@@ -128,3 +150,11 @@ In accordance with PrintPrice OS financial governance:
 - **`total_cost`:** The direct manufacturing expense computed from print house machine rates, setup time, and raw paper ODS matrix.
 - **`total_price`:** The suggested commercial price including platform margin rules.
 - **`breakdown`:** Transparent itemized cost lines ensuring complete explainability for publisher accounting.
+
+---
+
+## 4. Contract Specification
+
+Download the formal OpenAPI 3.1 specification for this domain:
+- **[Pricing & Marketplace Orders OpenAPI 3.1 Specification](/openapi/pricing-marketplace.openapi.yaml)**
+

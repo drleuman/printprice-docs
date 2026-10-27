@@ -63,11 +63,13 @@ const sidebars: SidebarsConfig = {
       label: 'API',
       items: [
         'api/overview',
-        'api/integration-contracts',
+        'api/quickstart',
         'api/authentication',
         'api/pricing-api',
+        'api/integration-contracts',
         'api/preflight-api',
         'api/webhooks',
+        'api/errors-and-limits',
       ],
     },
     {
