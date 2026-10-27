@@ -1788,3 +1788,323 @@ pre.terminal-body code {
     box-sizing: border-box;
   }
 }
+
+/* ==========================================================================
+   INTERACTIVE MERMAID DIAGRAMS & ACCESSIBLE ZOOM MODAL (DOC-UI-02)
+   ========================================================================== */
+
+.diagram-card-wrapper {
+  margin: 2rem 0;
+  border: 1px solid var(--ppos-card-border);
+  border-radius: var(--ppos-radius-md);
+  background: var(--ppos-card-bg);
+  box-shadow: var(--ppos-shadow-sm);
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.diagram-card-wrapper:hover {
+  border-color: var(--ppos-card-border-hover);
+  box-shadow: var(--ppos-shadow-md);
+}
+
+.diagram-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid var(--ppos-card-border);
+  font-size: 0.8rem;
+}
+
+[data-theme='light'] .diagram-toolbar {
+  background: #F1F5F9;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.diagram-toolbar-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--ifm-color-content-secondary);
+  font-weight: 500;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.diagram-zoom-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  color: var(--ppos-red-primary);
+  border: 1px solid rgba(229, 57, 53, 0.35);
+  border-radius: var(--ppos-radius-sm);
+  padding: 0.35rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.diagram-zoom-trigger:hover {
+  background: rgba(229, 57, 53, 0.1);
+  border-color: var(--ppos-red-primary);
+  color: var(--ppos-red-hover);
+  transform: translateY(-1px);
+}
+
+.diagram-zoom-trigger:focus-visible {
+  outline: 2px solid var(--ppos-red-primary) !important;
+  outline-offset: 2px !important;
+}
+
+/* Mobile & Desktop Readability Guarantee:
+   SVG preserves minimum readable text dimensions (font-size >= 13px)
+   and enables smooth touch horizontal scrolling rather than squishing letters. */
+.diagram-svg-viewport {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 1.5rem 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.diagram-svg-viewport svg {
+  display: block;
+  max-width: none;
+  min-width: min(100%, 680px);
+  height: auto;
+  transition: transform 0.2s ease;
+}
+
+@media (max-width: 768px) {
+  .diagram-svg-viewport {
+    justify-content: flex-start;
+    padding: 1rem 0.75rem;
+  }
+  .diagram-svg-viewport svg {
+    /* En pantallas móviles, mantenemos un ancho mínimo de 580px para que
+       las etiquetas de texto mantengan un font-size efectivo legible (>13px),
+       habilitando scroll horizontal accesible */
+    min-width: 580px;
+  }
+}
+
+/* Accessible Typography inside Mermaid SVGs */
+.diagram-svg-viewport svg text,
+.diagram-svg-viewport svg .nodeLabel,
+.diagram-svg-viewport svg .nodeLabel p,
+.diagram-svg-viewport svg .cluster-label,
+.diagram-svg-viewport svg .cluster-label span,
+.diagram-svg-viewport svg .cluster .nodeLabel,
+.diagram-svg-viewport svg .cluster span.nodeLabel,
+.diagram-svg-viewport svg .cluster span,
+.diagram-svg-viewport svg .label,
+.diagram-svg-viewport svg .label span,
+.diagram-modal-svg-wrapper svg text,
+.diagram-modal-svg-wrapper svg .nodeLabel,
+.diagram-modal-svg-wrapper svg .nodeLabel p,
+.diagram-modal-svg-wrapper svg .cluster-label,
+.diagram-modal-svg-wrapper svg .cluster-label span,
+.diagram-modal-svg-wrapper svg .cluster .nodeLabel,
+.diagram-modal-svg-wrapper svg .cluster span.nodeLabel,
+.diagram-modal-svg-wrapper svg .cluster span,
+.diagram-modal-svg-wrapper svg .label,
+.diagram-modal-svg-wrapper svg .label span {
+  font-size: 13.5px !important;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+}
+
+.diagram-svg-viewport svg .cluster-label span,
+.diagram-svg-viewport svg .cluster span.nodeLabel,
+.diagram-modal-svg-wrapper svg .cluster-label span,
+.diagram-modal-svg-wrapper svg .cluster span.nodeLabel {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.03em;
+}
+
+/* Modal Overlay & Dialog */
+.diagram-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(5, 7, 10, 0.85);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: diagramFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes diagramFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.diagram-modal-dialog {
+  background: #0B0D12;
+  border: 1px solid rgba(229, 57, 53, 0.35);
+  border-radius: 12px;
+  width: min(96vw, 1300px);
+  height: min(92vh, 850px);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.9), 0 0 40px rgba(229, 57, 53, 0.15);
+  overflow: hidden;
+  animation: diagramScaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes diagramScaleIn {
+  from { transform: scale(0.97); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.diagram-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.25rem;
+  background: #11141C;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 1rem;
+}
+
+.diagram-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #F8FAFC;
+  font-weight: 600;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.diagram-modal-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #E53935;
+  box-shadow: 0 0 10px #E53935;
+  flex-shrink: 0;
+}
+
+.diagram-modal-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.diagram-modal-btn {
+  background: #1A1E29;
+  color: #F8FAFC;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-width: 32px;
+  text-align: center;
+}
+
+.diagram-modal-btn:hover {
+  background: #242A38;
+  border-color: rgba(229, 57, 53, 0.5);
+  color: #FFFFFF;
+}
+
+.diagram-modal-btn:focus-visible {
+  outline: 2px solid #E53935 !important;
+  outline-offset: 2px !important;
+}
+
+.diagram-modal-btn-reset {
+  min-width: 58px;
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  color: #94A3B8;
+}
+
+.diagram-modal-btn-close {
+  background: rgba(229, 57, 53, 0.15);
+  color: #FF5252;
+  border-color: rgba(229, 57, 53, 0.35);
+  padding: 0.35rem 0.85rem;
+  margin-left: 0.5rem;
+}
+
+.diagram-modal-btn-close:hover {
+  background: #E53935;
+  color: #FFFFFF;
+  border-color: #E53935;
+}
+
+.diagram-modal-body {
+  flex: 1;
+  overflow: auto;
+  padding: 2.5rem 1.5rem;
+  background: #06080C;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+}
+
+.diagram-modal-body:active {
+  cursor: grabbing;
+}
+
+.diagram-modal-svg-wrapper {
+  transform-origin: center center;
+  transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.diagram-modal-svg-wrapper svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.diagram-modal-footer {
+  padding: 0.65rem 1.25rem;
+  background: #0E1118;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.78rem;
+  color: #94A3B8;
+  text-align: center;
+}
+
+.diagram-modal-footer kbd {
+  background: #1A1E29;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #F8FAFC;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+}
+
+/* Universal Focus Accessibility: High-contrast focus indicators */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--ppos-red-primary) !important;
+  outline-offset: 2px !important;
+}
+

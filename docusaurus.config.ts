@@ -65,6 +65,7 @@ const config: Config = {
       theme: {light: 'neutral', dark: 'dark'},
       options: {
         fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+        fontSize: 14,
       },
     },
     image: 'img/docusaurus-social-card.jpg',

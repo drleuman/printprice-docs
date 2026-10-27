@@ -12,34 +12,16 @@ This contract is implemented in the Control Plane at `src/api/routes/marketplace
 
 ```mermaid
 flowchart LR
-    subgraph S1 ["1. Ingestion & Validation"]
-        Req["POST /api/marketplace/offers\nx-trace-id header"]
-        Val["Fastify Schema Validator\nType checking & field presence"]
-        Req --> Val
-    end
-
-    subgraph S2 ["2. Book Pricing Engine (BPE :8004)"]
-        BPE["BPE Core Controller\nImposition, press & finishing"]
-    end
-
-    subgraph S3 ["3. Economic Governance"]
-        Decouple["Decoupling Engine\ntotal_cost vs total_price"]
-    end
-
-    subgraph S4 ["4. Deterministic Output"]
-        Evidence["Cryptographic Evidence\nevidenceId & variant anchor"]
-        Resp["200 OK Response\nRanked offers[] + breakdown"]
-        Evidence --> Resp
-    end
-
-    Val --> BPE
-    BPE --> Decouple
-    Decouple --> Evidence
+    Req["1. POST /api/marketplace/offers<br/>x-trace-id correlation header"] --> Val["Fastify Schema Validator<br/>Validates payload presence"]
+    Val --> BPE["2. Book Pricing Engine (:8004)<br/>Calculates imposition, press & waste"]
+    BPE --> Decouple["3. Margin Governance<br/>Decouples total_cost vs total_price"]
+    Decouple --> Evidence["4. Cryptographic Anchor<br/>Binds immutable evidenceId"]
+    Evidence --> Resp["200 OK Response<br/>Itemized offers[] breakdown"]
 
     classDef stageNode fill:#151820,stroke:#64748B,stroke-width:1.5px,color:#FFFFFF;
     classDef bpeNode fill:#1A1E29,stroke:#E53935,stroke-width:2px,color:#FFFFFF;
     classDef econNode fill:#151820,stroke:#FF5252,stroke-width:1.5px,color:#FFFFFF;
-    classDef outNode fill:#151820,stroke:#B71C1C,stroke-width:2px,color:#FFFFFF;
+    classDef outNode fill:#151820,stroke:#10B981,stroke-width:1.5px,color:#FFFFFF;
 
     class Req,Val stageNode;
     class BPE bpeNode;
@@ -57,12 +39,9 @@ Evaluates the physical specifications of a book and returns ranked offers from e
 
 ```mermaid
 flowchart LR
-    subgraph BPE_Stages ["BPE Manufacturing Calculation Pipeline"]
-        direction LR
-        Impos["1. Imposition & Geometry\nSignatures (8/16/32pp) & bleed"] --> Press["2. Press Evaluation\nSpeed, setup waste & clicks"]
-        Press --> Finish["3. Finishing Operations\nFolding, sewing/PUR & trim"]
-        Finish --> Pack["4. Packaging & Logistics\nVolumetric weight & SLA"]
-    end
+    Impos["1. Imposition & Geometry<br/>Signatures (8/16/32pp) & bleed"] --> Press["2. Press Evaluation<br/>Speed, setup waste & clicks"]
+    Press --> Finish["3. Finishing Operations<br/>Folding, sewing/PUR & trim"]
+    Finish --> Pack["4. Packaging & Logistics<br/>Volumetric weight & SLA"]
 
     classDef bpeStage fill:#1A1E29,stroke:#E53935,stroke-width:1.5px,color:#FFFFFF;
     class Impos,Press,Finish,Pack bpeStage;
@@ -205,16 +184,16 @@ If `copies` or `interior_pages` is omitted:
  
 ```mermaid
 flowchart LR
-    subgraph Costing ["Manufacturing Cost Base"]
-        DirectCost["Direct Cost (total_cost)\nPaper + Press + Finishing + Logistics"]
+    subgraph Costing ["Direct Manufacturing Cost Base"]
+        DirectCost["Direct Cost (total_cost)<br/>Paper + Press + Finishing + Logistics"]
     end
 
-    subgraph Governance ["Margin Governance"]
-        Multiplier["Tenant Margin Multiplier\nPlatform SLA & Tier Rules"]
+    subgraph Governance ["Margin Governance Layer"]
+        Multiplier["Tenant Margin Multiplier<br/>Platform SLA & Commercial Tier Rules"]
     end
 
-    subgraph Pricing ["Commercial Output"]
-        FinalPrice["Commercial Price (total_price)\nItemized breakdown[]\nCryptographic evidenceId"]
+    subgraph Pricing ["Commercial Output & Audit"]
+        FinalPrice["Commercial Price (total_price)<br/>Itemized breakdown[] & evidenceId"]
     end
 
     DirectCost --> Multiplier
