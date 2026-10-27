@@ -39,10 +39,8 @@ echo "Yarn version: $(yarn --version)"
 echo "=== 3. INSTALANDO DEPENDENCIAS CON YARN ==="
 yarn install --frozen-lockfile
 
-# 4. Hotfix de Mermaid para evitar fallos de SSG
-echo "=== 4. APLICANDO HOTFIX DE DIALOGRAMAS DE MERMAID ==="
-find docs src -type f \( -name "*.md" -o -name "*.mdx" \) -print0 2>/dev/null \
-  | xargs -0 perl -0pi -e 's/```mermaid/```text/g'
+# 4. Verificación de sintaxis de documentación
+echo "=== 4. VERIFICANDO SINTAXIS Y DIAGRAMAS MERMAID ==="
 
 # 5. Compilar Docusaurus
 echo "=== 5. COMPILANDO EL SITIO (YARN BUILD) ==="

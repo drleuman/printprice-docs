@@ -61,6 +61,12 @@ const config: Config = {
   ],
 
   themeConfig: {
+    mermaid: {
+      theme: {light: 'neutral', dark: 'dark'},
+      options: {
+        fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+      },
+    },
     image: 'img/docusaurus-social-card.jpg',
     colorMode: {
       defaultMode: 'dark',

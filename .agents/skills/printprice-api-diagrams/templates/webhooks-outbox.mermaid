@@ -1,0 +1,41 @@
+%% ============================================================================
+%% PrintPrice OS — Transactional Outbox & HMAC Webhook Delivery Engine
+%% Visual Identity: Red #E53935 | Dark Surface #151820 | Slate #64748B
+%% ============================================================================
+flowchart LR
+    subgraph TransactionScope ["1. ATOMIC TRANSACTION"]
+        direction TB
+        AppLogic["Domain Service\n(Order Status / Preflight State)"]
+        EventOutbox[("event_outbox Table\nevent_type, payload, status: PENDING,\ncreated_at, retry_count")]
+        AppLogic -->|"Atomic DB Transaction"| EventOutbox
+    end
+
+    subgraph OutboxWorkerCluster ["2. ASYNC OUTBOX WORKER"]
+        direction TB
+        Worker["Outbox Dispatcher Daemon"]
+        Signer["HMAC-SHA256 Signer\nKey: webhook_secret\nHeader: X-PPOS-Signature"]
+        Backoff["Exponential Backoff Engine\nRetry intervals: 10s, 1m, 15m, 1h"]
+
+        Worker --> Signer
+        Signer --> Backoff
+    end
+
+    subgraph ExternalPartner ["3. PARTNER DESTINATION"]
+        direction TB
+        Endpoint["Partner HTTPS Endpoint\nValidates signature & processes event"]
+        Ack["200 OK Response"]
+        Endpoint --> Ack
+    end
+
+    EventOutbox -.->|"Poll pending events"| Worker
+    Backoff -->|"HTTPS POST (Payload + Signature)"| Endpoint
+    Ack -.->|"Confirm Delivery (status: DELIVERED)"| EventOutbox
+
+    %% Styling
+    classDef txNode fill:#151820,stroke:#64748B,stroke-width:1.5px,color:#FFFFFF;
+    classDef workerNode fill:#1A1E29,stroke:#E53935,stroke-width:2px,color:#FFFFFF;
+    classDef destNode fill:#151820,stroke:#FF5252,stroke-width:1.5px,color:#FFFFFF;
+
+    class AppLogic,EventOutbox txNode;
+    class Worker,Signer,Backoff workerNode;
+    class Endpoint,Ack destNode;

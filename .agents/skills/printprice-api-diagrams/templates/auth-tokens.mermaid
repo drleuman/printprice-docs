@@ -1,0 +1,46 @@
+%% ============================================================================
+%% PrintPrice OS — Authentication, Token Isolation & Scopes
+%% Visual Identity: Red #E53935 | Dark Surface #151820 | Slate #64748B
+%% ============================================================================
+flowchart TD
+    subgraph CredentialTypes ["CREDENTIAL TYPES & ACCESS CHANNELS"]
+        direction TB
+        ApiKey["Partner Live Key\nppos_live_*\nHeader: Authorization: Bearer <key>"]
+        MarketToken["Marketplace Token\nX-Marketplace-Token\nOrder Intake & File Management"]
+        ReportToken["Ephemeral Human Report Token\nSigned JWT\nHUMAN_REPORT_VIEW"]
+        CustomerAction["Customer Handoff Token\nOne-Time SHA-256 Link\nCustomer Remediation"]
+    end
+
+    subgraph SecurityGate ["AUTHENTICATION & SCOPE ENFORCEMENT"]
+        AuthMiddleware["Fastify Auth Middleware\nStrict Tenant Context Validation"]
+        ScopeCheck{"Scope Verification"}
+    end
+
+    subgraph AuthorizedDomains ["DOMAIN EXECUTION PERIMETER"]
+        MarketplaceScope["Marketplace Operations\norders:create, orders:read,\nfiles:bind, offers:request"]
+        PreflightScope["Preflight Operations\npreflight:write, jobs:read,\nactions:fix"]
+        PublicReportScope["Public Inspection View\nRead-only SVG & Geometry Diff"]
+    end
+
+    ApiKey --> AuthMiddleware
+    MarketToken --> AuthMiddleware
+    ReportToken --> AuthMiddleware
+    CustomerAction --> AuthMiddleware
+
+    AuthMiddleware --> ScopeCheck
+
+    ScopeCheck -->|"Valid Partner Scope"| MarketplaceScope
+    ScopeCheck -->|"Valid Preflight Scope"| PreflightScope
+    ScopeCheck -->|"Valid Ephemeral Token"| PublicReportScope
+    ScopeCheck -->|"Invalid / Expired"| Err["401 Unauthorized / 403 Forbidden\nStandard Error Envelope"]
+
+    %% Styling
+    classDef credNode fill:#151820,stroke:#64748B,stroke-width:1.5px,color:#FFFFFF;
+    classDef gateNode fill:#1A1E29,stroke:#E53935,stroke-width:2px,color:#FFFFFF;
+    classDef domNode fill:#151820,stroke:#FF5252,stroke-width:1.5px,color:#FFFFFF;
+    classDef errNode fill:#2A1215,stroke:#E53935,stroke-width:2px,color:#FF8A80;
+
+    class ApiKey,MarketToken,ReportToken,CustomerAction credNode;
+    class AuthMiddleware,ScopeCheck gateNode;
+    class MarketplaceScope,PreflightScope,PublicReportScope domNode;
+    class Err errNode;

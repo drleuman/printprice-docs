@@ -27,17 +27,54 @@ To ensure clear operational boundaries, the PrintPrice OS ecosystem separates pu
    The runtime execution layer where API gateways, Fastify routers, and Node.js microservices process requests.
 
 ```mermaid
-graph TD
-    Client["Client / Publishing System"] -->|"1. Request Quotes (POST /api/marketplace/offers)"| Gateway["API Gateway (api.printprice.pro)"]
-    Gateway -->|"Route Offers"| CP["Control Plane Router"]
-    CP -->|"Calculate Price"| BPE["Book Pricing Engine (BPE :8004)"]
-    Client -->|"2. Create Order (POST /api/marketplace/orders)"| Gateway
-    Gateway -->|"Ingest Order (DRAFT)"| CP
-    CP -->|"Persist Order"| DB[("MySQL Cluster")]
-    Client -->|"3. Inspect PDF (POST /api/preflight/jobs)"| Gateway
-    Gateway -->|"Reverse Proxy (/api/preflight/*)"| PF["Preflight Service (:8001)"]
-    PF -->|"Extract Geometries & Box Checks"| Worker["Preflight Workers"]
-    CP -.->|"4. Event Webhooks (Push HMAC-SHA256)"| Client
+flowchart TB
+    subgraph ClientZone ["CLIENT & INTEGRATION SURFACE"]
+        Client["Integrator / Publishing App\n(REST HTTPS & Webhook Receiver)"]
+    end
+
+    subgraph Perimeter ["API PERIMETER & GATEWAY"]
+        Gateway["NGINX Reverse Proxy / Gateway\napi.printprice.pro (:443)"]
+    end
+
+    subgraph CoreServices ["PRINTPRICE OS CLUSTER"]
+        direction TB
+        CP["Control Plane Fastify Router (:8080)\nAuth, Tenancy & Orders"]
+        PF["Preflight Service (:8001)\nInspection, Geometric Check & Autofix"]
+        BPE["Book Pricing Engine (:8004)\nDeterministic Manufacturing Cost"]
+        Outbox["Transactional Outbox Worker\nHMAC-SHA256 Delivery Engine"]
+    end
+
+    subgraph DataStorage ["PERSISTENCE & STATE"]
+        DB[("MySQL Cluster\nTenants, Orders & Evidences")]
+        Redis[("Redis In-Memory\nPubSub & Ephemeral Tokens")]
+        Storage[("Object Storage\nPDF Originals & Normalized Fixes")]
+    end
+
+    Client -->|"1. POST /api/marketplace/offers\n(x-trace-id header)"| Gateway
+    Client -->|"2. POST /api/marketplace/orders\n(Bearer JWT / Intake Token)"| Gateway
+    Client -->|"3. POST /api/preflight/jobs\n(Multipart up to 2GB)"| Gateway
+
+    Gateway -->|"Proxy /api/marketplace/*"| CP
+    Gateway -->|"Proxy /api/preflight/*"| PF
+
+    CP -->|"Calculate Price Matrix"| BPE
+    CP -->|"Persist Order & Evidences"| DB
+    CP -->|"Cache & Rate Limiting"| Redis
+    PF -->|"Store Uploaded Artifacts"| Storage
+    CP -->|"Enqueue Event Outbox"| DB
+
+    DB -.->|"Poll Events"| Outbox
+    Outbox -.->|"Push Webhook with X-PPOS-Signature\n(order.ready, preflight.completed)"| Client
+
+    classDef clientNode fill:#0F1218,stroke:#64748B,stroke-width:1.5px,color:#94A3B8;
+    classDef gatewayNode fill:#151820,stroke:#FF5252,stroke-width:2px,color:#FFFFFF;
+    classDef coreNode fill:#1A1E29,stroke:#E53935,stroke-width:2px,color:#FFFFFF;
+    classDef dataNode fill:#11141C,stroke:#B71C1C,stroke-dasharray: 4 2,color:#F8FAFC;
+
+    class Client clientNode;
+    class Gateway gatewayNode;
+    class CP,PF,BPE,Outbox coreNode;
+    class DB,Redis,Storage dataNode;
 ```
 
 ---
