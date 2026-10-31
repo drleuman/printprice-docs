@@ -13,6 +13,7 @@ const sidebars: SidebarsConfig = {
         'api/authentication',
         'api/pricing-api',
         'api/logistics-api',
+        'logistics/carrier-service-protocol',
         'api/integration-contracts',
         'api/preflight-api',
         'api/webhooks',
