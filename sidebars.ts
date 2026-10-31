@@ -46,6 +46,7 @@ const sidebars: SidebarsConfig = {
       items: [
         'architecture/platform-architecture',
         'architecture/editorial-manufacturing-phase11',
+        'architecture/financial-escrow-jdf-oee-phase12',
         'architecture/state-of-the-art',
         'architecture/preflight-diagnostic-contract',
         'architecture/preflight-status-contract',

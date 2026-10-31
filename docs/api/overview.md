@@ -112,6 +112,9 @@ The following core contracts have been verified against active controller implem
 | **Phase 11A Preflight & Spine Auto-Fix** | `POST` | `/api/preflight/inspect` · `/api/preflight/auto-fix` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | **Phase 11B Dynamic Imposition & Queue** | `POST / GET` | `/api/manufacturing/imposition/plan` · `/queue` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | **Phase 11C Publisher B2B Hub & 3D Proof** | `GET / POST` | `/api/publisher/orders` · `/proof-decision` · `/notifications` | `Bearer JWT (PUBLISHER / PRINTHOUSE_ADMIN)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| **Phase 12A Commercial Escrow & POD Split** | `GET / POST` | `/api/financials/escrow/ledger` · `/:orderId/settle-on-pod` | `Bearer JWT (Control Plane / Financial Ops)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| **Phase 12B CIP4 JDF 1.7 & JMF Telemetry** | `GET / POST` | `/api/manufacturing/imposition/:jobId/jdf-ticket.xml` · `/jmf/signal` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| **Phase 12C Predictive Maintenance & OEE** | `GET / POST` | `/api/machines/predictive-maintenance` · `/:machineId/maintenance-reset` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 
 </div>
 
