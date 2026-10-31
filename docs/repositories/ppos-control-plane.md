@@ -18,31 +18,46 @@ PrintPrice OS is architected on a strict platform decoupling model:
 
 While specialized microservices (such as the Preflight Engine and Book Pricing Engine) perform heavy deterministic computational tasks, the **Control Plane** acts as the authoritative orchestration and management layer. It coordinates multi-tenant isolation, digital twin machine configurations, paper supplier ecosystems, and the commercial audit trail.
 
-```
-                     ┌─────────────────────────────────────────┐
-                     │          PrintPrice OS UI              │
-                     │  (Printhouse Setup / Supplier Hub)      │
-                     └────────────────────┬────────────────────┘
-                                          │ HTTPS / REST
-                                          ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│                      PPOS CONTROL PLANE                                │
-│                                                                        │
-│   ┌────────────────────┐ ┌────────────────────┐ ┌──────────────────┐   │
-│   │ Multi-Tenant RBAC  │ │ Intelligence Layer │ │ Paper Supplier   │   │
-│   │ & Security Guard   │ │ & Dynamic Solver   │ │ Hub & Master DB  │   │
-│   └────────────────────┘ └────────────────────┘ └──────────────────┘   │
-│   ┌────────────────────┐ ┌────────────────────┐ ┌──────────────────┐   │
-│   │ Printhouse Digital │ │ Commercial Evidence│ │ Diagnostics Sync │   │
-│   │ Twin Configuration │ │ Audit Trail        │ │ & Registry Gate  │   │
-│   └────────────────────┘ └────────────────────┘ └──────────────────┘   │
-└───────────────┬───────────────────┬───────────────────┬────────────────┘
-                │                   │                   │
-                ▼                   ▼                   ▼
-     ┌──────────────────┐   ┌───────────────┐   ┌────────────────┐
-     │ Book Pricing     │   │ Preflight     │   │ Matchmaker &   │
-     │ Engine (BPE)     │   │ Service       │   │ Routing Graph  │
-     └──────────────────┘   └───────────────┘   └────────────────┘
+```mermaid
+flowchart TB
+    subgraph ClientSurface ["PRINTPRICE OS ADMIN & PARTNER UI"]
+        UI["PrintPrice OS SPA\n(Printhouse Setup / ShippingPanel / Supplier Hub)"]
+    end
+
+    subgraph ControlPlane ["PPOS CONTROL PLANE (GOVERNANCE & INTELLIGENCE LAYER)"]
+        direction TB
+        RBAC["Multi-Tenant RBAC\n& Security Guard"]
+        Solver["Intelligence Layer\n& Dynamic Cost Solver"]
+        PaperHub["Paper Supplier Hub\n& Master Catalog DB"]
+        DigitalTwin["Printhouse Digital Twin\n(Presses, Binding & Setup)"]
+        Logistics["3D Cubing & Editorial\nLogistics Engine"]
+        Evidence["Commercial Evidence\n& Legal Audit Trail"]
+        DiagSync["Diagnostics Sync\n& Registry Gate"]
+    end
+
+    subgraph DownstreamEngines ["DETERMINISTIC COMPUTATION ENGINES"]
+        BPE["Book Pricing Engine (BPE)\nManufacturing Cost Truth"]
+        PF["Preflight Service\nPDF Geometry & Color Truth"]
+        Matchmaker["Matchmaker & Routing Graph\nLanded Cost & SLA Ranking"]
+    end
+
+    UI -->|"HTTPS / REST (Bearer JWT)"| ControlPlane
+    Solver -->|"Calculate Manufacturing Matrix"| BPE
+    Logistics -->|"3D Palletization, LDM & Freight"| Matchmaker
+    DiagSync -->|"Ingest Canonical Payload"| PF
+    DigitalTwin --> Solver
+    PaperHub --> Solver
+    Evidence --> Matchmaker
+
+    classDef clientNode fill:#0F1218,stroke:#64748B,stroke-width:1.5px,color:#94A3B8;
+    classDef gatewayNode fill:#151820,stroke:#FF5252,stroke-width:2px,color:#FFFFFF;
+    classDef coreNode fill:#1A1E29,stroke:#E53935,stroke-width:2px,color:#FFFFFF;
+    classDef engineNode fill:#11141C,stroke:#B71C1C,stroke-dasharray: 4 2,color:#F8FAFC;
+
+    class UI clientNode;
+    class RBAC,Evidence gatewayNode;
+    class Solver,PaperHub,DigitalTwin,Logistics,DiagSync coreNode;
+    class BPE,PF,Matchmaker engineNode;
 ```
 
 ---
@@ -76,6 +91,11 @@ While specialized microservices (such as the Preflight Engine and Book Pricing E
 ### F. Technical Diagnostics & Preflight Synchronization
 - **Diagnostic Preservation**: Safely ingests and stores the deep `canonicalPayload` from the Preflight Service without altering or truncating engineering findings.
 - **Status Lifecycles**: Translates preflight status flags (`SUCCESS`, `PARTIAL`, `DEGRADED`, `FAILED_RUNTIME_ENVIRONMENT`) into actionable production workflows.
+
+### G. 3D Cubing, Editorial Logistics & Freight Matrix Engine
+- **Deterministic 3D Palletization (`packagingAndCubingEngine.js`)**: Computes net trimmed book weight (including hardcover greyboard at `1.20 g/cm³` and endpapers), selects ergonomic FEFCO 0201 cartons (`≤ 15 kg`), and tiles cartons in interlocked pinwheel layers onto standard `1200 × 800 mm` EPAL Euro-pallets.
+- **Editorial Warehouse Compliance (`warehouse_delivery_profiles`)**: Enforces receiving dock standards for major European book distributors (`ZEITFRACHT_ERFURT`, `ARVATO_VVA_GUETERSLOH`, `AMAZON_EU_FBA_STD`, `STANDARD_COMMERCIAL_DOCK`), including perimeter overhang setbacks, maximum pallet heights, and 48h slot-booking governance.
+- **Landed Freight & Stackability (`logisticsDatabaseService.js`)**: Resolves taxable pallet weight under non-stackable LDM (`0.4 LDM = 740 kg`), double-deck carrier trucks, and printshop auto-stacking (`≤ 1200 mm`), while preserving strict accounting separation between manufacturing, packaging consumables, and carrier freight. See the [3D Cubing & Editorial Logistics Engine](/docs/engines/logistics-cubing-engine) and [Logistics & Freight REST API](/docs/api/logistics-api).
 
 ---
 

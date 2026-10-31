@@ -16,37 +16,41 @@ The **Paper Supplier Hub** in PrintPrice OS solves this friction by providing a 
 
 The Paper Supplier Hub operates as an intelligence bridge between paper manufacturers, distributors, and printing houses:
 
-```
-┌─────────────────────────────────┐
-│     Paper Manufacturers &       │
-│          Distributors           │
-└────────────────┬────────────────┘
-                 │ Self-Service Registration (/supplier/register)
-                 │ Automated Tax/VAT & Catalog Ingestion
-                 ▼
-┌───────────────────────────────────────────────────────────────┐
-│                 PAPER SUPPLIER HUB (CONTROL PLANE)            │
-│                                                               │
-│   ┌──────────────────────────┐    ┌───────────────────────┐   │
-│   │ Master Substrates DB     │    │ Verified Supplier     │   │
-│   │ (materials_catalog)      │    │ Directory             │   │
-│   └────────────┬─────────────┘    └───────────┬───────────┘   │
-│                │                              │               │
-│                └──────────────┬───────────────┘               │
-│                               ▼                               │
-│                ┌─────────────────────────────┐                │
-│                │ Dynamic Resolution Engine   │                │
-│                │ (GET /api/admin/materials)  │                │
-│                └──────────────┬──────────────┘                │
-└───────────────────────────────┼───────────────────────────────┘
-                                │ Live Linking & Auto-Country
-                                ▼
-┌───────────────────────────────────────────────────────────────┐
-│              PRINTHOUSE SETUP & MATERIALS PANEL               │
-│                                                               │
-│    [SupplierSelect Combobox] ──► [CountrySelect]             │
-│    Custom Margin Multipliers ──► Manufacturing vs Transport   │
-└───────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph SuppliersZone ["PAPER MANUFACTURERS & DISTRIBUTORS"]
+        Suppliers["Paper Mills & Merchants\n(Fedrigoni, Lecta, Sappi, Igepa)"]
+    end
+
+    subgraph HubZone ["PAPER SUPPLIER HUB (CONTROL PLANE)"]
+        direction TB
+        CatalogDB[("Master Substrates DB\n(materials_catalog)")]
+        SupplierDir[("Verified Supplier Directory\n(paper_suppliers)")]
+        ResolutionEngine["Dynamic Resolution Engine\n(GET /api/admin/materials/*)"]
+        CatalogDB --> ResolutionEngine
+        SupplierDir --> ResolutionEngine
+    end
+
+    subgraph SetupZone ["PRINTHOUSE SETUP & MATERIALS PANEL"]
+        direction LR
+        UI["SupplierSelect Combobox & CountrySelect\n(MaterialsPanel.tsx)"]
+        Economics["Custom Margin Multipliers\nManufacturing vs. Transport Segregation"]
+        UI --> Economics
+    end
+
+    Suppliers -->|"Self-Service Registration (/supplier/register)\nAutomated Tax/VAT & Catalog Ingestion"| SupplierDir
+    Suppliers -->|"Mill Specifications & Grammage Matrices"| CatalogDB
+    ResolutionEngine -->|"Live Linking & Auto-Country Resolution"| UI
+
+    classDef extNode fill:#0F1218,stroke:#64748B,stroke-width:1.5px,color:#94A3B8;
+    classDef coreNode fill:#1A1E29,stroke:#E53935,stroke-width:2px,color:#FFFFFF;
+    classDef dataNode fill:#11141C,stroke:#B71C1C,stroke-dasharray: 4 2,color:#F8FAFC;
+    classDef uiNode fill:#151820,stroke:#FF5252,stroke-width:2px,color:#FFFFFF;
+
+    class Suppliers extNode;
+    class CatalogDB,SupplierDir dataNode;
+    class ResolutionEngine coreNode;
+    class UI,Economics uiNode;
 ```
 
 ---

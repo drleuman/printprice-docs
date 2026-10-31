@@ -105,6 +105,10 @@ The following core contracts have been verified against active controller implem
 | **Readiness Recompute** | `POST` | `/api/marketplace/orders/:orderId/readiness/recompute` | `X-Marketplace-Token / Bearer JWT` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-code">VERIFIED_IN_CODE</span> |
 | **Shared Preflight Report** | `GET` | `/api/public/preflight/human-report/:token` | `Signed JWT (HUMAN_REPORT_VIEW)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-code">VERIFIED_IN_CODE</span> |
 | **Customer Action Handoff** | `GET` | `/api/marketplace/orders/:orderId/customer-action/:token` | `Ephemeral SHA-256 Token` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-code">VERIFIED_IN_CODE</span> |
+| **Editorial Warehouse Profiles** | `GET` | `/api/logistics/warehouses` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| **Warehouse Profile Detail** | `GET` | `/api/logistics/warehouses/:code` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| **3D Cubing & Landed Freight Quote** | `POST` | `/api/logistics/calculate-quote` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| **Printhouse Freight Matrices** | `GET / PUT` | `/api/printhouses/:id/freight-matrices` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 
 </div>
 
