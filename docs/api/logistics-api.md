@@ -61,8 +61,12 @@ When the authenticated user session is bound to a specific `tenantId` (`req.user
 | `POST` | `/api/logistics/shipments/:id/labels/sscc-pdf` | Generates vector GS1-128 SSCC-18 pallet labels in binary PDF (`?format=A6` thermal 1-page/pallet or `?format=A4_SHEET_4UP`). | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | `GET` | `/api/logistics/shipments/:id/delivery-note/pdf` | Generates the official DIN A4 Delivery Note / *Lieferschein* / *Albarán de Entrega* PDF with SSCC manifest, 0.4 LDM, 14-day EPAL voucher (15.00 EUR penalty) & CMR signature boxes. | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | `GET` | `/api/logistics/carrier-protocol/pdf` | Generates the official DIN A4 Carrier Integration Protocol & Service Conditions PDF (*Protocolo de Integración y Condiciones de Servicio de Transporte* — [see full protocol](../logistics/carrier-service-protocol.md)). | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
-| `POST` | `/api/logistics/carrier/milestones` | Ingests carrier telematic scan events (`PICKED_UP`, `CROSS_DOCK_SCANNED`, `DELIVERED_POD`), validates SSCC-18 Modulo-10, checks the 2h POD SLA, and updates EPAL dock exchange counts. | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| `POST` | `/api/logistics/carrier/milestones` | Ingests carrier telematic scan events (`PICKED_UP`, `CROSS_DOCK_SCANNED`, `DELIVERED_POD`), validates SSCC-18 Modulo-10, checks the 2h POD SLA, updates EPAL dock exchange counts, and triggers Publisher POD Notifications. | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | `POST` | `/api/logistics/epal/settlement-run` | Evaluates the 14-day Euro-Pallet EPAL (*Palettenschein*) exchange window across shipments and issues automatic `15.00 EUR / unit` (+ VAT) settlement charges for overdue unreturned pallets. | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| `GET` | `/api/logistics/epal/scheduler-status` | Returns the live status of the automated daily 14-day EPAL settlement cron daemon (`0 0 * * *`). | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| `POST` | `/api/logistics/epal/scheduler-control` | Starts or stops the automated daily EPAL settlement cron scheduler (`START` / `STOP`). | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| `GET` | `/api/logistics/notifications/publisher-pod` | Lists automatic trilingual (`ES`/`DE`/`EN`) Publisher POD notifications and signed outgoing webhook dispatches (`logistics.shipment.delivered_pod`). | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| `POST` | `/api/logistics/landed-cost/consolidate` | Consolidates manufacturing cost, workshop packaging consumables, quoted vs. actual carrier freight, and overdue EPAL settlement adjustments (`EPAL-SETTLE-*`) into the order balance. | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | `GET` | `/api/printhouses/:id/freight-matrices` | Lists printhouse freight rate matrices (plus platform defaults) and packaging consumable rates. | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | `PUT` | `/api/printhouses/:id/freight-matrices` | Upserts printhouse freight matrices, operational scenarios (LDM, slot booking, tracking), or adopts platform defaults (`adoptPlatformDefault: true`). | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 
@@ -697,5 +701,43 @@ Executes the automated 14-calendar-day Euro-Pallet EPAL (*Palettenschein*) settl
       "exchangedAtDockPallets": 1
     }
   ]
+}
+```
+
+---
+
+## 8. Automated EPAL Daily Cron, Publisher POD Webhooks & Landed Cost Consolidation (`LOGISTICS-07`)
+
+### `GET /api/logistics/epal/scheduler-status` & `POST /api/logistics/epal/scheduler-control`
+
+Manages the unattended background daily settlement cron daemon (`0 0 * * *`, booted automatically in `server.js`) that evaluates open *Palettenschein* vouchers across all active shipments every 24 hours.
+
+```json
+{
+  "action": "START",
+  "intervalMs": 86400000,
+  "runImmediately": true
+}
+```
+
+### `GET /api/logistics/notifications/publisher-pod`
+
+When a shipment reaches `DELIVERED` via `POST /api/logistics/carrier/milestones`, PrintPriceOS automatically generates a trilingual (`ES`/`DE`/`EN`) Publisher POD Notification and enqueues a signed `HMAC-SHA256` outgoing webhook event (`logistics.shipment.delivered_pod`) containing the SSCC-18 manifest, EPAL exchange status, and the direct link to the DIN A4 Delivery Note PDF (`/api/logistics/shipments/:id/delivery-note/pdf`).
+
+### `POST /api/logistics/landed-cost/consolidate`
+
+Consolidates governed manufacturing cost, workshop packaging consumables, quoted vs. actual carrier freight, and overdue 14-day EPAL *Palettenschein* settlement charges (`EPAL-SETTLE-*`) into the order's financial balance while preserving strict cost segregation:
+
+```json
+{
+  "orderId": "ORD-2026-901",
+  "shipmentId": "SHP-2026-ERFURT-01",
+  "evaluationDate": "2026-11-20T12:00:00.000Z",
+  "quantity": 2000,
+  "manufacturingCostEur": 3200.00,
+  "packagingMaterialsCostEur": 95.00,
+  "quotedCarrierFreightEur": 240.00,
+  "actualCarrierFreightEur": 255.00,
+  "epalAllocationMode": "CARRIER_FREIGHT_DEDUCTION"
 }
 ```
