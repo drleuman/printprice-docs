@@ -91,3 +91,16 @@ Authorization: Bearer <JWT_TOKEN>
   * `Content-Disposition: inline; filename="ppos-carrier-service-protocol-A4.pdf"`
   * `X-PPOS-Protocol-Version: PPOS-LOG-SLA-2026.1`
 
+---
+
+## 7. Endpoints de Ejecución Telemática (POD Webhook & Liquidación EPAL 14 Días)
+
+1. **Webhook Telemático de Hitos y POD Digital (`POST /api/logistics/carrier/milestones`):**
+   * Valida determinísticamente el dígito de control Módulo 10 del código **GS1-128 SSCC-18** en cada lectura (`PICKED_UP`, `CROSS_DOCK_SCANNED`, `DELIVERED_POD`).
+   * Verifica el cumplimiento del SLA de notificación telemática (`<= 120 minutos` desde `unloadedAt` hasta `timestamp`) y registra el número de palets EPAL canjeados en muelle (`epalExchangedCount`).
+
+2. **Motor de Liquidación Automatizada de Palets EPAL (`POST /api/logistics/epal/settlement-run`):**
+   * Evalúa periódicamente las expediciones frente al plazo improrrogable de **14 días naturales** (`EPAL_EXCHANGE_DEADLINE_DAYS = 14`).
+   * Si existen palets pendientes de restitución (`outstandingEpalPallets > 0`) una vez superados los 14 días, emite automáticamente el cargo de liquidación a razón de **`15,00 EUR / palet EPAL`** más IVA (`EPAL-SETTLE-<shipmentId>`).
+
+

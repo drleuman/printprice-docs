@@ -61,6 +61,8 @@ When the authenticated user session is bound to a specific `tenantId` (`req.user
 | `POST` | `/api/logistics/shipments/:id/labels/sscc-pdf` | Generates vector GS1-128 SSCC-18 pallet labels in binary PDF (`?format=A6` thermal 1-page/pallet or `?format=A4_SHEET_4UP`). | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | `GET` | `/api/logistics/shipments/:id/delivery-note/pdf` | Generates the official DIN A4 Delivery Note / *Lieferschein* / *Albarán de Entrega* PDF with SSCC manifest, 0.4 LDM, 14-day EPAL voucher (15.00 EUR penalty) & CMR signature boxes. | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | `GET` | `/api/logistics/carrier-protocol/pdf` | Generates the official DIN A4 Carrier Integration Protocol & Service Conditions PDF (*Protocolo de Integración y Condiciones de Servicio de Transporte* — [see full protocol](../logistics/carrier-service-protocol.md)). | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| `POST` | `/api/logistics/carrier/milestones` | Ingests carrier telematic scan events (`PICKED_UP`, `CROSS_DOCK_SCANNED`, `DELIVERED_POD`), validates SSCC-18 Modulo-10, checks the 2h POD SLA, and updates EPAL dock exchange counts. | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| `POST` | `/api/logistics/epal/settlement-run` | Evaluates the 14-day Euro-Pallet EPAL (*Palettenschein*) exchange window across shipments and issues automatic `15.00 EUR / unit` (+ VAT) settlement charges for overdue unreturned pallets. | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | `GET` | `/api/printhouses/:id/freight-matrices` | Lists printhouse freight rate matrices (plus platform defaults) and packaging consumable rates. | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | `PUT` | `/api/printhouses/:id/freight-matrices` | Upserts printhouse freight matrices, operational scenarios (LDM, slot booking, tracking), or adopts platform defaults (`adoptPlatformDefault: true`). | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 
@@ -652,5 +654,48 @@ curl -X GET "https://control.printprice.pro/api/logistics/shipments/SHP-2026-VVA
   2. **Production & Editorial Block**: Book title, ISBN-13, PO Number, trimmed format (`mm`), page count, and binding specification.
   3. **Palletized SSCC-18 Manifest Table**: Individual row per Euro-Pallet EPAL (`1200 × 800 mm`) listing its `SSCC-18 / NVE (AI 00)`, FEFCO 0201 carton count, books/box, total copies, stacked height (`mm`), and net vs. gross mass (`kg`).
   4. **Transport Control & LDM Block**: Total Loading Meters (**`0.4 LDM / Euro-pallet`**), Chargeable/Taxable Weight (`kg`) vs. Actual Gross Weight, Stackability Mode (`STRICT_LDM_NON_STACKABLE` / `DOUBLE_DECK_SUPPORTED`), and Assigned Dock Slot declaration.
-  5. **Euro-Pallet EPAL Exchange Control (*Palettenschein — 14 Days*)**: Tracks delivered UIC 435-2 / EPAL pallets, 1:1 dock exchange checkbox, and the **14-calendar-day** return balance.
+  5. **Euro-Pallet EPAL Exchange Control (*Palettenschein — 14 Days*)**: Tracks delivered UIC 435-2 / EPAL pallets, 1:1 dock exchange checkbox, and the **14-calendar-day** return balance (`15.00 EUR / unit` non-return fee).
   6. **CMR / POD Signature Boxes**: Dedicated sign-off boxes for the Shipper, Carrier Driver (with vehicle plate), and Receiving Dock Stamp (with arrival/unloading timestamps).
+
+---
+
+## 7. Carrier Telematic Milestones (POD) & 14-Day EPAL Settlement (`LOGISTICS-06`)
+
+### `POST /api/logistics/carrier/milestones`
+
+Ingests telematic scan events (`PICKED_UP`, `CROSS_DOCK_SCANNED`, `IN_TRANSIT`, `ARRIVED_AT_DOCK`, `DELIVERED_POD`, `EPAL_EXCHANGED_AT_DOCK`, `EPAL_RETURNED`) from carrier tracking webhooks, validating GS1-128 SSCC-18 Modulo-10 check digits and evaluating the 2-hour POD notification SLA (`PPOS-LOG-SLA-2026.1` Section 4.2).
+
+```json
+{
+  "shipmentId": "SHP-2026-ERFURT-01",
+  "milestone": "DELIVERED_POD",
+  "sscc": "(00) 0 8412345 000000001 0",
+  "closeAllPallets": true,
+  "unloadedAt": "2026-10-31T14:00:00.000Z",
+  "timestamp": "2026-10-31T14:25:00.000Z",
+  "gps": { "lat": 50.9848, "lon": 11.0299 },
+  "dockGate": "Halle 1 / Tor 14",
+  "epalExchangedCount": 2,
+  "deliveredEpalPallets": 3
+}
+```
+
+### `POST /api/logistics/epal/settlement-run`
+
+Executes the automated 14-calendar-day Euro-Pallet EPAL (*Palettenschein*) settlement sweep across shipments, billing unreturned pallets at **`15.00 EUR / unit`** (+ VAT) when `daysElapsed > 14` and `outstandingEpalPallets > 0`.
+
+```json
+{
+  "evaluationDate": "2026-11-20T12:00:00.000Z",
+  "autoSettle": true,
+  "shipments": [
+    {
+      "shipmentId": "SHP-2026-ERFURT-01",
+      "carrierName": "DACHSER",
+      "dispatchTimestamp": "2026-10-31T08:00:00.000Z",
+      "deliveredEpalPallets": 3,
+      "exchangedAtDockPallets": 1
+    }
+  ]
+}
+```
