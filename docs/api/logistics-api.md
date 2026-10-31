@@ -58,6 +58,8 @@ When the authenticated user session is bound to a specific `tenantId` (`req.user
 | `GET` | `/api/logistics/warehouses` | Lists all active editorial and fulfillment warehouse receiving profiles. | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | `GET` | `/api/logistics/warehouses/:code` | Retrieves physical constraints, dock rules, and penalties for a specific warehouse profile. | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | `POST` | `/api/logistics/calculate-quote` | Executes 3D book/carton/EPAL pallet cubing, run optimization (`ΔQ-` / `ΔQ+`), operational scenarios, and landed freight calculation. | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| `POST` | `/api/logistics/shipments/:id/labels/sscc-pdf` | Generates vector GS1-128 SSCC-18 pallet labels in binary PDF (`?format=A6` thermal 1-page/pallet or `?format=A4_SHEET_4UP`). | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| `GET` | `/api/logistics/shipments/:id/delivery-note/pdf` | Generates the official DIN A4 Delivery Note / *Lieferschein* / *Albarán de Entrega* PDF with SSCC manifest, 0.4 LDM, 14-day EPAL voucher & CMR signature boxes. | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | `GET` | `/api/printhouses/:id/freight-matrices` | Lists printhouse freight rate matrices (plus platform defaults) and packaging consumable rates. | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | `PUT` | `/api/printhouses/:id/freight-matrices` | Upserts printhouse freight matrices, operational scenarios (LDM, slot booking, tracking), or adopts platform defaults (`adoptPlatformDefault: true`). | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 
@@ -558,3 +560,96 @@ Upserts custom freight rate matrices and/or packaging consumable rates for a pri
   }
 }
 ```
+
+---
+
+## 6. Automated GS1-128 SSCC Pallet Labels & Delivery Note PDF Generation (`LOGISTICS-05`)
+
+Implemented in `src/api/services/logistics/ssccGeneratorService.js`, `src/api/services/logistics/deliveryNotePdfService.js`, and mounted in `src/api/routes/logisticsRoutes.js`, these endpoints generate vector PDF 1.4 binary streams in sub-millisecond time without external native dependencies.
+
+### `POST /api/logistics/shipments/:id/labels/sscc-pdf`
+
+Generates high-resolution vector **GS1-128 Subset C** pallet labels with Application Identifier `(00)` and an 18-digit **Serial Shipping Container Code (SSCC / NVE)** verified with the official GS1 Modulo-10 check digit algorithm.
+
+#### Path & Query Parameters
+| Parameter | Location | Type | Default | Description |
+| :--- | :---: | :---: | :---: | :--- |
+| `id` | Path | `string` | — | Shipment or dispatch identifier (e.g. `SHP-2026-0001`). |
+| `format` | Query | `string` | `"A6"` | `"A6"` (`105 × 148 mm`, 1 thermal label page per pallet for Zebra/TSC printers) or `"A4_SHEET_4UP"` (`210 × 297 mm`, 2×2 quadrant layout on DIN A4 laser sheets). |
+
+#### Optional Request Body
+| Field | Type | Default | Description |
+| :--- | :---: | :---: | :--- |
+| `warehouseProfileCode` | `string` | `"ZEITFRACHT_ERFURT"` | Receiving hub profile (`ZEITFRACHT_ERFURT`, `ARVATO_VVA_GUETERSLOH`, `AMAZON_EU_FBA_STD`, `STANDARD_COMMERCIAL_DOCK`). |
+| `poNumber` | `string` | `"PO-<id>"` | Publisher Purchase Order reference printed in the top & middle blocks. |
+| `isbn` | `string` | `"978-3-518-42910-5"` | Book ISBN-13 identifier. |
+| `bookTitle` | `string` | — | Title of the work printed in the middle HRI block. |
+| `palletCount` | `number` | `2` | Total Euro-pallets in the shipment (if `pallets` or 3D cubing dimensions are not passed). |
+| `companyPrefix` | `string` | `"8412345"` | 7-to-9 digit GS1 Company Prefix assigned to the printhouse/tenant. |
+| `startSerial` | `number` | `1` | Starting sequential pallet reference number. |
+
+#### Example Request (`cURL`)
+```bash
+curl -X POST "https://control.printprice.pro/api/logistics/shipments/SHP-2026-ERFURT-01/labels/sscc-pdf?format=A6" \
+  -H "Authorization: Bearer <jwt_token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "warehouseProfileCode": "ZEITFRACHT_ERFURT",
+    "poNumber": "PO-SUHRKAMP-9901",
+    "isbn": "978-3-518-42910-5",
+    "bookTitle": "Der Druckprozess im 21. Jahrhundert",
+    "palletCount": 3,
+    "unitsPerCarton": 44,
+    "cartonsPerPallet": 32,
+    "companyPrefix": "8412345",
+    "startSerial": 1
+  }' \
+  --output sscc-labels-SHP-2026-ERFURT-01-A6.pdf
+```
+
+#### Response `200 OK` (Binary PDF Stream)
+- **Headers**:
+  - `Content-Type: application/pdf`
+  - `Content-Disposition: inline; filename="sscc-labels-SHP-2026-ERFURT-01-A6.pdf"`
+  - `X-PPOS-Label-Format: A6`
+  - `X-PPOS-Page-Count: 3`
+- **Physical & GS1-128 Compliance Guarantees**:
+  - **Top Block**: Shipper (Printhouse) fiscal address, Consignee warehouse hub with **GLN** (e.g. `4026635000006` for Zeitfracht Erfurt), PO Number, and Dispatch Date.
+  - **Middle Block**: High-contrast banner `PALLET X OF Y`, total copies, total **FEFCO 0201** cartons, units/carton, gross & net weight (`kg`), total pallet height (`mm`), and red dock warning (`SLOT BOOKED / 48H AVIS`).
+  - **Bottom Block**: Vector **GS1-128 Subset C** barcode (`Start C` + `FNC1` + `00` + 18-digit SSCC + Modulo-103 Checksum + `Stop`), minimum bar height **`33.0 mm`** (`≥ 32 mm`), lateral quiet zones **`8.5 mm`** (`≥ 5 mm`), and monospace Courier-Bold HRI `(00) 0 8412345 000000001 0`.
+
+---
+
+### `GET /api/logistics/shipments/:id/delivery-note/pdf`
+
+Generates the official **DIN A4 Portrait (`210 × 297 mm`) Delivery Note / *Lieferschein* / *Albarán de Entrega*** in binary PDF format ready for driver signature and receiving dock stamping.
+
+#### Path & Query Parameters
+| Parameter | Location | Type | Default | Description |
+| :--- | :---: | :---: | :---: | :--- |
+| `id` | Path | `string` | — | Shipment identifier (e.g. `SHP-2026-VVA-02`). |
+| `warehouseProfileCode` | Query | `string` | `"ZEITFRACHT_ERFURT"` | Receiving warehouse profile code. |
+| `poNumber` | Query | `string` | `"PO-<id>"` | Purchase Order reference. |
+| `isbn` | Query | `string` | — | ISBN-13 reference. |
+| `assignedSlotNumber` | Query | `string` | `"SLOT-EF-48H-0930"` | Confirmed 48h dock unloading slot reference. |
+| `vehiclePlate` | Query | `string` | `"M-DS 4820"` | Carrier truck / trailer registration plate. |
+
+#### Example Request (`cURL`)
+```bash
+curl -X GET "https://control.printprice.pro/api/logistics/shipments/SHP-2026-VVA-02/delivery-note/pdf?warehouseProfileCode=ARVATO_VVA_GUETERSLOH&poNumber=PO-BERTELSMANN-774" \
+  -H "Authorization: Bearer <jwt_token>" \
+  --output delivery-note-SHP-2026-VVA-02.pdf
+```
+
+#### Response `200 OK` (Binary PDF Stream)
+- **Headers**:
+  - `Content-Type: application/pdf`
+  - `Content-Disposition: inline; filename="delivery-note-SHP-2026-VVA-02.pdf"`
+  - `X-PPOS-Page-Count: 1`
+- **Mandatory Sections Included in the DIN A4 Document**:
+  1. **Fiscal Header**: Shipper (Printhouse VAT/USt-IdNr. & GS1 Company Prefix) and Consignee Warehouse (Address, GLN, Warehouse Profile Code, and Publisher Client).
+  2. **Production & Editorial Block**: Book title, ISBN-13, PO Number, trimmed format (`mm`), page count, and binding specification.
+  3. **Palletized SSCC-18 Manifest Table**: Individual row per Euro-Pallet EPAL (`1200 × 800 mm`) listing its `SSCC-18 / NVE (AI 00)`, FEFCO 0201 carton count, books/box, total copies, stacked height (`mm`), and net vs. gross mass (`kg`).
+  4. **Transport Control & LDM Block**: Total Loading Meters (**`0.4 LDM / Euro-pallet`**), Chargeable/Taxable Weight (`kg`) vs. Actual Gross Weight, Stackability Mode (`STRICT_LDM_NON_STACKABLE` / `DOUBLE_DECK_SUPPORTED`), and Assigned Dock Slot declaration.
+  5. **Euro-Pallet EPAL Exchange Control (*Palettenschein — 14 Days*)**: Tracks delivered UIC 435-2 / EPAL pallets, 1:1 dock exchange checkbox, and the **14-calendar-day** return balance.
+  6. **CMR / POD Signature Boxes**: Dedicated sign-off boxes for the Shipper, Carrier Driver (with vehicle plate), and Receiving Dock Stamp (with arrival/unloading timestamps).

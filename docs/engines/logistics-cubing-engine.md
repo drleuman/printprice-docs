@@ -8,7 +8,7 @@ sidebar_label: 3D Cubing & Logistics Engine
 
 In industrial book manufacturing, **freight, palletization, and editorial warehouse compliance** frequently determine whether a production quote is profitable or eroded by logistics surcharges and receiving dock penalties. Unlike generic e-commerce parcel shipping, book distribution in the DACH and European markets (*Verlagsauslieferungen* such as **Zeitfracht Medien Erfurt** and **VVA Arvato Gütersloh**) operates under strict physical, ergonomic, and scheduling constraints.
 
-The **3D Cubing, Editorial Warehouses & Freight Engine** (`packagingAndCubingEngine.js` and `logisticsDatabaseService.js`, introduced in Phases `LOGISTICS-01` through `LOGISTICS-04`, Migrations `176` & `177`) transforms raw book manufacturing specifications into deterministic 3D carton and Euro-pallet geometry, validates compliance against receiving hub rules, optimizes print runs to avoid half-empty pallets (`ΔQ-` / `ΔQ+`), and computes landed freight costs while maintaining **strict cost segregation**.
+The **3D Cubing, Editorial Warehouses & Freight Engine** (`packagingAndCubingEngine.js`, `logisticsDatabaseService.js`, `ssccGeneratorService.js`, and `deliveryNotePdfService.js`, introduced in Phases `LOGISTICS-01` through `LOGISTICS-05`, Migrations `176` & `177`) transforms raw book manufacturing specifications into deterministic 3D carton and Euro-pallet geometry, validates compliance against receiving hub rules, optimizes print runs to avoid half-empty pallets (`ΔQ-` / `ΔQ+`), computes landed freight costs while maintaining **strict cost segregation**, and generates vector **GS1-128 SSCC-18 pallet labels (A6 / A4 4-UP)** and **DIN A4 Delivery Notes (*Lieferscheine*)**.
 
 ---
 
@@ -285,3 +285,54 @@ Within the Printhouse Setup and Shipping Configuration UI (`src/ui/components/pr
 
 - Renders the **`1200 × 800 mm` EPAL Euro-pallet** base, bottom protective greyboard, interlocked carton layers, corner edge protectors (*Kantenschutz*), top protective cardboard, plastic strapping bands, stretch foil, and pallet content label.
 - Displays live compliance badges comparing actual stacked height against the selected warehouse ceiling (`≤ 1200 mm` Zeitfracht / `≤ 1300 mm` VVA Arvato) and highlights perimeter setback compliance (`30 mm` / `20 mm`).
+
+---
+
+## 7. Automated GS1-128 SSCC-18 (NVE) & Vector Delivery Note Engine (`LOGISTICS-05`)
+
+Implemented in `src/api/services/logistics/ssccGeneratorService.js` and `src/api/services/logistics/deliveryNotePdfService.js`, Phase `LOGISTICS-05` closes the shop-floor execution loop by generating industrial thermal pallet labels and official delivery notes directly from the 3D cubing output.
+
+### A. SSCC-18 Data Structure & GS1 Modulo-10 Check Digit Algorithm
+
+Every Euro-pallet dispatched to editorial hubs is identified by a globally unique 18-digit **Serial Shipping Container Code (`SSCC-18` / *Nummer der Versandeinheit — NVE*)** preceded by GS1 Application Identifier **`(00)`**:
+
+| Component | Length | Example | Description |
+| :--- | :---: | :---: | :--- |
+| **Application Identifier (AI)** | 2 digits | `00` | Identifies the barcode data field as an SSCC-18 container code. |
+| **Extension Digit** | 1 digit | `0` | Configurable packaging indicator (`0–9`, default `0` or `3`). |
+| **GS1 Company Prefix** | 7–9 digits | `8412345` | Assigned to the printhouse/tenant by GS1 (`7`, `8`, or `9` digits). |
+| **Serial Reference** | 9–7 digits | `000000001` | Zero-padded sequential pallet counter completing `17` payload digits. |
+| **GS1 Modulo-10 Check Digit** | 1 digit | `0` | Deterministic error-detection digit calculated across the 17 payload digits. |
+
+#### Deterministic Modulo-10 Formula (`calculateGs1Mod10CheckDigit`)
+Starting from the rightmost digit of the 17-digit payload (`d_17` down to `d_1`), alternating weights of **`3`** and **`1`** are applied:
+
+```text
+S = sum(d[17 - i] * (i % 2 === 0 ? 3 : 1))   for i = 0 .. 16
+C = (10 - (S mod 10)) mod 10
+```
+
+The service emits both the formatted Human-Readable Interpretation (**HRI**) string `(00) 0 8412345 000000001 0` and the raw barcode payload `00084123450000000010`.
+
+### B. GS1-128 Subset C Symbology & A6 Thermal Label Geometry
+
+To achieve maximum bar density and first-scan reliability on industrial laser and 2D imagers at receiving docks, `encodeGs1128BarcodeModules()` encodes the 20-digit numeric string (`00` + `SSCC-18`) using **Code 128 Subset C** (2 digits per symbol):
+
+1. **Symbol Sequence (`14` symbols / `156` modules total)**:
+   - `Start C` (Value `105`)
+   - `FNC1` (Function 1 Symbol, Value `102` — mandatory GS1-128 identifier)
+   - `10` numeric digit-pair symbols (`00` through `99`, beginning with pair `00` for AI)
+   - **Modulo-103 Symbol Checksum**: `(105 + sum(p * v[p] for p = 1..11)) mod 103`
+   - `Stop` (Value `106`, 13 modules including termination bar)
+2. **Physical Label Layout (`A6` `105 × 148 mm` or `A4_SHEET_4UP` `210 × 297 mm`)**:
+   - **Minimum Bar Height**: Rendered at **`33.0 mm`** (exceeding the GS1 minimum of `32.0 mm`).
+   - **Quiet Zones (*Hellfelder*)**: Enforces **`8.5 mm`** clear lateral margins on both left and right sides (exceeding the `5.0 mm` minimum specification).
+   - **Zero Native Binary Dependencies**: `VectorPdfBuilder` writes native PDF 1.4 vector rectangles (`re f`) and Type1 `Helvetica-Bold` / `Courier-Bold` streams directly in memory.
+
+### C. Euro-Pallet EPAL Exchange Control (*Palettenschein — 14 Days*) & DIN A4 *Lieferschein*
+
+In European print and book logistics, **UIC 435-2 / EPAL Euro-pallets (`1200 × 800 mm`)** are exchangeable load carriers governed by the **Düsseldorfer / European Pallet Pool** rules. The automated DIN A4 Delivery Note (`generateDeliveryNotePdf`) embeds a dedicated **EPAL Exchange Control Section (*Palettenschein*)** alongside the transport control block:
+
+- **Loading Meters & Chargeable Weight**: Prints exact trailer floor occupation (**`0.40 LDM` per Euro-pallet**), actual gross mass vs. LDM-adjusted taxable weight (`kg`), stackability mode (`STRICT_LDM_NON_STACKABLE` vs. `DOUBLE_DECK_SUPPORTED`), and the confirmed 48h unloading slot reference.
+- **14-Day EPAL Clearing Window**: Records the exact number of EPAL pallets delivered, provides checkboxes for immediate **1:1 dock exchange** (*Zug-um-Zug-Tausch*) vs. deferred **Palettenschein voucher clearing**, and establishes the contractual **14-calendar-day return window** before pallet replacement charges (`euroPalletEpalEur`) are invoiced.
+- **Tripartite CMR / POD Sign-Off**: Includes structured signature boxes for the **Shipper (Printhouse)**, **Carrier Driver** (with vehicle registration plate), and **Receiving Warehouse Dock** (with arrival/unloading timestamps and company stamp).
