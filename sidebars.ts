@@ -5,10 +5,25 @@ const sidebars: SidebarsConfig = {
     'intro',
     {
       type: 'category',
+      label: 'Industrial Platform (Phases 10–16)',
+      collapsed: false,
+      items: [
+        'architecture/overview',
+        'prepress/3d-soft-proof',
+        'prepress/preflight-engine',
+        'security/rbac-governance',
+        'compliance/electronic-invoicing-pod',
+        'operations/storage-retention-backups',
+        'api/reference',
+      ],
+    },
+    {
+      type: 'category',
       label: 'API & Integration Contracts',
       collapsed: false,
       items: [
         'api/overview',
+        'api/reference',
         'api/quickstart',
         'api/authentication',
         'api/pricing-api',
