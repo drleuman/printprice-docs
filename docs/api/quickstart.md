@@ -77,19 +77,19 @@ console.log(`Suggested Price: €${data.offers[0].total_price} (${data.offers[0]
       "offer_id": "off_01j7b9e84k2",
       "house_id": "ph_valencia_01",
       "printer_id": "ph_valencia_01",
-      "print_house": "Talleres Gráficos Levante",
+      "print_house": "Levante Graphic Press",
       "total_cost": 1240.50,
       "total_price": 1650.00,
       "currency": "EUR",
       "margin": 409.50,
       "margin_percent": 24.82,
-      "estimated_delivery_time": "5-7 días laborables",
+      "estimated_delivery_time": "5-7 business days",
       "lead_time_days": 6,
       "breakdown": [
-        { "label": "Papel interior", "amount": 420.00 },
-        { "label": "Impresión y planchas", "amount": 380.50 },
-        { "label": "Encuadernación rústica", "amount": 310.00 },
-        { "label": "Embalaje y paletizado", "amount": 130.00 }
+        { "label": "Interior book block paper", "amount": 420.00 },
+        { "label": "Printing and CTP plates", "amount": 380.50 },
+        { "label": "Softcover PUR binding", "amount": 310.00 },
+        { "label": "Packaging and EPAL palletization", "amount": 130.00 }
       ],
       "recommended": true,
       "checkout_allowed": true,
@@ -147,7 +147,7 @@ Preflight inspection accepts PDF uploads up to 2GB via standard `multipart/form-
 ```bash
 curl -X POST "https://api.printprice.pro/api/preflight/jobs" \
   -H "Authorization: Bearer YOUR_PARTNER_TOKEN" \
-  -F "file=@/path/to/manuscrito_interior.pdf"
+  -F "file=@/path/to/book_interior_block.pdf"
 ```
 
 ### Expected Response (`200 OK`)
@@ -157,7 +157,7 @@ curl -X POST "https://api.printprice.pro/api/preflight/jobs" \
   "ok": true,
   "jobId": "pf_job_8a7d6e5c-1234",
   "status": "QUEUED",
-  "filename": "manuscrito_interior.pdf",
+  "filename": "book_interior_block.pdf",
   "sizeBytes": 15420310
 }
 ```
@@ -182,7 +182,7 @@ curl -X GET "https://api.printprice.pro/api/preflight/jobs/pf_job_8a7d6e5c-1234"
     "id": "pf_job_8a7d6e5c-1234",
     "status": "COMPLETED",
     "outcome": "PASSED_WITH_WARNINGS",
-    "filename": "manuscrito_interior.pdf",
+    "filename": "book_interior_block.pdf",
     "report": {
       "pageCount": 192,
       "trimBox": { "widthMm": 148, "heightMm": 210 },
@@ -194,7 +194,7 @@ curl -X GET "https://api.printprice.pro/api/preflight/jobs/pf_job_8a7d6e5c-1234"
           "code": "IMAGE_DPI_SUBOPTIMAL",
           "severity": "warning",
           "page": 45,
-          "message": "Imagen en página 45 cuenta con 240 DPI (mínimo recomendado: 300 DPI)."
+          "message": "Image on page 45 has 240 DPI (recommended minimum: 300 DPI)."
         }
       ]
     },

@@ -269,10 +269,10 @@ To bridge integrated logistics networks with regional printshop fleets, `trackin
 
 1. **`CARRIER_API` (REST / EDI / Webhooks)**:
    - Supports automated consignment creation and real-time webhook ingestion across four canonical milestone states:
-     - `PICKED_UP_AT_PRINTSHOP` (*Recogido en imprenta*)
-     - `IN_TRANSIT_HUB` (*En hub de tránsito*)
-     - `OUT_FOR_DELIVERY_WITH_SLOT` (*En reparto con cita acordada*)
-     - `DELIVERED_POD_SIGNED` (*Entregado con POD firmado*)
+     - `PICKED_UP_AT_PRINTSHOP` (Picked up at print plant)
+     - `IN_TRANSIT_HUB` (At transit hub)
+     - `OUT_FOR_DELIVERY_WITH_SLOT` (Out for delivery with booked dock slot)
+     - `DELIVERED_POD_SIGNED` (Delivered with signed POD)
 2. **`MANUAL_PORTAL_OR_CMR` (Regional Fleets & Charter Trucks)**:
    - When the carrier lacks a live API, the Control Plane **automatically generates a deterministic 18-digit GS1-128 SSCC / NVE (*Nummer der Versandeinheit*)** with Application Identifier `(00)` and a Modulo-10 check digit for every pallet in the shipment (e.g., `(00) 340123450000000105`).
    - Enables the printshop to print compliant **GS1-128 / VDA 4902 pallet labels** and the mandatory **Pallet Content Sheet (*Paletteninhaltsblatt*)** directly from the Control Plane, while capturing manual tracking URLs and signed CMR / delivery note (*Lieferschein*) PDFs.

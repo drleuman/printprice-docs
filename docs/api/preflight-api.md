@@ -100,7 +100,7 @@ Uploads a PDF file (up to 2GB) using `multipart/form-data` and triggers asynchro
 ```bash
 curl -X POST "https://api.printprice.pro/api/preflight/jobs" \
   -H "Authorization: Bearer YOUR_PARTNER_TOKEN" \
-  -F "file=@/path/to/manuscrito_interior.pdf"
+  -F "file=@/path/to/book_interior_block.pdf"
 ```
 
 ### Response (`200 OK`)
@@ -109,7 +109,7 @@ curl -X POST "https://api.printprice.pro/api/preflight/jobs" \
   "ok": true,
   "jobId": "pf_job_8a7d6e5c-1234",
   "status": "QUEUED",
-  "filename": "manuscrito_interior.pdf",
+  "filename": "book_interior_block.pdf",
   "sizeBytes": 15420310
 }
 ```
@@ -133,7 +133,7 @@ curl -X GET "https://api.printprice.pro/api/preflight/jobs/pf_job_8a7d6e5c-1234"
     "id": "pf_job_8a7d6e5c-1234",
     "status": "COMPLETED",
     "outcome": "PASSED_WITH_WARNINGS",
-    "filename": "manuscrito_interior.pdf",
+    "filename": "book_interior_block.pdf",
     "report": {
       "pageCount": 192,
       "trimBox": { "widthMm": 148, "heightMm": 210 },
@@ -145,7 +145,7 @@ curl -X GET "https://api.printprice.pro/api/preflight/jobs/pf_job_8a7d6e5c-1234"
           "code": "IMAGE_DPI_SUBOPTIMAL",
           "severity": "warning",
           "page": 45,
-          "message": "Imagen en página 45 cuenta con 240 DPI (mínimo recomendado: 300 DPI)."
+          "message": "Image on page 45 has 240 DPI (recommended minimum: 300 DPI)."
         }
       ]
     },
@@ -209,8 +209,8 @@ Allows print houses to share a customer-safe, visual diagnostic of an uploaded P
   "report": {
     "outcome": "FIXED_REVIEW_REQUIRED",
     "summary": {
-      "title": "Informe de Verificación de Archivos",
-      "description": "Se detectaron advertencias que requieren confirmación visual.",
+      "title": "File Preflight Verification Report",
+      "description": "Warnings were detected that require visual confirmation.",
       "pages_analyzed": 192,
       "color_space": "CMYK (FOGRA39)"
     },
@@ -218,7 +218,7 @@ Allows print houses to share a customer-safe, visual diagnostic of an uploaded P
       {
         "artifact_id": "art_visual_diff_01",
         "artifact_type": "VISUAL_DIFF_PAGE_12",
-        "label": "Comparativa de corrección en página 12 (resolución de imagen)",
+        "label": "Correction comparison on page 12 (image resolution)",
         "customer_visible": true,
         "download_url": "/api/public/preflight/artifacts/art_visual_diff_01?token=..."
       }
@@ -226,8 +226,8 @@ Allows print houses to share a customer-safe, visual diagnostic of an uploaded P
     "customer_actions": [
       {
         "action_id": "review_required",
-        "label": "Revisión requerida antes de imprimir",
-        "description": "El archivo corregido debe ser aprobado antes de enviar a planchas.",
+        "label": "Review required before printing",
+        "description": "The normalized file must be approved before releasing to CTP plates.",
         "severity": "warning"
       }
     ]
@@ -236,7 +236,7 @@ Allows print houses to share a customer-safe, visual diagnostic of an uploaded P
 ```
 
 :::note Error Handling: Missing Snapshots
-In the current implementation (`publicPreflight.js:12`), missing snapshots (`SNAPSHOT_NOT_FOUND`) return **HTTP 400** because the service does not assign a custom `statusCode` before evaluating `result.statusCode || 400`. Returning **HTTP 404** represents a target contract proposal (`[PROPUESTA DEV-02]`).
+In the current implementation (`publicPreflight.js:12`), missing snapshots (`SNAPSHOT_NOT_FOUND`) return **HTTP 400** because the service does not assign a custom `statusCode` before evaluating `result.statusCode || 400`. Returning **HTTP 404** represents a target contract proposal (`[PROPOSAL DEV-02]`).
 :::
 
 ---
@@ -260,7 +260,7 @@ When preflight detects blocking errors that require the client to supply new fil
     "status": "PENDING_NOTIFICATION",
     "requiredFiles": ["INTERIOR_PDF"],
     "blockers": ["LOW_IMAGE_DPI_PAGE_45"],
-    "message": "Por favor, sustituya el PDF interior con imágenes a 300 DPI.",
+    "message": "Please replace the interior book block PDF with 300 DPI images.",
     "expiresAt": "2026-11-01T23:59:59.000Z",
     "createdAt": "2026-10-25T14:00:00.000Z"
   },
@@ -278,11 +278,3 @@ When preflight detects blocking errors that require the client to supply new fil
   "trace_id": "trace_99887766"
 }
 ```
-
----
-
-## 8. Contract Specifications
-
-Download the formal OpenAPI 3.1 specifications for this domain:
-- **[Preflight Inspection & Normalization Specification](/openapi/preflight.openapi.yaml)**
-- **[Customer Shared Diagnostic Reports Specification](/openapi/shared-reports.openapi.yaml)**

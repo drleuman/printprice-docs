@@ -52,7 +52,7 @@ Implemented in `src/api/services/preflight/preflightEngineService.js` and expose
 ### 1.2 Bleed Geometry & Mirror Synthesis (`evaluateBleedGeometry`)
 * **Inner Block:** Minimum `3.0 mm` bleed on head, foot, and face edges.
 * **Softcover Cover:** Minimum `5.0 mm` bleed + recalibrated spine zone.
-* **Hardcover Wrap (*Vuelta de Cartoné*):** Minimum `15.0 mm` turn-in margin around greyboard edges.
+* **Hardcover Case Turn-In:** Minimum `15.0 mm` turn-in margin around greyboard edges.
 * **Auto-Fix (`POST /api/preflight/auto-fix`):** Synthesizes missing bleed via edge-pixel mirror reflection (`MIRROR_BLEED_SYNTHESIS`) and recalibrates the cover spine width (`COVER_SPINE_TEMPLATE_RECALIBRATION`).
 
 ### 1.3 Colorimetric TAC & Resolution Rules
@@ -69,7 +69,7 @@ Implemented in `src/api/services/manufacturing/impositionEngineService.js` and e
 ### 2.1 Editorial Signature Decomposition (`calculateSignaturesLayout`)
 Decomposes total book pages into standard folding signatures (`32`, `16`, `8`, and `4` pages) fitted to the machine sheet format (`B1: 720×1020 mm`, `B2: 520×720 mm`, `SRA3: 320×450 mm`, `WEB_ROTARY`), reserving:
 * `>= 6.0 mm` intermediate trim gutters,
-* `10–12 mm` gripper edge (*margen de pinzas*),
+* `10–12 mm` gripper edge,
 * `6.0 mm` CMYK densitometric control bar, and
 * folding/collation marks.
 
@@ -99,7 +99,7 @@ Implemented in `src/api/services/publisher/publisherHubService.js` and exposed a
 * **Commercial Confidentiality (`sanitizeOrderForRole`):** All internal printhouse workshop metrics (`ctpPlateCostEur`, `ctpPlatesCount`, `makeReadyWasteSheets`, `makeReadyWasteCostEur`, `printhouseMarginPct`, `internalManufacturingCostEur`) are stripped before serialization. Publishers only see their agreed purchase price (`agreedPurchasePriceEur`), technical specifications, and delivery milestones.
 
 ### 3.2 Parametric 3D Soft-Proofing & Digital Sign-Off
-* Models the physical book in 3D using exact `TrimWidth × TrimHeight × CalculatedSpine` dimensions, vertical spine typography, hardcover case overhang (`+3.0 mm` *ceja*), and toggleable `TrimBox` vs `BleedBox (+3.0 mm)` overlays.
+* Models the physical book in 3D using exact `TrimWidth × TrimHeight × CalculatedSpine` dimensions, vertical spine typography, hardcover case overhang (`+3.0 mm` board square), and toggleable `TrimBox` vs `BleedBox (+3.0 mm)` overlays.
 * **Telematic Approval (`POST /api/publisher/orders/:id/proof-decision`):** Records `"APPROVE FOR PRESS"` (`APPROVED_FOR_PRESS`) with a `SHA256` signature hash, timestamp, and `approvedByUserId`, automatically advancing the order to `PLATES_AND_IMPOSITION` and dispatching a transactional notification (`PROOF_SIGNED_AND_QUEUED`).
 
 ### 3.3 REST API Reference Summary (Phase 11)

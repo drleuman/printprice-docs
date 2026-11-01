@@ -4,11 +4,11 @@ info:
   version: 1.0.0
   description: |
     # PrintPrice OS — Preflight API
-    API de inspección técnica automatizada de archivos PDF para artes gráficas, extracción de cajas de página (TrimBox, BleedBox),
-    validación de resolución de imágenes, perfiles de color CMYK y corrección automática (autofix) de geometrías.
+    Automated technical PDF inspection API for commercial and book printing, extracting page geometry boxes (TrimBox, BleedBox),
+    validating image resolution, CMYK color profiles, and executing automated geometry fixes (autofix).
     
-    - **Servicio Responsable:** `ppos-preflight-service`
-    - **Punto de Entrada en Gateway:** `https://api.printprice.pro/api/preflight/*`
+    - **Responsible Service:** `ppos-preflight-service`
+    - **Gateway Entrypoint:** `https://api.printprice.pro/api/preflight/*`
   contact:
     name: PrintPrice Architecture & Security Team
     email: api-support@printprice.pro
@@ -19,26 +19,26 @@ info:
 
 servers:
   - url: https://api.printprice.pro
-    description: Servidor de Producción PrintPrice OS (Preflight Engine)
+    description: PrintPrice OS Production Server (Preflight Engine)
 
 tags:
   - name: Preflight Capabilities
-    description: Descubrimiento público de reglas y perfiles soportados.
+    description: Public discovery of supported validation rules and profiles.
   - name: Preflight Jobs
-    description: Procesamiento asíncrono de inspección, análisis y normalización de archivos PDF.
+    description: Asynchronous inspection, analysis, and normalization processing for PDF files.
 
 paths:
   /api/preflight/capabilities:
     get:
       tags:
         - Preflight Capabilities
-      summary: Consultar catálogo de capacidades, reglas y límites de preflight
-      description: Devuelve la lista de reglas de validación soportadas, operaciones de corrección (autofix) disponibles y el límite de subida.
+      summary: Query preflight capabilities catalog, rules, and upload limits
+      description: Returns the list of supported validation rules, available autofix operations, and maximum upload limits.
       operationId: getPreflightCapabilities
       security: []
       responses:
         '200':
-          description: Capacidades técnicas del motor de preflight.
+          description: Technical capabilities of the preflight engine.
           content:
             application/json:
               schema:
@@ -65,9 +65,9 @@ paths:
     post:
       tags:
         - Preflight Jobs
-      summary: Enviar archivo PDF para inspección técnica
+      summary: Submit PDF file for technical inspection
       description: |
-        Sube un archivo PDF (hasta 2GB) mediante multipart/form-data y encola un trabajo de análisis en los workers de Preflight.
+        Uploads a PDF file (up to 2GB) via multipart/form-data and enqueues an analysis job on the Preflight workers.
       operationId: submitPreflightJob
       security:
         - BearerAuth: []
@@ -83,10 +83,10 @@ paths:
                 file:
                   type: string
                   format: binary
-                  description: Archivo PDF a inspeccionar.
+                  description: PDF file to inspect.
       responses:
         '200':
-          description: Trabajo encolado exitosamente.
+          description: Job successfully enqueued.
           content:
             application/json:
               schema:
@@ -95,20 +95,20 @@ paths:
                 ok: true
                 jobId: "pf_job_8a7d6e5c-1234"
                 status: "QUEUED"
-                filename: "manuscrito_interior.pdf"
+                filename: "book_interior_block.pdf"
                 sizeBytes: 15420310
         '400':
-          description: Petición inválida o archivo no proporcionado.
+          description: Invalid request or missing file payload.
         '413':
-          description: El archivo excede el tamaño máximo permitido de 2GB.
+          description: File exceeds the maximum allowed size of 2GB.
         '429':
-          description: Concurrencia máxima del tenant alcanzada.
+          description: Maximum tenant concurrency limit reached.
 
   /api/preflight/jobs/{id}:
     get:
       tags:
         - Preflight Jobs
-      summary: Consultar resultado y hallazgos de un trabajo de inspección
+      summary: Query inspection job outcome and technical findings
       operationId: getPreflightJob
       security:
         - BearerAuth: []
@@ -118,10 +118,10 @@ paths:
           required: true
           schema:
             type: string
-          description: Identificador del trabajo (pf_job_...).
+          description: Job identifier (pf_job_...).
       responses:
         '200':
-          description: Estado del trabajo y reporte técnico detallado.
+          description: Job status and detailed technical report.
           content:
             application/json:
               schema:
@@ -132,7 +132,7 @@ paths:
                   id: "pf_job_8a7d6e5c-1234"
                   status: "COMPLETED"
                   outcome: "PASSED_WITH_WARNINGS"
-                  filename: "manuscrito_interior.pdf"
+                  filename: "book_interior_block.pdf"
                   report:
                     pageCount: 192
                     trimBox: { widthPt: 419.53, heightPt: 595.28, widthMm: 148, heightMm: 210 }
@@ -144,7 +144,7 @@ paths:
                       - code: "IMAGE_DPI_SUBOPTIMAL"
                         severity: "warning"
                         page: 45
-                        message: "Imagen en página 45 cuenta con 240 DPI (mínimo recomendado: 300 DPI)."
+                        message: "Image on page 45 has 240 DPI (recommended minimum: 300 DPI)."
                   artifacts:
                     - id: "art_rep_01"
                       type: "report_json"
@@ -153,13 +153,13 @@ paths:
                       type: "normalized_pdf"
                       name: "normalized.pdf"
         '404':
-          description: Trabajo no encontrado o no pertenece al tenant autenticado.
+          description: Job not found or does not belong to the authenticated tenant.
 
   /api/preflight/jobs/{id}/actions/fix:
     post:
       tags:
         - Preflight Jobs
-      summary: Ejecutar corrección automática (autofix) sobre un trabajo inspeccionado
+      summary: Trigger automated remediation (autofix) on an inspected job
       operationId: triggerPreflightFix
       security:
         - BearerAuth: []
@@ -190,7 +190,7 @@ paths:
                       default: true
       responses:
         '200':
-          description: Corrección iniciada.
+          description: Automated remediation initiated.
           content:
             application/json:
               schema:
@@ -212,7 +212,7 @@ paths:
     get:
       tags:
         - Preflight Jobs
-      summary: Descargar un archivo de artefacto generado
+      summary: Download a generated inspection artifact file
       operationId: downloadPreflightArtifact
       security:
         - BearerAuth: []
@@ -229,7 +229,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Archivo binario (PDF normalizado, informe JSON, etc.).
+          description: Binary artifact stream (normalized PDF, JSON report, etc.).
           content:
             application/pdf:
               schema:
@@ -239,7 +239,7 @@ paths:
               schema:
                 type: object
         '404':
-          description: Artefacto no encontrado.
+          description: Artifact not found.
 
 components:
   securitySchemes:
@@ -302,7 +302,7 @@ components:
 
   responses:
     ErrorResponse:
-      description: Error en la solicitud o fallo de validación
+      description: Request error or validation failure
       content:
         application/json:
           schema:

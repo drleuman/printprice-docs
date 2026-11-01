@@ -59,8 +59,8 @@ When the authenticated user session is bound to a specific `tenantId` (`req.user
 | `GET` | `/api/logistics/warehouses/:code` | Retrieves physical constraints, dock rules, and penalties for a specific warehouse profile. | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | `POST` | `/api/logistics/calculate-quote` | Executes 3D book/carton/EPAL pallet cubing, run optimization (`ΔQ-` / `ΔQ+`), operational scenarios, and landed freight calculation. | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | `POST` | `/api/logistics/shipments/:id/labels/sscc-pdf` | Generates vector GS1-128 SSCC-18 pallet labels in binary PDF (`?format=A6` thermal 1-page/pallet or `?format=A4_SHEET_4UP`). | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
-| `GET` | `/api/logistics/shipments/:id/delivery-note/pdf` | Generates the official DIN A4 Delivery Note / *Lieferschein* / *Albarán de Entrega* PDF with SSCC manifest, 0.4 LDM, 14-day EPAL voucher (15.00 EUR penalty) & CMR signature boxes. | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
-| `GET` | `/api/logistics/carrier-protocol/pdf` | Generates the official DIN A4 Carrier Integration Protocol & Service Conditions PDF (*Protocolo de Integración y Condiciones de Servicio de Transporte* — [see full protocol](../logistics/carrier-service-protocol.md)). | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| `GET` | `/api/logistics/shipments/:id/delivery-note/pdf` | Generates the official DIN A4 Delivery Note / *Lieferschein* PDF with SSCC manifest, 0.4 LDM, 14-day EPAL voucher (15.00 EUR penalty) & CMR signature boxes. | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| `GET` | `/api/logistics/carrier-protocol/pdf` | Generates the official DIN A4 Carrier Integration Protocol & Service Conditions PDF ([see full protocol](../logistics/carrier-service-protocol.md)). | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | `POST` | `/api/logistics/carrier/milestones` | Ingests carrier telematic scan events (`PICKED_UP`, `CROSS_DOCK_SCANNED`, `DELIVERED_POD`), validates SSCC-18 Modulo-10, checks the 2h POD SLA, updates EPAL dock exchange counts, and triggers Publisher POD Notifications. | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | `POST` | `/api/logistics/epal/settlement-run` | Evaluates the 14-day Euro-Pallet EPAL (*Palettenschein*) exchange window across shipments and issues automatic `15.00 EUR / unit` (+ VAT) settlement charges for overdue unreturned pallets. | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | `GET` | `/api/logistics/epal/scheduler-status` | Returns the live status of the automated daily 14-day EPAL settlement cron daemon (`0 0 * * *`). | Control Plane / Printhouse Role | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
@@ -629,7 +629,7 @@ curl -X POST "https://control.printprice.pro/api/logistics/shipments/SHP-2026-ER
 
 ### `GET /api/logistics/shipments/:id/delivery-note/pdf`
 
-Generates the official **DIN A4 Portrait (`210 × 297 mm`) Delivery Note / *Lieferschein* / *Albarán de Entrega*** in binary PDF format ready for driver signature and receiving dock stamping.
+Generates the official **DIN A4 Portrait (`210 × 297 mm`) Delivery Note / *Lieferschein*** in binary PDF format ready for driver signature and receiving dock stamping.
 
 #### Path & Query Parameters
 | Parameter | Location | Type | Default | Description |

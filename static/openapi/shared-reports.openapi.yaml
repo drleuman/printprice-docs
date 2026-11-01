@@ -4,11 +4,11 @@ info:
   version: 1.0.0
   description: |
     # PrintPrice OS — Customer Shared Diagnostic & Remediation API
-    Endpoints con tokens efímeros y URLs firmadas diseñados para el acceso directo y seguro de autores,
-    editores y clientes finales sin necesidad de credenciales interactivas de plataforma.
+    Ephemeral token and signed URL endpoints designed for direct, secure access by authors,
+    publishers, and end customers without requiring interactive platform credentials.
     
-    - **Informe Visual Preflight:** Permite a la imprenta compartir un informe comprensible de verificación técnica.
-    - **Acción de Subsanación:** Permite al cliente sustituir un archivo erróneo tras una detección de fallos bloqueantes en preflight.
+    - **Visual Preflight Report:** Allows print houses to share an actionable technical verification summary.
+    - **Customer Remediation Action:** Allows the customer to replace a rejected file following blocking preflight findings.
   contact:
     name: PrintPrice Architecture & Security Team
     email: api-support@printprice.pro
@@ -19,20 +19,20 @@ info:
 
 servers:
   - url: https://api.printprice.pro
-    description: Servidor de Producción Gateway
+    description: Production Gateway Server
 
 tags:
   - name: Customer Shared Reports
-    description: Diagnósticos amigables y subsanación guiada de archivos para clientes.
+    description: Customer-safe preflight diagnostics and guided file remediation.
 
 paths:
   /api/public/preflight/human-report/{token}:
     get:
       tags:
         - Customer Shared Reports
-      summary: Consultar informe visual compartido de preflight
+      summary: Query shared visual preflight report
       description: |
-        Acceso mediante token JWT firmado (`scope: HUMAN_REPORT_VIEW`). Devuelve el informe amigable del PDF sin exponer rutas internas de servidor ni datos de infraestructura.
+        Accessed via a signed JWT token (`scope: HUMAN_REPORT_VIEW`). Returns a customer-friendly PDF diagnostic summary without exposing internal server paths or infrastructure metadata.
       operationId: getSharedHumanReport
       security: []
       parameters:
@@ -41,10 +41,10 @@ paths:
           required: true
           schema:
             type: string
-          description: Token JWT criptográficamente firmado con la autorización de visualización.
+          description: Cryptographically signed JWT token carrying view authorization.
       responses:
         '200':
-          description: Informe visual recuperado con éxito.
+          description: Visual preflight report successfully retrieved.
           content:
             application/json:
               schema:
@@ -57,33 +57,33 @@ paths:
                 report:
                   outcome: "FIXED_REVIEW_REQUIRED"
                   summary:
-                    title: "Informe de Verificación de Archivos"
-                    description: "Se detectaron advertencias que requieren confirmación visual."
+                    title: "File Preflight Verification Report"
+                    description: "Warnings were detected that require visual confirmation."
                     pages_analyzed: 192
                     color_space: "CMYK (FOGRA39)"
                   artifact_recommendations:
                     - artifact_id: "art_visual_diff_01"
                       artifact_type: "VISUAL_DIFF_PAGE_12"
-                      label: "Comparativa de corrección en página 12 (resolución de imagen)"
+                      label: "Correction comparison on page 12 (image resolution)"
                       customer_visible: true
                       download_url: "/api/public/preflight/artifacts/art_visual_diff_01?token=..."
                   customer_actions:
                     - action_id: "review_required"
-                      label: "Revisión requerida antes de imprimir"
-                      description: "El archivo corregido debe ser aprobado antes de enviar a planchas."
+                      label: "Review required before printing"
+                      description: "The normalized file must be approved before releasing to CTP plates."
                       severity: "warning"
         '400':
-          description: Snapshot no encontrado en la base de datos (código devuelto actualmente).
+          description: Snapshot not found in the database (status code currently returned by implementation).
         '401':
-          description: Token inválido, manipulado o expirado.
+          description: Invalid, tampered, or expired token.
 
   /api/marketplace/orders/{orderId}/customer-action/{token}:
     get:
       tags:
         - Customer Shared Reports
-      summary: Consultar instrucciones y estado para subsanación / re-subida de archivos
+      summary: Query instructions and status for file remediation / re-upload
       description: |
-        Valida el token SHA-256 de subsanación y devuelve los archivos requeridos, errores detectados y enlace para subir la nueva versión.
+        Validates the SHA-256 remediation token and returns the required file slots, detected blockers, and instructions to upload a corrected version.
       operationId: getCustomerActionHandoff
       security: []
       parameters:
@@ -92,16 +92,16 @@ paths:
           required: true
           schema:
             type: string
-          description: Identificador del pedido.
+          description: Order identifier.
         - name: token
           in: path
           required: true
           schema:
             type: string
-          description: Token efímero de subsanación.
+          description: Ephemeral remediation token.
       responses:
         '200':
-          description: Instrucciones de subsanación recuperadas con éxito.
+          description: Remediation instructions successfully retrieved.
           content:
             application/json:
               schema:
@@ -116,7 +116,7 @@ paths:
                     - "INTERIOR_PDF"
                   blockers:
                     - "LOW_IMAGE_DPI_PAGE_45"
-                  message: "Por favor, sustituya el PDF interior con imágenes a 300 DPI."
+                  message: "Please replace the interior book block PDF with 300 DPI images."
                   expiresAt: "2026-11-01T23:59:59.000Z"
                   createdAt: "2026-10-25T14:00:00.000Z"
                 currentFiles:
@@ -129,11 +129,11 @@ paths:
                     version: 1
                 trace_id: "trace_99887766"
         '403':
-          description: Token inválido o no coincide con el hash del pedido.
+          description: Invalid token or token hash does not match the order.
         '404':
-          description: Pedido no encontrado.
+          description: Order not found.
         '410':
-          description: El enlace de subsanación ha expirado.
+          description: The remediation link has expired.
 
 components:
   schemas:

@@ -4,12 +4,12 @@ info:
   version: 1.0.0
   description: |
     # PrintPrice OS — Pricing & Marketplace Orders API
-    API para cotización determinista de libros mediante el Book Pricing Engine (BPE),
-    ingesta formal de pedidos de producción en estado DRAFT, registro de metadatos de archivos y evaluación de viabilidad de fabricación (readiness).
+    API for deterministic book pricing via the Book Pricing Engine (BPE),
+    formal intake of production orders in DRAFT status, file metadata registration, and manufacturing readiness evaluation.
     
-    - **Servidor Gateway:** `https://api.printprice.pro`
-    - **Simulador Local (Prism):** `http://localhost:4010`
-    - **Salvaguarda Operativa:** Las mutaciones interactivas directas en producción están inhabilitadas sin credenciales de partner certificadas.
+    - **Gateway Server:** `https://api.printprice.pro`
+    - **Local Simulator (Prism):** `http://localhost:4010`
+    - **Operational Safeguard:** Direct interactive mutations against production are disabled without certified partner credentials.
   contact:
     name: PrintPrice Architecture & Security Team
     email: api-support@printprice.pro
@@ -20,22 +20,22 @@ info:
 
 servers:
   - url: https://api.printprice.pro
-    description: Servidor de Producción (Requiere credenciales y autorización comercial)
+    description: Production Server (Requires partner credentials and commercial authorization)
 
 tags:
   - name: Pricing & Offers
-    description: Cotización algorítmica de libros e imprentas candidatas mediante BPE.
+    description: Algorithmic book quoting and candidate print house offers via BPE.
   - name: Orders & File Governance
-    description: Formalización de pedidos, fijación de ofertas, registro de archivos y evaluación de readiness.
+    description: Order intake, offer selection, file registration, and manufacturing readiness evaluation.
 
 paths:
   /api/marketplace/offers:
     post:
       tags:
         - Pricing & Offers
-      summary: Solicitar ofertas y cotizaciones de talleres de imprenta
+      summary: Request print house quotes and commercial offers
       description: |
-        Calcula deterministamente el coste de fabricación y devuelve ofertas competitivas de imprentas adscritas en base a las especificaciones técnicas de un libro.
+        Deterministically calculates manufacturing costs and returns competitive offers from qualified print houses based on a book's physical specifications.
       operationId: requestMarketplaceOffers
       security:
         - {}
@@ -46,7 +46,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Identificador de correlación distribuida. Si se omite, el gateway genera automáticamente un identificador único.
+          description: Distributed correlation identifier. If omitted, the gateway automatically generates a unique trace ID.
       requestBody:
         required: true
         content:
@@ -66,14 +66,14 @@ paths:
               delivery_country: "ES"
       responses:
         '200':
-          description: Ofertas calculadas con éxito o respuesta degradada controlada si BPE no está disponible.
+          description: Offers successfully calculated, or controlled graceful fallback if BPE is unavailable.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/OffersResponse'
               examples:
                 success:
-                  summary: Ofertas calculadas exitosamente
+                  summary: Offers successfully calculated
                   value:
                     success: true
                     recommended_offer_id: "off_01j7b9e84k2"
@@ -85,28 +85,28 @@ paths:
                         house_id: "ph_valencia_01"
                         printer_id: "ph_valencia_01"
                         print_house_id: "ph_valencia_01"
-                        print_house: "Talleres Gráficos Levante"
+                        print_house: "Levante Graphic Press"
                         total_cost: 1240.50
                         total_price: 1650.00
                         currency: "EUR"
                         margin: 409.50
                         margin_percent: 24.82
-                        estimated_delivery_time: "5-7 días laborables"
+                        estimated_delivery_time: "5-7 business days"
                         lead_time_days: 6
                         breakdown:
-                          - label: "Papel interior"
+                          - label: "Interior book block paper"
                             amount: 420.00
-                          - label: "Impresión y planchas"
+                          - label: "Printing and CTP plates"
                             amount: 380.50
-                          - label: "Encuadernación rústica"
+                          - label: "Softcover PUR binding"
                             amount: 310.00
-                          - label: "Embalaje y paletizado"
+                          - label: "Packaging and EPAL palletization"
                             amount: 130.00
                         recommended: true
                         checkout_allowed: true
                         source: "BPE_MARKETPLACE_NATIVE"
         '400':
-          description: Petición inválida por omisión de campos requeridos (copies o interior_pages).
+          description: Invalid request due to missing required fields (copies or interior_pages).
           content:
             application/json:
               schema:
@@ -120,9 +120,9 @@ paths:
     post:
       tags:
         - Orders & File Governance
-      summary: Crear pedido de fabricación en estado DRAFT
+      summary: Create manufacturing order in DRAFT status
       description: |
-        Registra la intención formal de compra de un libro vinculando la sesión de precios y reservando los slots obligatorios de archivo (`INTERIOR_PDF` y `COVER_PDF`).
+        Registers a formal book manufacturing order by binding the pricing session and reserving mandatory file slots (`INTERIOR_PDF` and `COVER_PDF`).
       operationId: createMarketplaceOrder
       security:
         - MarketplaceToken: []
@@ -137,11 +137,11 @@ paths:
               pricingSessionId: "sess_89f7a6e1-9876"
               selectedOfferId: "off_01j7b9e84k2"
               customer:
-                name: "Editorial Minerva S.L."
-                email: "produccion@editorialminerva.es"
+                name: "Minerva Publishing House Ltd."
+                email: "production@minervapublishing.eu"
                 phone: "+34 912 345 678"
                 address:
-                  street: "Calle Gran Vía 28, 4º"
+                  street: "28 Gran Via Avenue, 4th Floor"
                   city: "Madrid"
                   postal_code: "28013"
                   country: "ES"
@@ -156,7 +156,7 @@ paths:
                 colors_cover: "4/0"
       responses:
         '201':
-          description: Pedido creado exitosamente en estado borrador.
+          description: Order successfully created in draft status.
           content:
             application/json:
               schema:
@@ -174,13 +174,13 @@ paths:
                     - "MISSING_REQUIRED_FILE_INTERIOR_PDF"
                     - "MISSING_REQUIRED_FILE_COVER_PDF"
         '400':
-          description: Datos de pedido inválidos o incompletos.
+          description: Invalid or incomplete order payload.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Token de autenticación ausente o inválido.
+          description: Missing or invalid authentication token.
           content:
             application/json:
               schema:
@@ -190,7 +190,7 @@ paths:
     get:
       tags:
         - Orders & File Governance
-      summary: Consultar detalle y readiness de un pedido
+      summary: Query order details and manufacturing readiness
       operationId: getMarketplaceOrder
       security:
         - MarketplaceToken: []
@@ -201,16 +201,16 @@ paths:
           required: true
           schema:
             type: string
-          description: Identificador UUID del pedido.
+          description: Order UUID identifier.
       responses:
         '200':
-          description: Detalle completo del pedido, archivos vinculados y estado de preparación.
+          description: Full order details, linked files, and manufacturing readiness status.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrderDetailResponse'
         '404':
-          description: Pedido no encontrado.
+          description: Order not found.
           content:
             application/json:
               schema:
@@ -220,7 +220,7 @@ paths:
     post:
       tags:
         - Orders & File Governance
-      summary: Fijar o actualizar la oferta comercial del pedido
+      summary: Lock or update the commercial offer for the order
       operationId: selectOrderOffer
       security:
         - MarketplaceToken: []
@@ -254,7 +254,7 @@ paths:
               totalPrice: 1650.00
       responses:
         '200':
-          description: Oferta comercial fijada con éxito.
+          description: Commercial offer successfully locked.
           content:
             application/json:
               schema:
@@ -273,7 +273,7 @@ paths:
     post:
       tags:
         - Orders & File Governance
-      summary: Registrar metadatos de un archivo PDF subido
+      summary: Register metadata for an uploaded PDF file
       operationId: registerOrderFile
       security:
         - MarketplaceToken: []
@@ -314,14 +314,14 @@ paths:
                   type: string
             example:
               role: "INTERIOR_PDF"
-              originalName: "manuscrito_final.pdf"
+              originalName: "book_interior_final.pdf"
               mimeType: "application/pdf"
               sizeBytes: 15420310
               checksumSha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
               storagePath: "orders/ord_123/interior_v1.pdf"
       responses:
         '201':
-          description: Archivo registrado exitosamente.
+          description: File metadata successfully registered.
           content:
             application/json:
               schema:
@@ -344,7 +344,7 @@ paths:
     post:
       tags:
         - Orders & File Governance
-      summary: Vincular archivo a un trabajo de inspección Preflight
+      summary: Bind an order file to a Preflight inspection job
       operationId: bindPreflightJob
       security:
         - MarketplaceToken: []
@@ -375,7 +375,7 @@ paths:
               preflightJobId: "pf_job_8a7d6e5c-1234"
       responses:
         '200':
-          description: Archivo vinculado al trabajo de preflight.
+          description: Order file bound to the preflight inspection job.
           content:
             application/json:
               schema:
@@ -396,7 +396,7 @@ paths:
     post:
       tags:
         - Orders & File Governance
-      summary: Reevaluar deterministamente la preparación de fabricación (Readiness)
+      summary: Deterministically recompute manufacturing readiness
       operationId: recomputeOrderReadiness
       security:
         - MarketplaceToken: []
@@ -409,7 +409,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Estado de preparación evaluado.
+          description: Manufacturing readiness status evaluated.
           content:
             application/json:
               schema:
@@ -440,12 +440,12 @@ components:
       type: apiKey
       in: header
       name: X-API-Key
-      description: Clave API con prefijo ppos_live_ o ppos_test_.
+      description: Partner API key prefixed with ppos_live_ or ppos_test_.
     MarketplaceToken:
       type: apiKey
       in: header
       name: X-Marketplace-Token
-      description: Token secreto M2M de ingesta de pedidos.
+      description: Secret M2M order intake token.
     BearerAuth:
       type: http
       scheme: bearer
@@ -461,11 +461,11 @@ components:
         copies:
           type: integer
           minimum: 1
-          description: Cantidad total de ejemplares a imprimir.
+          description: Total quantity of book copies to print.
         interior_pages:
           type: integer
           minimum: 1
-          description: Número de páginas del bloque interior (múltiplo de 4 o 2 según encuadernación).
+          description: Number of pages in the interior book block (multiple of 4 or 2 depending on binding).
         format:
           type: string
           example: "148x210"
@@ -630,7 +630,7 @@ components:
 
   responses:
     ErrorResponse:
-      description: Error en la solicitud o fallo de validación
+      description: Request error or validation failure
       content:
         application/json:
           schema:

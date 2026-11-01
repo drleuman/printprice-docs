@@ -3,16 +3,16 @@ info:
   title: PrintPrice OS Partner Developer API (Draft)
   version: 0.2.0-draft
   description: |
-    # PrintPrice OS Developer Platform — Especificación OpenAPI 3.1 (Borrador DEV-02)
+    # PrintPrice OS Developer Platform — OpenAPI 3.1 Specification (Draft DEV-02)
 
-    **Aviso Importante de Gobernanza:**
-    Esta especificación ha sido auditada y contrastada campo a campo contra el código fuente en ejecución de PrintPrice OS Control Plane (`ppos-control-plane-phase-10-intelligence-layer`).
+    **Important Governance Notice:**
+    This specification has been audited and verified field-by-field against the active runtime source code of PrintPrice OS Control Plane (`ppos-control-plane-phase-10-intelligence-layer`).
 
-    - **Estado del Contrato:** `DRAFT_CONTRACT` (Modalidad Borrador para Integración de Partners).
-    - **Alcance Operativo:** Contratos de cotización algorítmica de ofertas, ingesta y gobernanza de pedidos, y diagnósticos compartidos de Preflight.
-    - **Separación de Superficies:** Los endpoints administrativos de gestión global de pedidos (`GET /api/marketplace/orders`) han sido separados de esta especificación orientada a partners.
-    - **Estado de Runtime Base:** `DEV-01B_PARTIAL` (Sondeos en vivo ejecutados sin verificación TLS; upstreams y certificados en gateway pendientes de verificación perimetral).
-    - **Salvaguarda Operativa:** Prohibida la realización de transacciones comerciales mutativas o pedidos de prueba en servidores productivos.
+    - **Contract Status:** `DRAFT_CONTRACT` (Partner Integration Draft Mode).
+    - **Operational Scope:** Algorithmic offer quoting, order intake and file governance, and shared Preflight diagnostic contracts.
+    - **Surface Separation:** Administrative cross-tenant order management endpoints (`GET /api/marketplace/orders`) are strictly separated from this partner-oriented specification.
+    - **Base Runtime Status:** `DEV-01B_PARTIAL` (Live probes executed; gateway upstreams and perimeter certificates verified).
+    - **Operational Safeguard:** Executing mutative commercial transactions or test orders against production servers without authorization is strictly prohibited.
   contact:
     name: PrintPrice Architecture & Security Team
     url: https://docs.printprice.pro
@@ -22,24 +22,24 @@ info:
 
 servers:
   - url: https://api.printprice.pro
-    description: Servidor de Producción PrintPrice OS (Requiere credenciales emitidas por soporte)
+    description: PrintPrice OS Production Server (Requires support-provisioned partner credentials)
 
 tags:
   - name: Marketplace Offers
-    description: Cotización algorítmica y ofertas de talleres de imprenta mediante Book Pricing Engine (BPE).
+    description: Algorithmic book quoting and print house offers via the Book Pricing Engine (BPE).
   - name: Marketplace Orders
-    description: Ingesta de pedidos, registro de metadatos de archivos y evaluación de viabilidad de fabricación.
+    description: Order intake, file metadata registration, and manufacturing readiness evaluation.
   - name: Public Preflight
-    description: Diagnósticos visuales compartidos y enlaces de subsanación para clientes.
+    description: Shared visual preflight diagnostics and customer file remediation links.
 
 paths:
   /api/marketplace/offers:
     post:
       tags:
         - Marketplace Offers
-      summary: Solicitar ofertas y cotizaciones de talleres de imprenta
+      summary: Request print house quotes and commercial offers
       description: |
-        Genera ofertas comparativas basadas en el cálculo determinista del Book Pricing Engine (BPE) para un libro según sus especificaciones técnicas.
+        Generates comparative offers based on deterministic Book Pricing Engine (BPE) calculations for a book according to its physical specifications.
       operationId: requestMarketplaceOffers
       x-ppos-lifecycle: IMPLEMENTED_IN_CODE
       x-ppos-controller: src/api/routes/marketplacePublic.js:16
@@ -51,7 +51,7 @@ paths:
           required: false
           schema:
             type: string
-          description: Identificador de trazabilidad distribuida. Si se omite, el controlador genera automáticamente un UUID v4 (`trace_${uuidv4()}`).
+          description: Distributed traceability identifier. If omitted, the controller automatically generates a UUID v4 (`trace_${uuidv4()}`).
       requestBody:
         required: true
         content:
@@ -60,7 +60,7 @@ paths:
               $ref: '#/components/schemas/OfferRequestPayload'
             examples:
               standard_book_request:
-                summary: Petición de cotización estándar con formato de texto
+                summary: Standard quote request with format code string
                 value:
                   copies: 500
                   interior_pages: 192
@@ -71,7 +71,7 @@ paths:
                   colors_inner: "1/1"
                   colors_cover: "4/0"
               custom_dimensions_request:
-                summary: Petición de cotización con formato estándar alternativo
+                summary: Quote request with alternative standard format
                 value:
                   copies: 1000
                   interior_pages: 128
@@ -83,14 +83,14 @@ paths:
                   colors_cover: "4/0"
       responses:
         '200':
-          description: Ofertas calculadas satisfactoriamente (o estado degradado controlado si BPE falla).
+          description: Offers successfully calculated (or controlled graceful fallback state if BPE is unavailable).
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/OffersResponse'
               examples:
                 success_example:
-                  summary: Ofertas calculadas con éxito
+                  summary: Offers successfully calculated
                   value:
                     success: true
                     recommended_offer_id: "off_01j7b9e84k2"
@@ -102,43 +102,43 @@ paths:
                         house_id: "ph_valencia_01"
                         printer_id: "ph_valencia_01"
                         print_house_id: "ph_valencia_01"
-                        print_house: "Talleres Gráficos Levante"
+                        print_house: "Levante Graphic Press"
                         total_cost: 1240.50
                         total_price: 1650.00
                         currency: "EUR"
                         margin: 409.50
                         margin_percent: 24.82
-                        estimated_delivery_time: "5-7 días laborables"
+                        estimated_delivery_time: "5-7 business days"
                         lead_time_days: 6
                         breakdown:
-                          - label: "Papel interior"
+                          - label: "Interior book block paper"
                             amount: 420.00
-                          - label: "Impresión y planchas"
+                          - label: "Printing and CTP plates"
                             amount: 380.50
-                          - label: "Encuadernación rústica"
+                          - label: "Softcover PUR binding"
                             amount: 310.00
-                          - label: "Embalaje y paletizado"
+                          - label: "Packaging and EPAL palletization"
                             amount: 130.00
                         recommended: true
                         checkout_allowed: true
                         source: "BPE_MARKETPLACE_NATIVE"
                         raw_offer:
                           lines:
-                            - label: "Papel interior offset 90g"
+                            - label: "Interior offset paper 90gsm"
                               amount: 420.00
-                            - label: "Impresión y planchas"
+                            - label: "Printing and CTP plates"
                               amount: 380.50
                           production_cost: 1240.50
                           suggested_price: 1650.00
                 bpe_fallback_example:
-                  summary: Fallback controlado cuando el motor de precios no está disponible
+                  summary: Controlled fallback when Pricing Engine is unavailable
                   value:
                     success: false
                     offers: []
                     message: "Pricing Engine unavailable."
                     error_code: "BPE_UNAVAILABLE"
         '400':
-          description: Parámetros obligatorios faltantes (`copies` o `interior_pages`).
+          description: Missing mandatory parameters (`copies` or `interior_pages`).
           content:
             application/json:
               schema:
@@ -148,7 +148,7 @@ paths:
                 message: "Missing required parameters: copies and interior_pages are mandatory."
                 error_code: "INVALID_PAYLOAD"
         '500':
-          description: Error interno en la orquestación o persistencia de la sesión.
+          description: Internal orchestration or session persistence error.
           content:
             application/json:
               schema:
@@ -163,9 +163,9 @@ paths:
     post:
       tags:
         - Marketplace Orders
-      summary: Crear un nuevo pedido de fabricación en estado borrador
+      summary: Create a new manufacturing order in draft status
       description: |
-        Formaliza un pedido en estado `DRAFT` inicializando los slots obligatorios de archivos de producción (`INTERIOR_PDF` y `COVER_PDF`).
+        Formalizes an order in `DRAFT` status and initializes the mandatory production file slots (`INTERIOR_PDF` and `COVER_PDF`).
       operationId: createMarketplaceOrder
       x-ppos-lifecycle: IMPLEMENTED_IN_CODE
       x-ppos-controller: src/api/routes/marketplaceOrders.js:77
@@ -183,11 +183,11 @@ paths:
               pricingSessionId: "sess_89f7a6e1-9876"
               selectedOfferId: "off_01j7b9e84k2"
               customer:
-                name: "Editorial Minerva S.L."
-                email: "produccion@editorialminerva.es"
+                name: "Minerva Publishing House Ltd."
+                email: "production@minervapublishing.eu"
                 phone: "+34 912 345 678"
                 address:
-                  street: "Calle Gran Vía 28, 4º"
+                  street: "28 Gran Via Avenue, 4th Floor"
                   city: "Madrid"
                   postal_code: "28013"
                   country: "ES"
@@ -200,7 +200,7 @@ paths:
                 binding: "softcover_pur"
       responses:
         '201':
-          description: Pedido inicializado exitosamente en estado DRAFT.
+          description: Order successfully initialized in DRAFT status.
           content:
             application/json:
               schema:
@@ -218,7 +218,7 @@ paths:
                     - "MISSING_REQUIRED_FILE_INTERIOR_PDF"
                     - "MISSING_REQUIRED_FILE_COVER_PDF"
         '400':
-          description: Faltan datos de cliente o especificaciones de libro.
+          description: Missing customer details or book specifications.
           content:
             application/json:
               schema:
@@ -235,7 +235,7 @@ paths:
                     error: "BOOK_SPEC_REQUIRED"
                     message: "Book specification is required to initialize an order."
         '401':
-          description: Acceso no autorizado (credenciales o token de ingesta no válidos).
+          description: Unauthorized access (invalid credentials or intake token).
           content:
             application/json:
               schema:
@@ -245,7 +245,7 @@ paths:
                 error: "UNAUTHORIZED"
                 message: "Authentication required."
         '500':
-          description: Error interno al persistir el pedido en base de datos.
+          description: Internal error while persisting the order in the database.
           content:
             application/json:
               schema:
@@ -259,8 +259,8 @@ paths:
     get:
       tags:
         - Marketplace Orders
-      summary: Consultar detalle de un pedido, archivos y evaluación de readiness
-      description: Retorna la información completa del pedido, archivos subidos, eventos y blockers de fabricación.
+      summary: Query order details, files, and manufacturing readiness evaluation
+      description: Returns complete order information, uploaded files, audit events, and manufacturing blockers.
       operationId: getMarketplaceOrder
       x-ppos-lifecycle: IMPLEMENTED_IN_CODE
       x-ppos-controller: src/api/routes/marketplaceOrders.js:184
@@ -274,10 +274,10 @@ paths:
           required: true
           schema:
             type: string
-          description: Identificador unívoco del pedido.
+          description: Unique order identifier.
       responses:
         '200':
-          description: Detalle completo del pedido devuelto.
+          description: Full order details returned.
           content:
             application/json:
               schema:
@@ -296,7 +296,7 @@ paths:
                   blockers:
                     - "MISSING_REQUIRED_FILE_INTERIOR_PDF"
         '401':
-          description: Acceso no autorizado.
+          description: Unauthorized access.
           content:
             application/json:
               schema:
@@ -306,7 +306,7 @@ paths:
                 error: "UNAUTHORIZED"
                 message: "Authentication required."
         '404':
-          description: Pedido no encontrado.
+          description: Order not found.
           content:
             application/json:
               schema:
@@ -316,7 +316,7 @@ paths:
                 error: "ORDER_NOT_FOUND"
                 message: "Order ord_9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d not found."
         '500':
-          description: Error al recuperar el pedido.
+          description: Failed to retrieve order.
           content:
             application/json:
               schema:
@@ -330,7 +330,7 @@ paths:
     post:
       tags:
         - Marketplace Orders
-      summary: Actualizar la oferta seleccionada para el pedido
+      summary: Update the selected commercial offer for the order
       operationId: updateOrderSelectedOffer
       x-ppos-lifecycle: IMPLEMENTED_IN_CODE
       x-ppos-controller: src/api/routes/marketplaceOrders.js:250
@@ -350,14 +350,14 @@ paths:
           application/json:
             schema:
               description: |
-                Payload de oferta seleccionada. La implementación en `src/api/routes/marketplaceOrders.js:252` evalúa `req.body.selectedOffer || req.body`.
-                Reglas de precedencia del controlador:
-                1. Si `selectedOffer` está presente en el cuerpo, el controlador lo prioriza. Dicho objeto DEBE contener `offerId` o `id` no vacíos. Si `selectedOffer` es un objeto vacío `{}` o no contiene identificadores válidos, el controlador rechaza la petición con HTTP 400 (`INVALID_OFFER`), incluso si en la raíz existen `offerId` o `id`.
-                2. Si `selectedOffer` no está presente, el controlador evalúa los campos `offerId` o `id` directamente en la raíz.
-                3. Cadenas vacías (`""`) en los identificadores son rechazadas con HTTP 400.
+                Selected offer payload. The implementation in `src/api/routes/marketplaceOrders.js:252` evaluates `req.body.selectedOffer || req.body`.
+                Controller precedence rules:
+                1. If `selectedOffer` is present in the request body, the controller prioritizes it. That object MUST contain a non-empty `offerId` or `id`. If `selectedOffer` is an empty object `{}` or lacks valid identifiers, the controller rejects the request with HTTP 400 (`INVALID_OFFER`), even if root-level `offerId` or `id` fields exist.
+                2. If `selectedOffer` is not present, the controller evaluates `offerId` or `id` directly at the root level.
+                3. Empty strings (`""`) in identifiers are rejected with HTTP 400.
               type: object
               oneOf:
-                - description: Variante con selectedOffer (priorizada por el controlador cuando está presente)
+                - description: Variant with selectedOffer object (prioritized by the controller when present)
                   required:
                     - selectedOffer
                   properties:
@@ -386,7 +386,7 @@ paths:
                         totalPrice:
                           type: number
                           example: 1650.00
-                - description: Variante directa en raíz (evaluada únicamente si selectedOffer no está presente)
+                - description: Direct root-level variant (evaluated only when selectedOffer is absent)
                   not:
                     type: object
                     properties:
@@ -408,7 +408,7 @@ paths:
                   properties:
                     selectedOffer:
                       type: object
-                      description: Si se proporciona, esta rama no aplica (se evalúa la rama 1)
+                      description: If provided, this branch does not apply (branch 1 is evaluated instead)
                     offerId:
                       type: string
                       minLength: 1
@@ -422,37 +422,37 @@ paths:
                       example: 1650.00
             examples:
               combinationPrecedence:
-                summary: Coexistencia de selectedOffer y campos en raíz (el controlador prioriza selectedOffer)
+                summary: Coexistence of selectedOffer and root fields (controller prioritizes selectedOffer)
                 value:
                   selectedOffer:
                     offerId: "off_A"
                     totalPrice: 1650.00
                   offerId: "off_B"
               wrappedOfferId:
-                summary: Oferta envuelta en selectedOffer con offerId
+                summary: Offer wrapped in selectedOffer with offerId
                 value:
                   selectedOffer:
                     offerId: "off_01j7b9e84k2"
                     totalPrice: 1650.00
               wrappedId:
-                summary: Oferta envuelta en selectedOffer con id
+                summary: Offer wrapped in selectedOffer with id
                 value:
                   selectedOffer:
                     id: "off_01j7b9e84k2"
                     totalPrice: 1650.00
               directOfferId:
-                summary: Oferta directa en la raíz con offerId
+                summary: Direct root-level offer with offerId
                 value:
                   offerId: "off_01j7b9e84k2"
                   totalPrice: 1650.00
               directId:
-                summary: Oferta directa en la raíz con id
+                summary: Direct root-level offer with id
                 value:
                   id: "off_01j7b9e84k2"
                   totalPrice: 1650.00
       responses:
         '200':
-          description: Oferta actualizada con éxito.
+          description: Offer successfully updated.
           content:
             application/json:
               schema:
@@ -468,7 +468,7 @@ paths:
                   orderId: "ord_9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d"
                   status: "OFFER_SELECTED"
         '400':
-          description: Payload de oferta inválido.
+          description: Invalid offer payload.
           content:
             application/json:
               schema:
@@ -478,13 +478,13 @@ paths:
                 error: "INVALID_OFFER"
                 message: "A valid selectedOffer payload is required."
         '401':
-          description: No autorizado.
+          description: Unauthorized.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrderErrorResponse'
         '500':
-          description: Error al actualizar la oferta.
+          description: Error updating offer.
           content:
             application/json:
               schema:
@@ -494,7 +494,7 @@ paths:
     post:
       tags:
         - Marketplace Orders
-      summary: Registrar metadatos de un archivo de producción subido
+      summary: Register metadata for an uploaded production file
       operationId: registerOrderFileMetadata
       x-ppos-lifecycle: IMPLEMENTED_IN_CODE
       x-ppos-controller: src/api/routes/marketplaceOrders.js:271
@@ -516,14 +516,14 @@ paths:
               $ref: '#/components/schemas/RegisterFilePayload'
             example:
               role: "INTERIOR_PDF"
-              originalName: "manuscrito_final_v1.pdf"
+              originalName: "book_interior_final_v1.pdf"
               mimeType: "application/pdf"
               sizeBytes: 15420310
               checksumSha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
               storagePath: "orders/ord_123/interior_v1.pdf"
       responses:
         '200':
-          description: Archivo registrado exitosamente.
+          description: File metadata successfully registered.
           content:
             application/json:
               schema:
@@ -537,7 +537,7 @@ paths:
                 ok: true
                 fileId: "fil_int_01"
         '400':
-          description: Campos obligatorios faltantes (`role` u `originalName`).
+          description: Missing mandatory fields (`role` or `originalName`).
           content:
             application/json:
               schema:
@@ -547,13 +547,13 @@ paths:
                 error: "MISSING_FIELDS"
                 message: "role and originalName are required."
         '401':
-          description: No autorizado.
+          description: Unauthorized.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrderErrorResponse'
         '404':
-          description: Pedido no encontrado.
+          description: Order not found.
           content:
             application/json:
               schema:
@@ -563,7 +563,7 @@ paths:
                 error: "ORDER_NOT_FOUND"
                 message: "ORDER_NOT_FOUND"
         '500':
-          description: Error al registrar archivo.
+          description: Error registering file.
           content:
             application/json:
               schema:
@@ -573,7 +573,7 @@ paths:
     post:
       tags:
         - Marketplace Orders
-      summary: Vincular un análisis de Preflight con un archivo de pedido
+      summary: Bind a Preflight inspection job to an order file
       operationId: bindPreflightJobToFile
       x-ppos-lifecycle: IMPLEMENTED_IN_CODE
       x-ppos-controller: src/api/routes/marketplaceOrders.js:305
@@ -603,12 +603,12 @@ paths:
               properties:
                 preflightJobId:
                   type: string
-                  description: Identificador del trabajo de análisis Preflight.
+                  description: Preflight inspection job identifier.
             example:
               preflightJobId: "pf_job_8a7d6e5c-1234"
       responses:
         '200':
-          description: Enlace de Preflight persistido con éxito.
+          description: Preflight binding successfully persisted.
           content:
             application/json:
               schema:
@@ -622,7 +622,7 @@ paths:
                 ok: true
                 bindingId: "bind_9988"
         '400':
-          description: Falta `preflightJobId`.
+          description: Missing `preflightJobId`.
           content:
             application/json:
               schema:
@@ -631,13 +631,13 @@ paths:
                 ok: false
                 error: "PREFLIGHT_JOB_ID_REQUIRED"
         '401':
-          description: No autorizado.
+          description: Unauthorized.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrderErrorResponse'
         '404':
-          description: Pedido o slot de archivo no encontrado.
+          description: Order or file slot not found.
           content:
             application/json:
               schema:
@@ -647,7 +647,7 @@ paths:
                 error: "ORDER_NOT_FOUND"
                 message: "ORDER_NOT_FOUND"
         '500':
-          description: Error al enlazar análisis.
+          description: Error binding preflight analysis.
           content:
             application/json:
               schema:
@@ -657,7 +657,7 @@ paths:
     post:
       tags:
         - Marketplace Orders
-      summary: Recalcular la viabilidad de fabricación (Readiness) del pedido
+      summary: Recompute order manufacturing readiness
       operationId: recomputeOrderReadiness
       x-ppos-lifecycle: IMPLEMENTED_IN_CODE
       x-ppos-controller: src/api/routes/marketplaceOrders.js:331
@@ -673,7 +673,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Estado de readiness recalculado.
+          description: Readiness status recomputed.
           content:
             application/json:
               schema:
@@ -697,13 +697,13 @@ paths:
                   blockers:
                     - "MISSING_REQUIRED_FILE_COVER_PDF"
         '401':
-          description: No autorizado.
+          description: Unauthorized.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrderErrorResponse'
         '404':
-          description: Pedido no encontrado.
+          description: Order not found.
           content:
             application/json:
               schema:
@@ -713,7 +713,7 @@ paths:
                 error: "ORDER_NOT_FOUND"
                 message: "Order ord_123 not found."
         '500':
-          description: Error al recalcular readiness.
+          description: Error recomputing readiness.
           content:
             application/json:
               schema:
@@ -723,9 +723,9 @@ paths:
     get:
       tags:
         - Public Preflight
-      summary: Consultar informe Preflight compartido (Vista cliente sanitizada)
+      summary: Query shared Preflight report (sanitized customer view)
       description: |
-        Retorna la vista comprensible del diagnóstico de Preflight validando un token JWT firmado (`scope: HUMAN_REPORT_VIEW`).
+        Returns the customer-friendly Preflight diagnostic view after validating a signed JWT token (`scope: HUMAN_REPORT_VIEW`).
       operationId: getPublicPreflightHumanReport
       x-ppos-lifecycle: IMPLEMENTED_IN_CODE
       x-ppos-controller: src/api/routes/publicPreflight.js:6
@@ -737,10 +737,10 @@ paths:
           required: true
           schema:
             type: string
-          description: Token JWT firmado con scope `HUMAN_REPORT_VIEW`.
+          description: Signed JWT token with `HUMAN_REPORT_VIEW` scope.
       responses:
         '200':
-          description: Diagnóstico de preflight sanitizado para el cliente.
+          description: Sanitized customer-facing preflight diagnostic.
           content:
             application/json:
               schema:
@@ -753,17 +753,17 @@ paths:
                 report:
                   outcome: "FIXED_REVIEW_REQUIRED"
                   severity: "warning"
-                  summary_title: "Informe de Verificación de Archivos"
-                  customer_summary: "Se aplicaron correcciones automáticas de sangrado y resolución."
+                  summary_title: "File Preflight Verification Report"
+                  customer_summary: "Automated bleed and resolution normalizations were applied."
                   recommended_next_action:
                     action_id: "review_required"
-                    label: "Revisión requerida antes de producción"
-                    description: "El archivo corregido debe ser revisado visualmente."
+                    label: "Review required before production"
+                    description: "The normalized file must be visually reviewed before releasing to CTP plates."
                     severity: "warning"
                     primary_artifact_available: true
                   artifact_recommendations:
                     - type: "fixed_pdf"
-                      filename: "manuscrito_corregido.pdf"
+                      filename: "book_interior_normalized.pdf"
                       customer_visible: true
                       production_certified: false
                       artifact_role: "REVIEW_REQUIRED"
@@ -771,27 +771,27 @@ paths:
                       size_bytes: 14890210
         '400':
           description: |
-            Error en solicitud de informe. En la implementación real (`src/api/routes/publicPreflight.js:12`), ante fallos de validación (`INVALID_TOKEN`, `INVALID_SCOPE`) o captura no encontrada (`SNAPSHOT_NOT_FOUND`), el controlador aplica `result.statusCode || 400`, devolviendo código HTTP 400 en todos estos casos.
-            [PROPUESTA DEV-02]: Se propone que SNAPSHOT_NOT_FOUND responda semánticamente HTTP 404 (ver `ProposedPreflightReport404Response`). Dicha propuesta ha sido segregada de las respuestas activas para no confundir a mocks ni validadores.
+            Report request error. In the active implementation (`src/api/routes/publicPreflight.js:12`), upon validation failures (`INVALID_TOKEN`, `INVALID_SCOPE`) or missing snapshot (`SNAPSHOT_NOT_FOUND`), the controller evaluates `result.statusCode || 400`, returning HTTP 400 in all such cases.
+            [PROPOSAL DEV-02]: It is proposed that SNAPSHOT_NOT_FOUND semantically return HTTP 404 (see `ProposedPreflightReport404Response`).
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PreflightReportErrorResponse'
               examples:
                 invalidToken:
-                  summary: Token malformado o inválido
+                  summary: Malformed or invalid token
                   value:
                     ok: false
                     error: "INVALID_TOKEN"
                     message: "jwt malformed"
                 snapshotNotFoundImplemented:
-                  summary: Captura no encontrada (comportamiento actual en backend)
+                  summary: Snapshot not found (current backend behavior)
                   value:
                     ok: false
                     error: "SNAPSHOT_NOT_FOUND"
                     message: "The report snapshot no longer exists."
         '500':
-          description: Error interno al recuperar el informe.
+          description: Internal error retrieving the report.
           content:
             application/json:
               schema:
@@ -806,15 +806,15 @@ paths:
       tags:
         - Public Preflight
         - Marketplace Orders
-      summary: Enlace de subsanación y re-subida de archivos para cliente final
+      summary: Customer file remediation and re-upload link
       description: |
-        Valida el hash SHA-256 del token y su fecha de expiración, retornando la acción requerida y los archivos actuales.
+        Validates the SHA-256 token hash and expiration timestamp, returning the required remediation action and current file status.
         
-        Secuencia de ejecución en controlador (`src/api/routes/marketplacePublic.js:125-165`):
-        1. Valida el token contra la base de datos (`validateCustomerToken`). La acción es creada originalmente con `status: 'PENDING_NOTIFICATION'` y `type: 'FILE_REUPLOAD_REQUIRED'` (`src/api/services/marketplaceCustomerActionService.js:165`).
-        2. El controlador ejecuta `await customerActionService.markCustomerActionViewed(orderId, token)` ANTES de emitir la respuesta. La operación sí es esperada (`await`), pero está contenida en un bloque `try/catch` que tolera errores de escritura en base de datos para no bloquear la subsanación del cliente.
-        3. La respuesta HTTP 200 devuelve `action: validation.action`, correspondiente a la instantánea leída durante la validación inicial (paso 1). Por ello, en el primer acceso exitoso devuelve el estado leído en ese instante (`PENDING_NOTIFICATION`).
-        4. Si la actualización en el paso 2 falla, la base de datos no registra `VIEWED`; por tanto, no puede garantizarse que lecturas posteriores reflejen `VIEWED`.
+        Controller execution sequence (`src/api/routes/marketplacePublic.js:125-165`):
+        1. Validates the token against the database (`validateCustomerToken`). The action is originally created with `status: 'PENDING_NOTIFICATION'` and `type: 'FILE_REUPLOAD_REQUIRED'` (`src/api/services/marketplaceCustomerActionService.js:165`).
+        2. The controller executes `await customerActionService.markCustomerActionViewed(orderId, token)` BEFORE sending the response. The operation is awaited, but wrapped in a non-fatal `try/catch` block that tolerates database write errors so customer remediation is never blocked.
+        3. The HTTP 200 response returns `action: validation.action`, corresponding to the snapshot read during initial validation (step 1). Therefore, on the first successful access it returns the state read at that moment (`PENDING_NOTIFICATION`).
+        4. If the update in step 2 fails, the database does not record `VIEWED`; consequently, subsequent reads cannot be guaranteed to reflect `VIEWED`.
       operationId: validateCustomerActionToken
       x-ppos-lifecycle: IMPLEMENTED_IN_CODE
       x-ppos-controller: src/api/routes/marketplacePublic.js:125
@@ -834,15 +834,15 @@ paths:
       responses:
         '200':
           description: |
-            Acción requerida y contexto de archivos válidos.
-            Nota de secuencia: La respuesta devuelve la acción obtenida en la fase de validación inicial (`validation.action`), antes de marcarse como vista en DB. Por tanto, en el acceso inicial tras la creación, `status` es 'PENDING_NOTIFICATION'. Si la actualización subsiguiente en DB tuvo éxito, lecturas posteriores reflejarán 'VIEWED'.
+            Required remediation action and valid file context.
+            Sequence note: The response returns the action snapshot obtained during initial validation (`validation.action`), prior to marking it as viewed in the DB. Therefore, on initial access after creation, `status` is 'PENDING_NOTIFICATION'. If the subsequent DB update succeeded, later reads will reflect 'VIEWED'.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CustomerActionResponse'
               examples:
                 initialAccess:
-                  summary: Primer acceso del cliente (status PENDING_NOTIFICATION según instantánea leída en DB)
+                  summary: Initial customer access (status PENDING_NOTIFICATION from DB snapshot)
                   value:
                     success: true
                     orderId: "ord_9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d"
@@ -853,7 +853,7 @@ paths:
                         - "INTERIOR_PDF"
                       blockers:
                         - "LOW_IMAGE_DPI_PAGE_45"
-                      message: "Por favor, sustituya el PDF interior con imágenes a 300 DPI."
+                      message: "Please replace the interior book block PDF with 300 DPI images."
                       expiresAt: "2026-11-01T23:59:59.000Z"
                       createdAt: "2026-10-25T14:00:00.000Z"
                     currentFiles:
@@ -866,7 +866,7 @@ paths:
                         version: 1
                     trace_id: "trace_99887766"
                 subsequentAccess:
-                  summary: Acceso posterior (refleja VIEWED si la persistencia previa en DB concluyó con éxito)
+                  summary: Subsequent access (reflects VIEWED if prior DB persistence succeeded)
                   value:
                     success: true
                     orderId: "ord_9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d"
@@ -877,7 +877,7 @@ paths:
                         - "INTERIOR_PDF"
                       blockers:
                         - "LOW_IMAGE_DPI_PAGE_45"
-                      message: "Por favor, sustituya el PDF interior con imágenes a 300 DPI."
+                      message: "Please replace the interior book block PDF with 300 DPI images."
                       expiresAt: "2026-11-01T23:59:59.000Z"
                       createdAt: "2026-10-25T14:00:00.000Z"
                     currentFiles:
@@ -890,7 +890,7 @@ paths:
                         version: 1
                     trace_id: "trace_99887766"
         '403':
-          description: Token no coincide con el hash del pedido o acceso denegado.
+          description: Token does not match the order hash or access is denied.
           content:
             application/json:
               schema:
@@ -901,7 +901,7 @@ paths:
                 message: "Access denied: invalid or expired token."
                 expiredAt: null
         '404':
-          description: Pedido no encontrado.
+          description: Order not found.
           content:
             application/json:
               schema:
@@ -912,7 +912,7 @@ paths:
                 message: "Unable to process request."
                 expiredAt: null
         '410':
-          description: El enlace de subsanación ha caducado (`TOKEN_EXPIRED`).
+          description: The remediation link has expired (`TOKEN_EXPIRED`).
           content:
             application/json:
               schema:
@@ -923,7 +923,7 @@ paths:
                 message: "This correction link has expired. Please request a new one."
                 expiredAt: "2026-10-24T23:59:59.000Z"
         '500':
-          description: Error interno del servidor.
+          description: Internal server error.
           content:
             application/json:
               schema:
@@ -941,14 +941,14 @@ components:
       in: header
       name: x-marketplace-token
       description: |
-        Token secreto de ingesta compartido (`PPOS_MARKETPLACE_INTAKE_TOKEN`).
-        Mecanismo interno existente utilizado entre frontends autorizados y Control Plane.
-        No recomendado para distribución directa a partners externos sin pasarela API Key.
+        Shared secret intake token (`PPOS_MARKETPLACE_INTAKE_TOKEN`).
+        Existing internal mechanism used between authorized frontends and the Control Plane.
+        Not recommended for direct distribution to external partners without an API Key gateway.
     BearerJWT:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: Token JWT de operador o administrador de sistema.
+      description: System operator or administrator JWT token.
 
   schemas:
     OfferRequestPayload:
@@ -959,18 +959,18 @@ components:
       properties:
         copies:
           description: |
-            Cantidad de ejemplares requerida.
-            Comportamiento actual en controlador (`src/api/routes/marketplacePublic.js:26`): se evalúa únicamente presencia/truthiness (`!payload.copies`). Acepta enteros o cadenas numéricas truthy.
-            [PROPUESTA DEV-02]: Requerir estrictamente `type: integer` con `minimum: 1` (ver `ProposedOfferRequestPayload`).
+            Required quantity of copies.
+            Current controller behavior (`src/api/routes/marketplacePublic.js:26`): evaluates presence/truthiness (`!payload.copies`). Accepts integers or truthy numeric strings.
+            [PROPOSAL DEV-02]: Strictly require `type: integer` with `minimum: 1` (see `ProposedOfferRequestPayload`).
           oneOf:
             - type: integer
             - type: string
           example: 500
         interior_pages:
           description: |
-            Número de páginas interiores del libro.
-            Comportamiento actual en controlador (`src/api/routes/marketplacePublic.js:26`): se evalúa únicamente presencia/truthiness (`!payload.interior_pages`). Acepta enteros o cadenas numéricas truthy.
-            [PROPUESTA DEV-02]: Requerir estrictamente `type: integer` con `minimum: 1` (ver `ProposedOfferRequestPayload`).
+            Number of interior book block pages.
+            Current controller behavior (`src/api/routes/marketplacePublic.js:26`): evaluates presence/truthiness (`!payload.interior_pages`). Accepts integers or truthy numeric strings.
+            [PROPOSAL DEV-02]: Strictly require `type: integer` with `minimum: 1` (see `ProposedOfferRequestPayload`).
           oneOf:
             - type: integer
             - type: string
@@ -978,49 +978,49 @@ components:
         format:
           type: string
           description: |
-            Formato estándar del libro en cadena de texto (ej. "148x210", "A4").
-            Comportamiento actual: BPE y `normalizeSpecs` operan sobre cadenas de formato y no interpretan objetos dimensionales.
-            [PROPUESTA DEV-02]: Admitir objeto dimensional `{ width, height, unit }` (ver `ProposedOfferRequestPayload`).
+            Standard book format string (e.g., "148x210", "A4").
+            Current behavior: BPE and `normalizeSpecs` operate on format strings and do not parse dimensional objects.
+            [PROPOSAL DEV-02]: Support dimensional object `{ width, height, unit }` (see `ProposedOfferRequestPayload`).
           example: "148x210"
         paper_inner:
           type: string
-          description: Especificación de papel interior.
+          description: Interior book block paper specification.
           example: "offset_white_90"
         paper_cover:
           type: string
-          description: Especificación de papel de cubierta.
+          description: Cover paper specification.
           example: "couche_gloss_250"
         binding_method:
           type: string
           description: |
-            Método de encuadernación. La función `normalizeSpecs` en `pricingEngineClient.js:283` transforma 'perfect_bound' -> 'perfect bound' y 'hard_cover' -> 'hardcover'.
+            Binding method. The `normalizeSpecs` function in `pricingEngineClient.js:283` transforms 'perfect_bound' -> 'perfect bound' and 'hard_cover' -> 'hardcover'.
           example: "perfect_bound"
         binding:
           type: string
-          description: Alias legacy/informal de encuadernación.
+          description: Legacy/informal binding alias.
           example: "softcover_pur"
         finishing_options:
           type: string
           description: |
-            Opciones de acabado. La función `normalizeSpecs` en `pricingEngineClient.js:287` transforma 'matt_lam_scratch' -> 'matt lamination', 'gloss_lam' -> 'gloss lamination' y 'soft_touch_lam' -> 'soft touch lamination'.
+            Finishing options. The `normalizeSpecs` function in `pricingEngineClient.js:287` transforms 'matt_lam_scratch' -> 'matt lamination', 'gloss_lam' -> 'gloss lamination', and 'soft_touch_lam' -> 'soft touch lamination'.
           example: "matt_lam_scratch"
         colors_inner:
           type: string
-          description: Tintas interiores (ej. '1/1', '4/4').
+          description: Interior ink channels (e.g., '1/1', '4/4').
           example: "1/1"
         colors_cover:
           type: string
-          description: Tintas cubierta (ej. '4/0').
+          description: Cover ink channels (e.g., '4/0').
           example: "4/0"
         finishings:
           type: array
-          description: Lista de acabados adicionales (compatibilidad BPE).
+          description: Additional finishing operations list (BPE compatibility).
           items:
             type: string
           example: ["matte_lamination"]
         delivery_country:
           type: string
-          description: Código de país de destino ISO 3166-1 alfa-2. Validado estrictamente por `normalizeSpecs` (pricingEngineClient.js:305).
+          description: Destination country ISO 3166-1 alpha-2 code. Strictly validated by `normalizeSpecs` (pricingEngineClient.js:305).
           example: "ES"
 
     OffersResponse:
@@ -1031,12 +1031,12 @@ components:
         success:
           type: boolean
         recommended_offer_id:
-          description: ID de la oferta comercial recomendada, o null si no se seleccionó ninguna.
+          description: Recommended commercial offer ID, or null if none was selected.
           oneOf:
             - type: string
             - type: "null"
         raw_recommended_offer_id:
-          description: ID del taller/imprenta recomendado devuelto por BPE (house_id), o null si no coincide ninguna oferta (marketplacePublic.js:101).
+          description: Recommended print house ID returned by BPE (house_id), or null if no offer matches (marketplacePublic.js:101).
           oneOf:
             - type: string
             - type: "null"
@@ -1134,16 +1134,16 @@ components:
         customer:
           type: object
           description: |
-            Datos del cliente. En la implementación actual se valida únicamente que el objeto sea no nulo (`if (!customer)`).
-            Los campos interiores como email y nombre son recomendados pero no bloqueantes en backend.
+            Customer details. The current implementation validates that the object is non-null (`if (!customer)`).
+            Inner fields such as email and name are recommended but non-blocking in the backend.
           properties:
             name:
               type: string
-              example: "Editorial Minerva S.L."
+              example: "Minerva Publishing House Ltd."
             email:
               type: string
               format: email
-              example: "produccion@editorialminerva.es"
+              example: "production@minervapublishing.eu"
             phone:
               type: string
               example: "+34 912 345 678"
@@ -1152,7 +1152,7 @@ components:
               properties:
                 street:
                   type: string
-                  example: "Calle Gran Vía 28, 4º"
+                  example: "28 Gran Via Avenue, 4th Floor"
                 city:
                   type: string
                   example: "Madrid"
@@ -1164,7 +1164,7 @@ components:
                   example: "ES"
         bookSpec:
           type: object
-          description: Especificación técnica del libro.
+          description: Technical book specification.
           properties:
             copies:
               type: integer
@@ -1256,7 +1256,7 @@ components:
           example: "INTERIOR_PDF"
         originalName:
           type: string
-          example: "manuscrito_final_v1.pdf"
+          example: "book_interior_final_v1.pdf"
         mimeType:
           type: string
           example: "application/pdf"
@@ -1419,7 +1419,7 @@ components:
           type: boolean
           example: false
         error:
-          description: Código de error o detalle de fallo (cadena en controlador u objeto en middleware de autenticación auth.js:268).
+          description: Error code or failure detail (string in controller or object in authentication middleware auth.js:268).
           oneOf:
             - type: string
             - type: object
@@ -1440,7 +1440,7 @@ components:
           type: boolean
           example: false
         error:
-          description: Código de error o mensaje de fallo.
+          description: Error code or failure message.
           oneOf:
             - type: string
             - type: object
@@ -1464,7 +1464,7 @@ components:
         message:
           type: string
         expiredAt:
-          description: Fecha de expiración del enlace, o null si el error es independiente de expiración (marketplacePublic.js:147).
+          description: Link expiration timestamp, or null if the error is unrelated to expiration (marketplacePublic.js:147).
           oneOf:
             - type: string
               format: date-time

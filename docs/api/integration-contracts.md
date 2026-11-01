@@ -25,11 +25,11 @@ Requires `X-Marketplace-Token: <PPOS_MARKETPLACE_INTAKE_TOKEN>` or `Authorizatio
   "pricingSessionId": "sess_89f7a6e1-9876",
   "selectedOfferId": "off_01j7b9e84k2",
   "customer": {
-    "name": "Editorial Minerva S.L.",
-    "email": "produccion@editorialminerva.es",
+    "name": "Minerva Publishing House Ltd.",
+    "email": "production@minervapublishing.eu",
     "phone": "+34 912 345 678",
     "address": {
-      "street": "Calle Gran Vía 28, 4º",
+      "street": "28 Gran Via Avenue, 4th Floor",
       "city": "Madrid",
       "postal_code": "28013",
       "country": "ES"
@@ -104,7 +104,7 @@ Once the order is initialized, client systems register uploaded file metadata an
 ```json
 {
   "role": "INTERIOR_PDF",
-  "originalName": "manuscrito_final.pdf",
+  "originalName": "book_interior_final.pdf",
   "mimeType": "application/pdf",
   "sizeBytes": 15420310,
   "checksumSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -142,4 +142,3 @@ The endpoint `GET /api/marketplace/orders` is an **administrative cross-tenant e
 
 Download the formal OpenAPI 3.1 specification for this domain:
 - **[Pricing & Marketplace Orders OpenAPI 3.1 Specification](/openapi/pricing-marketplace.openapi.yaml)**
-

@@ -88,9 +88,9 @@ Implemented in `src/api/services/machines/predictiveMaintenanceService.js` and m
 ### Nominal Consumable Lifespan Thresholds
 | Consumable Code | Industrial Component | Nominal Lifespan (`maxLifespanCycles`) | Warning Threshold | Preventive Lock Threshold |
 | :--- | :--- | :---: | :---: | :---: |
-| `OFFSET_RUBBER_BLANKET` | Offset Rubber Blankets (Mantillas de caucho) | `1,200,000` impressions | `80.0%` | `95.0%` |
-| `TRIMMER_BLADE` | 3-Knife Trimmer Blades (Cuchillas guillotina trilateral) | `150,000` cuts | `80.0%` | `95.0%` |
-| `INKING_ROLLER` | Inking Rollers (Rodillos entintadores) | `5,000,000` impressions | `80.0%` | `95.0%` |
+| `OFFSET_RUBBER_BLANKET` | Offset Rubber Blankets | `1,200,000` impressions | `80.0%` | `95.0%` |
+| `TRIMMER_BLADE` | 3-Knife Trimmer Blades | `150,000` cuts | `80.0%` | `95.0%` |
+| `INKING_ROLLER` | Inking Rollers | `5,000,000` impressions | `80.0%` | `95.0%` |
 | `DIGITAL_PIP_FOIL` | Digital Imaging PIP / Blanket (HP Indigo) | `450,000` impressions | `80.0%` | `95.0%` |
 
 ### OEE Calculation & Preventive Routing Lock

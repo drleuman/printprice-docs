@@ -85,3 +85,4 @@ Implemented in `scripts/deploy_atomic_ecosystem_phase13c.sh` on the production s
 | :--- | :---: | :--- | :--- | :--- |
 | **13A** | `GET` | `/api/financials/escrow/profitability` | Returns tenant-scoped real-time net industrial margin EUR/%, JMF waste savings, and OEE per order. | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | **13B** | `GET` | `/api/financials/escrow/:orderId/e-invoice.xml` | Generates EN 16931 compliant `FACTURAE_3_2_2` or `XRECHNUNG_3_0` XML with segregated fiscal lines. | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+

@@ -67,9 +67,9 @@ flowchart LR
 ### Request Body (JSON)
 | Field | Type | Required | Description |
 | :--- | :---: | :---: | :--- |
-| `copies` | Integer / String | **Yes** | Quantity of copies to print. Current controller checks presence/truthiness (`!payload.copies`); strict `type: integer, minimum: 1` is a target proposal (`[PROPUESTA DEV-02]`). |
-| `interior_pages` | Integer / String | **Yes** | Total interior page count. Current controller checks presence/truthiness (`!payload.interior_pages`); strict `type: integer, minimum: 1` is a target proposal (`[PROPUESTA DEV-02]`). |
-| `format` | String | No | Standard format code (`"148x210"`, `"A5"`). Current BPE processes strings only. Object dimensions `{width, height, unit}` represent a separate contract proposal (`[PROPUESTA DEV-02]`). |
+| `copies` | Integer / String | **Yes** | Quantity of copies to print. Current controller checks presence/truthiness (`!payload.copies`); strict `type: integer, minimum: 1` is a target proposal (`[PROPOSAL DEV-02]`). |
+| `interior_pages` | Integer / String | **Yes** | Total interior page count. Current controller checks presence/truthiness (`!payload.interior_pages`); strict `type: integer, minimum: 1` is a target proposal (`[PROPOSAL DEV-02]`). |
+| `format` | String | No | Standard format code (`"148x210"`, `"A5"`). Current BPE processes strings only. Object dimensions `{width, height, unit}` represent a separate contract proposal (`[PROPOSAL DEV-02]`). |
 | `paper_inner` | String | No | Interior paper specification (e.g., `"offset_white_90"`). |
 | `paper_cover` | String | No | Cover paper specification (e.g., `"couche_gloss_250"`). |
 | `binding_method` | String | No | Binding method normalized by `pricingEngineClient.js:283` (`"perfect_bound"` → `"perfect bound"`, `"hard_cover"` → `"hardcover"`). |
@@ -141,19 +141,19 @@ Returns a structured array of print offers sorted with recommended flags (note t
       "house_id": "ph_valencia_01",
       "printer_id": "ph_valencia_01",
       "print_house_id": "ph_valencia_01",
-      "print_house": "Talleres Gráficos Levante",
+      "print_house": "Levante Graphic Press",
       "total_cost": 1240.50,
       "total_price": 1650.00,
       "currency": "EUR",
       "margin": 409.50,
       "margin_percent": 24.82,
-      "estimated_delivery_time": "5-7 días laborables",
+      "estimated_delivery_time": "5-7 business days",
       "lead_time_days": 6,
       "breakdown": [
-        { "label": "Papel interior", "amount": 420.00 },
-        { "label": "Impresión y planchas", "amount": 380.50 },
-        { "label": "Encuadernación rústica", "amount": 310.00 },
-        { "label": "Embalaje y paletizado", "amount": 130.00 }
+        { "label": "Interior book block paper", "amount": 420.00 },
+        { "label": "Printing and CTP plates", "amount": 380.50 },
+        { "label": "Softcover PUR binding", "amount": 310.00 },
+        { "label": "Packaging and EPAL palletization", "amount": 130.00 }
       ],
       "recommended": true,
       "checkout_allowed": true,
@@ -230,4 +230,3 @@ In accordance with PrintPrice OS financial governance:
 
 Download the formal OpenAPI 3.1 specification for this domain:
 - **[Pricing & Marketplace Orders OpenAPI 3.1 Specification](/openapi/pricing-marketplace.openapi.yaml)**
-

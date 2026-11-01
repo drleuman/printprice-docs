@@ -3,104 +3,102 @@ title: Carrier Integration Protocol & Service Conditions
 sidebar_label: Carrier Service Protocol
 ---
 
-# PrintPriceOS — Protocolo de Integración y Condiciones de Servicio de Transporte
+# PrintPriceOS — Carrier Integration Protocol & Freight Service Conditions
 
-Este protocolo establece los estándares operativos vinculantes, requisitos de entrega en muelles editoriales y condiciones de tarificación aplicables a los servicios de transporte contratados a través o en nombre de la red industrial de manufactura **PrintPriceOS**.
+This protocol establishes the binding operational standards, editorial receiving dock compliance rules, and tariff conditions applicable to road freight services contracted through or on behalf of the **PrintPriceOS** industrial manufacturing network.
 
-> **Referencia Documental:** `PPOS-LOG-SLA-2026.1`  
-> **Descarga PDF Oficial DIN A4 (Control Plane):** `GET /api/logistics/carrier-protocol/pdf`
-
----
-
-## 1. Parámetros de Facturación y Conversión Volumétrica
-
-1. **Régimen de Tasación por Metro Lineal de Carga (LDM):**
-   * **Equivalencia unitaria:** `1 Euro-Palet EPAL (1.200 × 800 mm) = 0,40 LDM`.
-   * **Ratio masa/volumen estándar:** `1 LDM = 1.850 kg` tasables.
-   * **Cálculo de masa tasable por palet:** `Masa tasable = max(Masa bruta real, 740 kg)`.
-   * **Condición de apilabilidad (*Strict LDM*):** Las expediciones editoriales son por defecto **no apilables en tránsito** (`STRICT_LDM_NON_STACKABLE`), salvo en semirremolques equipados con sistema de doble piso (*Doppelstock* / `DOUBLE_DECK_TRAILER`).
-
-2. **Segregación Estricta de Costes:**
-   * La tarifa de transporte cubre exclusivamente el porte, seguros y recargos aplicables (combustible y peajes).
-   * Los consumibles de embalaje (cajas de cartón doble canal **FEFCO 0201**, flejes, cantoneras/esquineras y film estirable) forman parte del coste de fabricación/taller y no admiten recargos de manipulación por parte del transportista.
+> **Document Reference:** `PPOS-LOG-SLA-2026.1`  
+> **Official DIN A4 PDF Download (Control Plane):** `GET /api/logistics/carrier-protocol/pdf`
 
 ---
 
-## 2. Cumplimiento Operativo en Hubs Editoriales Europeos
+## 1. Billing Parameters & Volumetric Conversion
 
-Las expediciones dirigidas a plataformas de distribución editorial y centros de fulfillment deben cumplir estrictamente las directrices físicas de recepción de cada centro. El transportista es responsable de respetar la ventana horaria asignada.
+1. **Loading Meter (LDM) Tariff Regime:**
+   * **Unit Equivalence:** `1 Euro-Pallet EPAL (1,200 × 800 mm) = 0.40 LDM`.
+   * **Standard Mass-to-Volume Ratio:** `1 LDM = 1,850 kg` chargeable weight.
+   * **Chargeable Weight Calculation per Pallet:** `Chargeable Weight = max(Actual Gross Weight, 740 kg)`.
+   * **Stackability Condition (*Strict LDM*):** Editorial book shipments are **non-stackable in transit** by default (`STRICT_LDM_NON_STACKABLE`), except inside semi-trailers equipped with a certified double-deck beam system (*Doppelstock* / `DOUBLE_DECK_TRAILER`).
 
-| Centro de Destino | Altura Máxima Carga | Masa Máxima | Requisito Crítico de Muelle | Ventana de Cita Previa (*Avis*) |
+2. **Strict Cost Segregation:**
+   * The freight tariff covers exclusively road transport, cargo insurance, and applicable surcharges (fuel and highway tolls).
+   * Packaging consumables (double-wall corrugated cardboard boxes **FEFCO 0201**, strapping bands, corner edge protectors, and stretch wrap film) are part of the print plant manufacturing cost and are not subject to carrier handling surcharges.
+
+---
+
+## 2. Operational Compliance at European Editorial Distribution Hubs
+
+Shipments bound for editorial distribution platforms and fulfillment centers must strictly comply with the physical receiving guidelines of each hub. The carrier is responsible for honoring the assigned dock time slot.
+
+| Destination Hub | Max Loaded Height | Max Gross Weight | Critical Dock Requirement | Advance Slot Booking Window (*Avis*) |
 | :--- | :--- | :--- | :--- | :--- |
-| **Zeitfracht Erfurt**<br/>`GLN: 4026635000006` | `1.200 mm`<br/>*(palet incluido)* | `1.000 kg` | Retranqueo perimetral interior de `>= 30 mm` (*zero overhang*). Cajas alineadas dentro del borde de las tablas del palet. | **Obligatoria `>= 48 h` antes de la entrega**. Notificación telemática de matrícula y franja horaria. |
-| **VVA Arvato Gütersloh**<br/>`GLN: 4002693000002` | `1.300 mm`<br/>*(palet incluido)* | `700 kg` | Capa superior plana obligatoria (`requiresFlatTopLayer: true`). Cajas de pico o media capa deben situarse en capas intermedias. | **Obligatoria `>= 24 h`**. Reserva de slot de descarga en portal de proveedores. |
-| **Amazon EU FBA**<br/>`GLN: 5450534000007` | Según ASIN / Cita (`<= 1.800 mm`) | Masa máx. por caja: `<= 15,0 kg` | Paletizado normalizado EUR-1. Prohibido remonte sin film de seguridad. | **Obligatoria vía Carrier Central (CARP)**. Cita vinculada a PO e ID de envío FBA. |
+| **Zeitfracht Erfurt**<br/>`GLN: 4026635000006` | `1,200 mm`<br/>*(pallet included)* | `1,000 kg` | Minimum `>= 30 mm` perimeter setback (*zero overhang*). Cartons must be aligned inside the pallet deck perimeter. | **Mandatory `>= 48 h` prior to delivery**. Electronic notification of truck registration plate and unloading slot. |
+| **VVA Arvato Gütersloh**<br/>`GLN: 4002693000002` | `1,300 mm`<br/>*(pallet included)* | `700 kg` | Mandatory flat top layer (`requiresFlatTopLayer: true`). Partial or remainder layers must be placed in intermediate tiers. | **Mandatory `>= 24 h`**. Unloading dock slot reservation via the supplier portal. |
+| **Amazon EU FBA**<br/>`GLN: 5450534000007` | Per ASIN / Slot (`<= 1,800 mm`) | Max carton weight: `<= 15.0 kg` | Standardized EUR-1 palletization. Double-stacking without safety stretch wrap is prohibited. | **Mandatory via Carrier Central (CARP)**. Appointment linked to PO and FBA Shipment ID. |
 
-*Cualquier retraso, rechazo en muelle o sobrecoste derivado del incumplimiento de la cita previa reservada por falta imputable al transportista será repercutido según las condiciones contractuales.*
-
----
-
-## 3. Circuito de Paletería EPAL y Vales de Canje (*Palettenschein*)
-
-1. **Modalidad de Intercambio Inmediato (`1:1`):**
-   En el momento de la carga en taller, el transportista debe entregar en muelle el mismo número de Euro-palets **EPAL** (`1.200 × 800 mm`, norma **UIC 435-2**) en estado apto para uso industrial (categoría A/B, sin tablas rotas ni clavos salientes).
-
-2. **Vale de Intercambio (*Palettenschein* — Plazo improrrogable de 14 días):**
-   Si en el momento de la recogida el transportista no dispone de palets vacíos para canje directo:
-   * El taller emitirá un vale formal de paletería registrado en la Sección 4 del Albarán de Entrega DIN A4 (*Lieferschein*).
-   * El transportista dispone de un plazo improrrogable de **14 días naturales** para retornar el saldo de palets deudores en las instalaciones del taller emisor o en el centro de consolidación designado.
-   * **Penalización por no restitución:** Vencido el plazo de 14 días sin restitución física, los palets se liquidarán automáticamente a razón de **15,00 EUR / ud.** más IVA en la siguiente facturación de portes.
+*Any delay, dock rejection, or penalty surcharge resulting from failure to honor a booked unloading slot attributable to the carrier shall be rebilled according to the contractual terms.*
 
 ---
 
-## 4. Trazabilidad Documental y Requisitos de Escaneo
+## 3. EPAL Euro-Pallet Exchange Loop & Vouchers (*Palettenschein*)
 
-1. **Etiquetado GS1-128 SSCC-18 (NVE):**
-   * Cada palet cuenta con una etiqueta física (formato térmico **A6 `105 × 148 mm`** o pliego **DIN A4 4-UP**) con código de barras **GS1-128 Subset C** e Identificador de Aplicación `(00)`.
-   * El transportista debe escanear el código SSCC-18 en el momento de la recogida y en cada punto de transbordo (*cross-docking*).
-   * La etiqueta no debe ser rasgada, tapada con precinto opaco ni deteriorada durante el tránsito.
+1. **Immediate `1:1` Dock Exchange Mode:**
+   At the time of loading at the print plant dock, the carrier must hand over the exact same quantity of **EPAL** Euro-pallets (`1,200 × 800 mm`, **UIC 435-2** standard) in industrial-grade condition (Category A/B, free of broken deck boards or protruding nails).
 
-2. **Confirmación de Entrega (POD / CMR):**
-   * **Vía Telemática (Recomendada):** Notificación de entrega (*milestone webhook*) vía API con código SSCC-18, marca de tiempo ISO-8601 y coordenadas GPS en un plazo inferior a **2 horas** tras la descarga.
-   * **Vía Documental Física:** En ausencia de integración API, el transportista debe custodiar el ejemplar del Albarán de Entrega DIN A4 (*Lieferschein*), debidamente firmado y sellado por el receptor en el recuadro correspondiente (sección POD), remitiendo copia digitalizada en un plazo máximo de **24 horas**.
+2. **Pallet Exchange Voucher (*Palettenschein* — Non-Extendable 14-Day Deadline):**
+   If the carrier does not have empty exchange pallets available at pickup:
+   * The print plant will issue a formal pallet exchange voucher recorded in Section 4 of the DIN A4 Delivery Note (*Lieferschein*).
+   * The carrier has a non-extendable deadline of **14 calendar days** to return the owed pallet balance to the issuing print plant or designated consolidation hub.
+   * **Non-Return Settlement Penalty:** Once the 14-day window expires without physical return, unreturned pallets are automatically settled and invoiced at **15.00 EUR / unit** plus VAT on the next freight billing cycle.
 
 ---
 
-## 5. Acuse de Recibo y Adhesión
+## 4. Document Traceability & Barcode Scanning Requirements
 
-| Datos de la Empresa Transportista | Conformidad Operativa |
+1. **GS1-128 SSCC-18 (NVE) Pallet Labeling:**
+   * Every pallet bears a physical thermal label (**A6 `105 × 148 mm`** format or **DIN A4 4-UP** sheet) featuring a **GS1-128 Subset C** barcode with Application Identifier `(00)`.
+   * The carrier must scan the SSCC-18 barcode at pickup and at every cross-docking hub.
+   * Labels must not be torn, covered with opaque tape, or damaged during transit.
+
+2. **Proof of Delivery (POD / CMR) Confirmation:**
+   * **Telematic Channel (Recommended):** Electronic delivery milestone webhook via API including SSCC-18 code, ISO-8601 timestamp, and GPS coordinates within **2 hours** after unloading.
+   * **Physical Document Channel:** In the absence of an API integration, the carrier must retain the copy of the DIN A4 Delivery Note (*Lieferschein*), duly signed and stamped by the consignee in the designated POD box, and upload a digitized copy within **24 hours**.
+
+---
+
+## 5. Acknowledgment & Carrier Adherence
+
+| Carrier Company Details | Operational Acceptance |
 | :--- | :--- |
-| **Razón Social:** | **Firma autorizada y sello:** |
-| **CIF / NIF / VAT:** | |
-| **Representante Legal / Operativo:** | |
-| **Canal de notificación de tracking (Email / API Endpoint):** | **Fecha:** |
+| **Legal Entity Name:** | **Authorized Signature & Company Stamp:** |
+| **Tax ID / VAT Number:** | |
+| **Legal / Operations Representative:** | |
+| **Tracking Notification Channel (Email / API Endpoint):** | **Date:** |
 
 ---
 
-## 6. Generación Programática del Protocolo en PDF (Control Plane API)
+## 6. Programmatic Protocol PDF Generation (Control Plane API)
 
-El Control Plane expone el generador vectorial nativo del protocolo en formato DIN A4 listo para firma:
+The Control Plane exposes a native vector PDF generator for this protocol in DIN A4 format ready for signature:
 
 ```http
 GET /api/logistics/carrier-protocol/pdf?carrierName=DACHSER%20SE&carrierVatId=DE123456789
 Authorization: Bearer <JWT_TOKEN>
 ```
 
-* **Cabeceras de respuesta:**
+* **Response Headers:**
   * `Content-Type: application/pdf`
   * `Content-Disposition: inline; filename="ppos-carrier-service-protocol-A4.pdf"`
   * `X-PPOS-Protocol-Version: PPOS-LOG-SLA-2026.1`
 
 ---
 
-## 7. Endpoints de Ejecución Telemática (POD Webhook & Liquidación EPAL 14 Días)
+## 7. Telematic Execution Endpoints (POD Webhook & 14-Day EPAL Settlement)
 
-1. **Webhook Telemático de Hitos y POD Digital (`POST /api/logistics/carrier/milestones`):**
-   * Valida determinísticamente el dígito de control Módulo 10 del código **GS1-128 SSCC-18** en cada lectura (`PICKED_UP`, `CROSS_DOCK_SCANNED`, `DELIVERED_POD`).
-   * Verifica el cumplimiento del SLA de notificación telemática (`<= 120 minutos` desde `unloadedAt` hasta `timestamp`) y registra el número de palets EPAL canjeados en muelle (`epalExchangedCount`).
+1. **Telematic Milestone & Digital POD Webhook (`POST /api/logistics/carrier/milestones`):**
+   * Deterministically validates the Modulo-10 check digit of the **GS1-128 SSCC-18** code on every scan (`PICKED_UP`, `CROSS_DOCK_SCANNED`, `DELIVERED_POD`).
+   * Verifies compliance with the telematic notification SLA (`<= 120 minutes` from `unloadedAt` to `timestamp`) and records the number of EPAL Euro-pallets exchanged at the dock (`epalExchangedCount`).
 
-2. **Motor de Liquidación Automatizada de Palets EPAL (`POST /api/logistics/epal/settlement-run`):**
-   * Evalúa periódicamente las expediciones frente al plazo improrrogable de **14 días naturales** (`EPAL_EXCHANGE_DEADLINE_DAYS = 14`).
-   * Si existen palets pendientes de restitución (`outstandingEpalPallets > 0`) una vez superados los 14 días, emite automáticamente el cargo de liquidación a razón de **`15,00 EUR / palet EPAL`** más IVA (`EPAL-SETTLE-<shipmentId>`).
-
-
+2. **Automated EPAL Pallet Settlement Engine (`POST /api/logistics/epal/settlement-run`):**
+   * Periodically evaluates shipments against the non-extendable **14-calendar-day** deadline (`EPAL_EXCHANGE_DEADLINE_DAYS = 14`).
+   * Whenever unreturned pallets remain (`outstandingEpalPallets > 0`) past the 14-day window, it automatically issues the settlement charge at **`15.00 EUR / EPAL pallet`** plus VAT (`EPAL-SETTLE-<shipmentId>`).
