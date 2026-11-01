@@ -47,6 +47,7 @@ const sidebars: SidebarsConfig = {
         'architecture/platform-architecture',
         'architecture/editorial-manufacturing-phase11',
         'architecture/financial-escrow-jdf-oee-phase12',
+        'architecture/profitability-einvoicing-cicd-phase13',
         'architecture/state-of-the-art',
         'architecture/preflight-diagnostic-contract',
         'architecture/preflight-status-contract',

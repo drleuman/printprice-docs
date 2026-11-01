@@ -115,6 +115,8 @@ The following core contracts have been verified against active controller implem
 | **Phase 12A Commercial Escrow & POD Split** | `GET / POST` | `/api/financials/escrow/ledger` · `/:orderId/settle-on-pod` | `Bearer JWT (Control Plane / Financial Ops)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | **Phase 12B CIP4 JDF 1.7 & JMF Telemetry** | `GET / POST` | `/api/manufacturing/imposition/:jobId/jdf-ticket.xml` · `/jmf/signal` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | **Phase 12C Predictive Maintenance & OEE** | `GET / POST` | `/api/machines/predictive-maintenance` · `/:machineId/maintenance-reset` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| **Phase 13A Real-Time Executive Profitability** | `GET` | `/api/financials/escrow/profitability` | `Bearer JWT (Control Plane / Financial Ops)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| **Phase 13B EN 16931 Electronic Invoicing** | `GET` | `/api/financials/escrow/:orderId/e-invoice.xml` (`FACTURAE_3_2_2` / `XRECHNUNG_3_0`) | `Bearer JWT (Control Plane / Financial Ops)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 
 </div>
 
