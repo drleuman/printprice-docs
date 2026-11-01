@@ -94,23 +94,23 @@ flowchart TD
 
 When an actor attempts an action outside their role's capability matrix, the API returns a deterministic `403 Forbidden` JSON contract:
 
-| Protected Capability | Guarded Endpoints | HTTP Status | Error Code (`error_code`) |
+| Protected Capability | Guarded Canonical Endpoints | HTTP Status | Error Code (`error` / `code`) |
 | :--- | :--- | :--- | :--- |
-| `can_sign_imprimatur` | `POST /api/marketplace/orders/:id/soft-proof/sign-off`<br/>`POST /api/customer-portal/orders/:id/reorder` | `403 Forbidden` | `FORBIDDEN_RBAC_INSUFFICIENT_SIGN_OFF_RIGHTS` |
-| `can_approve_finance` | `POST /api/marketplace/orders/:id/checkout/session`<br/>`POST /api/marketplace/orders/:id/wire-transfer/proof`<br/>`GET /api/marketplace/orders/:id/einvoice.xml` | `403 Forbidden` | `FORBIDDEN_RBAC_FINANCE_RIGHTS_REQUIRED` |
-| `can_upload_assets` | `POST /api/marketplace/orders/:id/assets` | `403 Forbidden` | `FORBIDDEN_RBAC_ASSET_UPLOAD_RIGHTS_REQUIRED` |
-| `can_manage_org` | `POST /api/customer-portal/profile/:id/members`<br/>`PATCH /api/customer-portal/profile/:id/members/:mId`<br/>`DELETE /api/customer-portal/profile/:id/members/:mId` | `403 Forbidden` | `FORBIDDEN_RBAC_ORG_ADMIN_REQUIRED` |
+| `canApproveSoftProof` (`requireSignOffRights`) | `POST /api/customer/orders/:orderId/soft-proof/approve`<br/>`POST /api/customer/orders/:orderId/reorder` | `403 Forbidden` | `FORBIDDEN_RBAC_INSUFFICIENT_SIGN_OFF_RIGHTS` |
+| `canExecutePayments` (`requireFinanceRights`) | `POST /api/marketplace/orders/:orderId/checkout/session`<br/>`POST /api/marketplace/orders/:orderId/payment/wire-proof`<br/>`GET /api/financials/escrow/:orderId/e-invoice.xml` | `403 Forbidden` | `FORBIDDEN_RBAC_FINANCE_RIGHTS_REQUIRED` |
+| `canUploadProductionFiles` (`requireAssetUploadRights`) | `POST /api/marketplace/orders/:orderId/files/upload`<br/>`POST /api/marketplace/orders/:orderId/files/external-link` | `403 Forbidden` | `FORBIDDEN_RBAC_ASSET_UPLOAD_RIGHTS_REQUIRED` |
+| `canManageMembers` (`requireOrgAdminRights`) | `POST /api/customer/organization/members`<br/>`PUT /api/customer/organization/members/:memberId/role`<br/>`DELETE /api/customer/organization/members/:memberId` | `403 Forbidden` | `FORBIDDEN_RBAC_ORG_ADMIN_REQUIRED` |
 
 #### Sample `403 Forbidden` Response Payload
 
 ```json
 {
-  "status": "error",
+  "ok": false,
   "error": "FORBIDDEN_RBAC_INSUFFICIENT_SIGN_OFF_RIGHTS",
-  "error_code": "FORBIDDEN_RBAC_INSUFFICIENT_SIGN_OFF_RIGHTS",
-  "message": "Role 'PREPRESS_DESIGNER' is not authorized to sign the 3D Soft-Proof Imprimatur or lock MoR Escrow funds. Required role: ORG_ADMIN or PRODUCTION_MANAGER.",
-  "actor_role": "PREPRESS_DESIGNER",
-  "required_capability": "can_sign_imprimatur"
+  "code": "FORBIDDEN_RBAC_INSUFFICIENT_SIGN_OFF_RIGHTS",
+  "message": "Binding 3D Soft-Proof Sign-Off and CTP release require PRODUCTION_MANAGER or ORG_ADMIN role. Active role 'PREPRESS_DESIGNER' is not in [ORG_ADMIN, PRODUCTION_MANAGER].",
+  "actorRole": "PREPRESS_DESIGNER",
+  "requiredRoles": ["ORG_ADMIN", "PRODUCTION_MANAGER"]
 }
 ```
 
@@ -121,18 +121,21 @@ When an actor attempts an action outside their role's capability matrix, the API
 ### 4.1 List Organization Members & Capabilities
 
 ```bash
-curl -X GET "https://control.printprice.pro/api/customer-portal/profile/CUST_PLANETA_ES/members" \
+curl -X GET "https://control.printprice.pro/api/customer/organization/members" \
+  -H "x-marketplace-token: YOUR_MARKETPLACE_TOKEN" \
   -H "Accept: application/json"
 ```
 
 ### 4.2 Provision a New Member (`ORG_ADMIN` Required)
 
 ```bash
-curl -X POST "https://control.printprice.pro/api/customer-portal/profile/CUST_PLANETA_ES/members" \
+curl -X POST "https://control.printprice.pro/api/customer/organization/members" \
   -H "Content-Type: application/json" \
+  -H "x-marketplace-token: YOUR_MARKETPLACE_TOKEN" \
   -H "x-b2b-role: ORG_ADMIN" \
+  -H "x-b2b-member-id: MEM_2026_0001" \
   -d '{
-    "full_name": "Lucia Fernandez",
+    "fullName": "Lucia Fernandez",
     "email": "lucia.fernandez@planeta.es",
     "role": "PREPRESS_DESIGNER",
     "status": "ACTIVE"

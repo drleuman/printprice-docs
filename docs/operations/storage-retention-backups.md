@@ -74,7 +74,8 @@ Implemented in `src/api/services/telemetry/operationalTelemetryService.js` and e
 ### 4.1 Inspect Storage Lifecycle & Backup Status
 
 ```bash
-curl -X GET "https://control.printprice.pro/api/storage/status" \
+curl -X GET "https://control.printprice.pro/api/customer/storage/backup/status" \
+  -H "x-marketplace-token: YOUR_MARKETPLACE_TOKEN" \
   -H "Accept: application/json"
 ```
 
@@ -82,27 +83,17 @@ curl -X GET "https://control.printprice.pro/api/storage/status" \
 
 ```json
 {
-  "status": "ok",
-  "retention_policy": {
-    "cold_retention_days": 30,
-    "db_backup_keep_count": 14,
-    "scheduler_interval_hours": 24
+  "ok": true,
+  "retentionPolicy": {
+    "coldRetentionDays": 30,
+    "dbBackupKeepCount": 14,
+    "schedulerIntervalHours": 24
   },
-  "storage_metrics": {
-    "hot_orders_count": 59,
-    "hot_storage_bytes": 14829104,
-    "cold_archives_count": 4,
-    "cold_archives_bytes": 412908,
-    "estimated_compression_ratio": 0.72
-  },
-  "database_backups": {
-    "total_snapshots": 3,
-    "latest_snapshot": {
-      "filename": "ppos_control_2026-11-01_181500.sql.gz",
-      "size_bytes": 184920,
-      "sha256": "7d865e959b2466918c9863afca942d0fb89d7c9ac0c99bafc3749504ded97730",
-      "created_at": "2026-11-01T18:15:00.412Z"
-    }
+  "storageMetrics": {
+    "hotOrdersCount": 59,
+    "hotStorageBytes": 14829104,
+    "coldArchivesCount": 4,
+    "coldArchivesBytes": 412908
   }
 }
 ```
@@ -110,21 +101,24 @@ curl -X GET "https://control.printprice.pro/api/storage/status" \
 ### 4.2 Trigger On-Demand Retention Sweep or MySQL Snapshot
 
 ```bash
-# Execute Hot-to-Cold Retention Sweep (supports dry_run or custom cold_days override)
-curl -X POST "https://control.printprice.pro/api/storage/retention/run" \
+# Execute Hot-to-Cold Retention Sweep (Customer Portal or Admin SRE mirror)
+curl -X POST "https://control.printprice.pro/api/customer/storage/retention/run" \
   -H "Content-Type: application/json" \
-  -d '{ "cold_days": 30, "dry_run": false }'
+  -H "x-marketplace-token: YOUR_MARKETPLACE_TOKEN" \
+  -d '{ "coldDays": 30, "dryRun": false }'
 
 # Trigger Immediate Atomic MySQL Snapshot (.sql.gz)
-curl -X POST "https://control.printprice.pro/api/storage/backups/mysql" \
+curl -X POST "https://control.printprice.pro/api/customer/storage/backup/run" \
   -H "Content-Type: application/json" \
+  -H "x-marketplace-token: YOUR_MARKETPLACE_TOKEN" \
   -d '{ "reason": "PRE_RELEASE_CHECKPOINT" }'
 ```
 
 ### 4.3 Query Real-Time Executive Operational Telemetry
 
 ```bash
-curl -X GET "https://control.printprice.pro/api/telemetry/executive-summary" \
+curl -X GET "https://control.printprice.pro/api/customer/operations/summary" \
+  -H "x-marketplace-token: YOUR_MARKETPLACE_TOKEN" \
   -H "Accept: application/json"
 ```
 

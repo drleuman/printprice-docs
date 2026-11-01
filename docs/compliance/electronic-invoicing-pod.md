@@ -51,20 +51,20 @@ flowchart LR
 
 Implemented in `src/api/services/logistics/podAndLabelsPdfService.js`, the logistics document engine generates two industrial vector PDF documents required for warehouse dispatch and escrow settlement:
 
-### 2.1 GS1-128 SSCC-18 Pallet Labels (`DIN A6` — `105 x 148 mm`)
+### 2.1 GS1-128 SSCC-18 Pallet Labels (`DIN A6` — `105 x 148 mm` / `A4_SHEET_4UP`)
 
-- **Endpoint:** `GET /api/marketplace/orders/:orderId/logistics/labels.pdf`
-- **Format:** Native `PDF-1.4` DIN A6 (`297.64 x 419.53 pt`) vector pallet identification label.
+- **Endpoints:** `GET /api/logistics/shipments/:id/labels/sscc-pdf` and `POST /api/logistics/shipments/:id/labels/sscc-pdf`
+- **Format:** Native `PDF-1.4` DIN A6 (`297.64 x 419.53 pt`) or A4 4-UP vector pallet identification label (`deliveryNotePdfService.js`).
 - **Specifications:**
   - High-contrast vector barcode bars encoding Application Identifier `(00)` followed by the 18-digit **Serial Shipping Container Code (`SSCC-18`)** with Modulo-10 check digit validation.
   - Displays Shipper (Assigned Industrial Plant), Consignee (Publisher Warehouse Dock), Gross Pallet Weight (`kg`), Carton Count (`FEFCO 0201`), Units per Carton, and ISPM-15 heat-treatment certification mark.
 
 ### 2.2 Proof of Delivery & International CMR Waybill (`DIN A4`)
 
-- **Endpoint:** `GET /api/marketplace/orders/:orderId/logistics/pod.pdf`
-- **Format:** Native `PDF-1.4` DIN A4 (`595.28 x 841.89 pt`) vector delivery note and signed POD/CMR certificate.
+- **Endpoint:** `GET /api/logistics/shipments/:id/delivery-note/pdf`
+- **Format:** Native `PDF-1.4` DIN A4 (`595.28 x 841.89 pt`) vector delivery note and signed POD/CMR certificate (`deliveryNotePdfService.js`).
 - **Escrow Settlement Trigger (`STAGE_05_DELIVERED`):**
-  - When the order advances to `Stage 05: Delivered & Signed POD`, the POD document embeds the consignee's **eIDAS electronic reception seal (`SHA-256`)**, GPS dock coordinates, reception timestamp, and receiver identity.
+  - When the order advances to `Stage 05: Delivered & Signed POD` (`POST /api/customer/orders/:orderId/stage` or `POST /api/financials/escrow/:orderId/settle-on-pod`), the POD document embeds the consignee's **eIDAS electronic reception seal (`SHA-256`)**, GPS dock coordinates, reception timestamp, and receiver identity.
   - Simultaneously, the MoR Escrow ledger transitions from `FUNDS_LOCKED_ON_PROOF_APPROVAL` to **`RELEASED_ON_SIGNED_POD`**, authorizing net manufacturing payout to the printhouse.
 
 ---
@@ -86,31 +86,41 @@ Implemented in `src/api/services/notifications/transactionalEmailService.js`, th
 
 ## 4. API Reference: Regulatory Documents & Notifications
 
-### 4.1 Download EN 16931 Electronic Invoice (`Facturae 3.2.2` or `UBL 2.1`)
+### 4.1 Download EN 16931 Electronic Invoice (`Facturae 3.2.2` or `XRechnung 3.0 / UBL 2.1`)
 
-- **RBAC Requirement:** `ORG_ADMIN` or `FINANCE_APPROVER` (`can_approve_finance: true`).
+- **RBAC Requirement:** `ORG_ADMIN` or `FINANCE_APPROVER` (`requireFinanceRights`).
 
 ```bash
 # Download Spanish Facturae 3.2.2 XML
-curl -X GET "https://control.printprice.pro/api/marketplace/orders/ORD-2026-88412/einvoice.xml?format=facturae" \
+curl -X GET "https://control.printprice.pro/api/financials/escrow/ORD_2026_101/e-invoice.xml?format=FACTURAE_3_2_2&raw=true" \
+  -H "x-marketplace-token: YOUR_MARKETPLACE_TOKEN" \
   -H "x-b2b-role: FINANCE_APPROVER" \
-  -o Facturae_ORD-2026-88412.xml
+  -H "x-b2b-member-id: MEM_2026_0003" \
+  -o Facturae_ORD_2026_101.xml
 
 # Download Pan-European XRechnung 3.0 / UBL 2.1 XML
-curl -X GET "https://control.printprice.pro/api/marketplace/orders/ORD-2026-88412/einvoice.xml?format=ubl" \
+curl -X GET "https://control.printprice.pro/api/financials/escrow/ORD_2026_101/e-invoice.xml?format=XRECHNUNG_3_0&raw=true" \
+  -H "x-marketplace-token: YOUR_MARKETPLACE_TOKEN" \
   -H "x-b2b-role: FINANCE_APPROVER" \
-  -o XRechnung_UBL_ORD-2026-88412.xml
+  -H "x-b2b-member-id: MEM_2026_0003" \
+  -o XRechnung_UBL_ORD_2026_101.xml
 ```
 
-### 4.2 Download Vector Commercial Invoice, POD/CMR, and SSCC-18 Pallet Labels
+### 4.2 Download Vector POD/CMR, Carrier Protocol, and SSCC-18 Pallet Labels
 
 ```bash
-# 1. Commercial Invoice PDF (DIN A4)
-curl -sS "https://control.printprice.pro/api/marketplace/orders/ORD-2026-88412/invoice.pdf" -o Invoice.pdf
+# 1. Signed Proof of Delivery / CMR Waybill PDF (DIN A4)
+curl -sS "https://control.printprice.pro/api/logistics/shipments/SHP-2026-0101/delivery-note/pdf" \
+  -H "x-marketplace-token: YOUR_MARKETPLACE_TOKEN" \
+  -o POD_CMR.pdf
 
-# 2. Signed Proof of Delivery / CMR Waybill PDF (DIN A4)
-curl -sS "https://control.printprice.pro/api/marketplace/orders/ORD-2026-88412/logistics/pod.pdf" -o POD_CMR.pdf
+# 2. GS1-128 SSCC-18 Pallet Labels PDF (DIN A6 or A4_SHEET_4UP)
+curl -sS "https://control.printprice.pro/api/logistics/shipments/SHP-2026-0101/labels/sscc-pdf?format=A6" \
+  -H "x-marketplace-token: YOUR_MARKETPLACE_TOKEN" \
+  -o SSCC_Labels.pdf
 
-# 3. GS1-128 SSCC-18 Pallet Labels PDF (DIN A6)
-curl -sS "https://control.printprice.pro/api/marketplace/orders/ORD-2026-88412/logistics/labels.pdf" -o SSCC_Labels.pdf
+# 3. Official DIN A4 Carrier Integration Protocol PDF
+curl -sS "https://control.printprice.pro/api/logistics/carrier-protocol/pdf" \
+  -H "x-marketplace-token: YOUR_MARKETPLACE_TOKEN" \
+  -o Carrier_Protocol_A4.pdf
 ```

@@ -68,7 +68,7 @@ signature_hash = HMAC_OR_SHA256_HEX(IMPRIMATUR_PAYLOAD)
 
 ### 2.2 Legal Binding & Automatic Escrow Lock
 
-Executing `POST /api/marketplace/orders/:orderId/soft-proof/sign-off` triggers an atomic state transition across four subsystems:
+Executing `POST /api/customer/orders/:orderId/soft-proof/approve` (or its Publisher Hub alias `POST /api/publisher/proofs/:orderId/sign-off`) triggers an atomic state transition across four subsystems:
 
 1. **Order Production Lock:** Order status transitions from `PREFLIGHT_APPROVED` / `READY_FOR_PROOF` to `IN_PRODUCTION`. Binary assets (`INTERIOR_PDF` and `COVER_PDF`) become immutable on disk.
 2. **MoR Escrow Lock:** The financial ledger transitions to `FUNDS_LOCKED_ON_PROOF_APPROVAL`, guaranteeing to the assigned industrial printhouse that 100% of the manufacturing and landed freight funds are held in custody by PrintPriceOS.
@@ -118,30 +118,23 @@ The service `src/api/services/documents/softProofCertificatePdfService.js` gener
 
 ### 4.1 Execute Cryptographic Sign-Off
 
-- **Endpoint:** `POST /api/marketplace/orders/:orderId/soft-proof/sign-off`
-- **RBAC Requirement:** `ORG_ADMIN` or `PRODUCTION_MANAGER` (`can_sign_imprimatur: true`). Roles such as `PREPRESS_DESIGNER` or `FINANCE_APPROVER` receive `HTTP 403 FORBIDDEN_RBAC_INSUFFICIENT_SIGN_OFF_RIGHTS`.
+- **Endpoint:** `POST /api/customer/orders/:orderId/soft-proof/approve` (Alias: `POST /api/publisher/proofs/:orderId/sign-off`)
+- **RBAC Requirement:** `ORG_ADMIN` or `PRODUCTION_MANAGER` (`canApproveSoftProof: true`). Roles such as `PREPRESS_DESIGNER` or `FINANCE_APPROVER` receive `HTTP 403 FORBIDDEN_RBAC_INSUFFICIENT_SIGN_OFF_RIGHTS`.
 
 ```bash
-curl -X POST "https://control.printprice.pro/api/marketplace/orders/ORD-2026-88412/soft-proof/sign-off" \
+curl -X POST "https://control.printprice.pro/api/customer/orders/ORD_2026_101/soft-proof/approve" \
   -H "Content-Type: application/json" \
+  -H "x-marketplace-token: YOUR_MARKETPLACE_TOKEN" \
   -H "x-b2b-role: PRODUCTION_MANAGER" \
-  -H "x-b2b-member-id: MEM_2026_PROD01" \
+  -H "x-b2b-member-id: MEM_2026_0002" \
   -d '{
-    "approved_by_name": "Elena Rostova",
-    "approved_by_email": "elena.rostova@penguinrandomhouse.es",
-    "approved_by_role": "PRODUCTION_MANAGER",
-    "geometry_confirmed": {
-      "trim_width_mm": 150,
-      "trim_height_mm": 230,
-      "spine_width_mm": 14.8,
-      "bleed_mm": 3.0,
-      "binding_type": "PUR"
-    },
-    "checks_accepted": {
-      "trim_and_bleed_verified": true,
-      "spine_folding_verified": true,
-      "color_profile_fogra39_accepted": true,
-      "barcode_clearance_verified": true
+    "approvedBy": "production@printprice.pro",
+    "comments": "Spine 27.66 mm and +3.0 mm BleedBox verified for CTP platesetter.",
+    "geometry": {
+      "trimWidthMm": 210,
+      "trimHeightMm": 280,
+      "spineThicknessMm": 27.66,
+      "bleedMarginMm": 3.0
     }
   }'
 ```
@@ -150,28 +143,24 @@ curl -X POST "https://control.printprice.pro/api/marketplace/orders/ORD-2026-884
 
 ```json
 {
-  "status": "ok",
-  "order_id": "ORD-2026-88412",
-  "order_status": "IN_PRODUCTION",
-  "escrow_state": "FUNDS_LOCKED_ON_PROOF_APPROVAL",
-  "soft_proof_sign_off": {
-    "approved": true,
-    "certificate_id": "CERT-SP-2026-88412",
-    "signature_hash": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
-    "approved_by_name": "Elena Rostova",
-    "approved_by_email": "elena.rostova@penguinrandomhouse.es",
-    "approved_by_role": "PRODUCTION_MANAGER",
-    "approved_at": "2026-11-01T18:42:10.114Z",
-    "certificate_pdf_url": "/api/marketplace/orders/ORD-2026-88412/soft-proof/certificate.pdf"
-  }
+  "ok": true,
+  "orderId": "ORD_2026_101",
+  "decision": "APPROVED",
+  "proofStatus": "APPROVED_FOR_PRESS",
+  "proofSignatureHash": "SHA256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+  "proofApprovedAt": "2026-11-01T18:42:10.114Z",
+  "proofApprovedBy": "production@printprice.pro",
+  "orderStatus": "IN_PRODUCTION",
+  "escrowStatus": "FUNDS_LOCKED_ON_PROOF_APPROVAL"
 }
 ```
 
 ### 4.2 Download Vector PDF Certificate (`CERT-SP`)
 
 ```bash
-curl -X GET "https://control.printprice.pro/api/marketplace/orders/ORD-2026-88412/soft-proof/certificate.pdf" \
-  -o CERT-SP-2026-88412.pdf
+curl -X GET "https://control.printprice.pro/api/customer/orders/ORD_2026_101/soft-proof/certificate.pdf" \
+  -H "x-marketplace-token: YOUR_MARKETPLACE_TOKEN" \
+  -o CERT-SP-2026-ORD_2026_101.pdf
 ```
 
 - **Response Headers:**

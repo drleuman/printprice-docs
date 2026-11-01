@@ -77,11 +77,12 @@ The Control Plane (`ppos-control-plane`) runs a hybrid architecture combining Fa
 
 1. **Fastify Selective Upstream Proxy (`src/index.ts`):**
    - Upstream routes `/api/preflight/jobs*`, `/api/preflight/policies*`, and `/api/preflight/workers*` are proxied directly to the native Docker Preflight container (`http://127.0.0.1:8001`) with automatic `x-api-key` injection.
-2. **Express Domain Routers (`src/api/app.js`):**
-   - `/api/marketplace/orders/*`: Order intake, binary PDF upload (`multer`), 3D Soft-Proof cryptographic sign-off, MoR Escrow transitions, EN 16931 XML generation, and Stage 01–05 logistics tracking.
-   - `/api/preflight/inspect`, `/api/marketplace/orders/:orderId/preflight/callback`, and `/api/marketplace/orders/:orderId/preflight/report`: Handled directly by [`preflightRoutes.js`](/docs/prepress/preflight-engine) to correlate native preflight findings with MySQL order state.
-   - `/api/customer-portal/*`: B2B fiscal profiles, multi-user RBAC organization governance (`customer_b2b_members`), 1-Click Reorders, and invoice repositories.
-   - `/api/telemetry/*` & `/api/storage/*`: Executive operational telemetry aggregation (`operationalTelemetryService.js`) and automated cold storage archiving / database snapshots (`assetRetentionAndBackupService.js`).
+2. **Express Domain Routers (`server.js`):**
+   - `/api/marketplace/orders/*`: Order intake, binary PDF upload (`multer`), Dual Checkout, wire transfer proof ingestion, preflight callbacks, and preflight reports (`marketplaceOrders.js`).
+   - `/api/preflight/*`: Synchronous and asynchronous preflight inspection, FIX IT auto-remediation, and callbacks (`preflightRoutes.js`).
+   - `/api/customer/*`: B2B fiscal profiles, multi-user RBAC organization governance (`customer_b2b_members`), 3D Soft-Proof cryptographic sign-off (`CERT-SP`), 1-Click Reorders, Stage 01–05 logistics tracking, Executive Operational Telemetry (`operationalTelemetryService.js`), and Storage Lifecycle / DB backups (`assetRetentionAndBackupService.js`).
+   - `/api/financials/escrow/*`: MoR Escrow lock, POD split-settlement, JMF profitability, and EN 16931 Facturae 3.2.2 / XRechnung 3.0 XML generation (`escrowRoutes.js`).
+   - `/api/logistics/*` & `/api/printhouses/*`: 3D FEFCO/EPAL cubing, DIN A4 Delivery Note / Signed POD PDFs, DIN A6 `GS1-128 SSCC-18` pallet labels, and 14-day EPAL Palettenschein settlement (`logisticsRoutes.js`).
 
 ---
 
