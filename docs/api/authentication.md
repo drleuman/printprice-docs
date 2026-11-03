@@ -2,9 +2,11 @@
 title: Authentication & Security Models
 ---
 
+import ApiPlayground from '@site/src/components/ApiPlayground';
+
 # Authentication & Security Models
 
-PrintPrice OS implements dedicated authentication and authorization mechanisms adapted to each operational boundary: public B2B calculation, partner order intake, backoffice administration, and customer-facing shared diagnostic links.
+PrintPrice OS implements dedicated authentication and authorization mechanisms adapted to each operational boundary: public B2B calculation, self-service developer API keys (`pp_test_*` / `pp_live_*`), partner order intake, backoffice administration, and customer-facing shared diagnostic links.
 
 :::info Scope & Identity Separation
 In accordance with the DEV-01B security audit, interactive backoffice user sessions (`jti` claim revocation) are strictly separated from machine-to-machine partner API tokens and ephemeral customer action links.
@@ -38,18 +40,23 @@ When validated, the system grants the request the internal system identity:
 
 ---
 
-## 2. Partner API Keys (`ppos_live_*` / `ppos_test_*`)
+## 2. Self-Service Developer & Partner API Keys (`pp_test_*` / `pp_live_*`)
 
-Used for automated machine-to-machine communication with high throughput and rate limiting:
+Used for automated machine-to-machine communication with granular scopes (`pricing:read`, `preflight:write`, `orders:create`, `webhooks:manage`), sliding-window rate limiting, and Stripe hybrid metered governance:
 
-- **Key Format:** `ppos_(live|test)_[key_id_16hex]_[secret_43b64url]`
-- **Header Transmission:** Transmitted via `X-API-Key` header or `Authorization: Bearer <key>`. Query parameter transmission (`?api_key=...`) is strictly prohibited and returns `HTTP 400 API_KEY_QUERY_PARAMETER_FORBIDDEN`.
-- **Cryptographic Storage:** Secrets are stored using unique salt and SHA-256 with constant-time verification (`crypto.timingSafeEqual`).
-- **Distributed Revocation:** Checked in real time against Redis revocation registry and fail-closed MySQL verification.
+- **Key Format:** `pp_(test|live)_[secret_hex]` (also backwards-compatible with `ppos_(test|live)_*`)
+- **Header Transmission:** Transmitted via `Authorization: Bearer <key>` or `X-API-Key: <key>`. Query parameter transmission (`?api_key=...`) is strictly prohibited and returns `HTTP 400 API_KEY_QUERY_PARAMETER_FORBIDDEN`.
+- **Cryptographic Storage:** Secrets are hashed using SHA-256 (`developerApiKeyService.js`) and never stored or logged in plaintext after initial one-time generation.
+- **Three-Tier Governance & Spend Caps:**
+  - `SANDBOX_FREE` (`pp_test_*`): Instant self-service creation at **[control.printprice.pro/developers](https://control.printprice.pro/developers)**, free of charge, `60 req/min` sliding window.
+  - `PRODUCTION_SCALE` (`pp_live_*`): Automated Stripe Hybrid Billing (€49/mo base commitment + €0.10/preflight & €0.005/BPE quote), `600 req/min` sliding window, with configurable Monthly Spend Caps (80% warning email and 100% automatic pause).
+  - `ENTERPRISE_TENANT` (`pp_live_*`): Zero-base-fee allocation for verified partner printhouses (`PRINTHOUSE_ADMIN`).
 
-:::note Partner Key Provisioning
-Self-service generation of API keys directly from a web console is currently in security review (GATE 2). Active partner integrations are provisioned manually by contacting [api-support@printprice.pro](mailto:api-support@printprice.pro).
-:::
+### Live Authentication Handshake (`GET /api/developer/keys/test-ping`)
+
+Verify your `pp_test_*` or `pp_live_*` key signature and inspect your active rate-limit headers (`X-RateLimit-Limit`, `X-RateLimit-Remaining`) directly below:
+
+<ApiPlayground defaultEndpoint="test-ping" compact={true} />
 
 ---
 

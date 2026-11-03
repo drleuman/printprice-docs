@@ -2,15 +2,24 @@
 title: Preflight & Shared Reports API
 ---
 
+import ApiPlayground from '@site/src/components/ApiPlayground';
+
 # Preflight & Shared Reports API
 
-The Preflight API provides programmatic access to technical PDF inspection, production fact extraction, geometry box enforcement (TrimBox, BleedBox), automatic corrections, and sanitized customer-facing diagnostic reports.
+The Preflight API provides programmatic access to technical PDF inspection, production fact extraction, geometry box enforcement (TrimBox, BleedBox), physical spine caliper validation, automatic corrections, and sanitized customer-facing diagnostic reports.
 
 :::note Architecture & Implementation Traceability
+- **Synchronous Geometry & Spine Audit (`POST /api/preflight/inspect`):** Implemented in `src/api/routes/preflightRoutes.js` (`ppos-control-plane`), accepting `pp_test_*` and `pp_live_*` developer keys with `preflight:write` scope.
 - **Core Inspection Engine:** Executed by `ppos-preflight-service` (listening on port 8001) and proxied through the Control Plane at `/api/preflight/*`.
 - **Shared Diagnostic Link:** Implemented in `src/api/routes/publicPreflight.js:6` (`ppos-control-plane`) under `/api/public/preflight/human-report/:token`.
 - **Customer Action Remediation:** Implemented in `src/api/routes/marketplacePublic.js:125` (`ppos-control-plane`) under `/api/marketplace/orders/:orderId/customer-action/:token`.
 :::
+
+## Interactive Console: PDF Geometry & Spine Caliper Audit (`POST /api/preflight/inspect`)
+
+Run a live preflight geometry and PUR spine caliper inspection directly in your browser using a `pp_test_*` or `pp_live_*` API key:
+
+<ApiPlayground defaultEndpoint="preflight-inspect" />
 
 ```mermaid
 sequenceDiagram

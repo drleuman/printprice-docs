@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
+import ApiPlayground from '@site/src/components/ApiPlayground';
 
 interface SearchItem {
   title: string;
@@ -213,14 +214,14 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
 
   return (
     <Layout
-      title="PrintPrice OS — Production Intelligence Platform"
+      title="PrintPrice OS â€” Production Intelligence Platform"
       description="Official API documentation and technical architecture for PrintPrice OS: deterministic quoting, preflight PDF diagnostics, and order governance."
     >
       <main className="portal-hero">
         {/* Technical Status Badge */}
         <div className="portal-badge">
           <span className="portal-badge-dot"></span>
-          <span>PrintPrice OS · Developer &amp; Integration Platform</span>
+          <span>PrintPrice OS Â· Developer &amp; Integration Platform</span>
         </div>
 
         {/* Hero Title & Subtitle */}
@@ -276,7 +277,7 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
                 }}
                 aria-label="Clear search query"
               >
-                ✕
+                âœ•
               </button>
             )}
             <span className="portal-search-kbd" title="Press Ctrl+K to search">
@@ -289,7 +290,7 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
             <div className="portal-search-dropdown" role="listbox" aria-label="Search suggestions">
               <div className="portal-search-dropdown-header">
                 <span>{searchQuery ? `Suggested results for "${searchQuery}"` : 'Recommended quick links'}</span>
-                <span className="portal-search-dropdown-hint"><kbd>↑</kbd> <kbd>↓</kbd> navigate · <kbd>Enter</kbd> open</span>
+                <span className="portal-search-dropdown-hint"><kbd>â†‘</kbd> <kbd>â†“</kbd> navigate Â· <kbd>Enter</kbd> open</span>
               </div>
 
               <div className="portal-search-dropdown-list">
@@ -321,7 +322,7 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
                       className="portal-search-empty-link"
                       onClick={() => setIsSearchOpen(false)}
                     >
-                      Search &ldquo;{searchQuery}&rdquo; in global documentation index ➔
+                      Search &ldquo;{searchQuery}&rdquo; in global documentation index âž”
                     </Link>
                   </div>
                 )}
@@ -333,7 +334,7 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
                     to={`/search?q=${encodeURIComponent(searchQuery)}`}
                     onClick={() => setIsSearchOpen(false)}
                   >
-                    View all results for &ldquo;{searchQuery}&rdquo; in global search ➔
+                    View all results for &ldquo;{searchQuery}&rdquo; in global search âž”
                   </Link>
                 </div>
               )}
@@ -344,7 +345,7 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
         {/* Primary CTA Buttons */}
         <div className="portal-cta-group">
           <Link to="/docs/api/quickstart" className="portal-btn-primary">
-            Start Integrating ➔
+            Start Integrating âž”
           </Link>
           <Link to="/docs/api/overview" className="portal-btn-secondary">
             View OpenAPI Contracts
@@ -382,7 +383,7 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
             </p>
             <div className="pillar-footer">
               <span>Explore Pricing API &amp; BPE</span>
-              <span>➔</span>
+              <span>âž”</span>
             </div>
           </Link>
 
@@ -402,7 +403,7 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
             </p>
             <div className="pillar-footer">
               <span>Explore Preflight &amp; Autofix</span>
-              <span>➔</span>
+              <span>âž”</span>
             </div>
           </Link>
 
@@ -424,7 +425,7 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
             </p>
             <div className="pillar-footer">
               <span>Explore Order Lifecycle</span>
-              <span>➔</span>
+              <span>âž”</span>
             </div>
           </Link>
 
@@ -447,7 +448,7 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
             </p>
             <div className="pillar-footer">
               <span>Explore Webhooks &amp; Events</span>
-              <span>➔</span>
+              <span>âž”</span>
             </div>
           </Link>
         </div>
@@ -463,7 +464,7 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
               <p>No proprietary SDKs or complex dependencies. Standard REST with native JSON payloads.</p>
             </div>
             <Link to="/docs/api/quickstart" className="quickstart-cta-link">
-              View Full Quickstart Guide ➔
+              View Full Quickstart Guide âž”
             </Link>
           </div>
 
@@ -526,6 +527,16 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
           </div>
         </section>
 
+        {/* Interactive API Playground on Homepage */}
+        <div className="portal-section-header">
+          <span className="portal-section-tag">Interactive Console</span>
+          <h2 className="portal-section-title">Try the API Live in Your Browser</h2>
+          <p className="portal-section-desc">
+            Paste a free Sandbox key (pp_test_*) from control.printprice.pro/developers and test real-time 5-Axis BPE book pricing, PDF/X-4 geometry inspection, and rate-limit headers.
+          </p>
+        </div>
+        <ApiPlayground defaultEndpoint="book-estimate" />
+
         {/* ================================================================= */}
         {/* Deep Systems & Architecture Grid */}
         {/* ================================================================= */}
@@ -554,7 +565,7 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
             </p>
             <div className="pillar-footer">
               <span>View Control Plane Specs</span>
-              <span>➔</span>
+              <span>âž”</span>
             </div>
           </Link>
 
@@ -577,7 +588,7 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
             </p>
             <div className="pillar-footer">
               <span>Explore Paper Supplier Hub</span>
-              <span>➔</span>
+              <span>âž”</span>
             </div>
           </Link>
 
@@ -597,7 +608,7 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
             </p>
             <div className="pillar-footer">
               <span>Discover Matchmaker</span>
-              <span>➔</span>
+              <span>âž”</span>
             </div>
           </Link>
 
@@ -618,7 +629,7 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
             </p>
             <div className="pillar-footer">
               <span>Explore Architecture Contracts</span>
-              <span>➔</span>
+              <span>âž”</span>
             </div>
           </Link>
         </div>
@@ -687,3 +698,4 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
     </Layout>
   );
 }
+

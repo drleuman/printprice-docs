@@ -1,8 +1,8 @@
----
+﻿---
 title: API Overview & Architecture
 ---
 
-# PrintPrice OS Developer Platform — API Overview
+# PrintPrice OS Developer Platform â€” API Overview
 
 The PrintPrice OS Developer Platform exposes structured HTTP APIs and event-driven contracts designed to connect external publishing systems, print houses, and e-commerce platforms with the central manufacturing intelligence layer.
 
@@ -84,8 +84,8 @@ flowchart TB
 The following core contracts have been verified against active controller implementations:
 
 <div className="table-scroll-indicator">
-  <span className="table-scroll-icon">↔</span>
-  <span>Full 6-column specification table. Scroll horizontally to inspect authentication, responsible service, and verification status · Keyboard navigable (<kbd>Tab</kbd> + arrow keys).</span>
+  <span className="table-scroll-icon">â†”</span>
+  <span>Full 6-column specification table. Scroll horizontally to inspect authentication, responsible service, and verification status Â· Keyboard navigable (<kbd>Tab</kbd> + arrow keys).</span>
 </div>
 
 <div className="table-responsive-wrapper" tabIndex={0} role="region" aria-label="PrintPrice OS public endpoint inventory, authentication, and verification status">
@@ -109,12 +109,12 @@ The following core contracts have been verified against active controller implem
 | **Warehouse Profile Detail** | `GET` | `/api/logistics/warehouses/:code` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | **3D Cubing & Landed Freight Quote** | `POST` | `/api/logistics/calculate-quote` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | **Printhouse Freight Matrices** | `GET / PUT` | `/api/printhouses/:id/freight-matrices` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
-| **Phase 11A Preflight & Spine Auto-Fix** | `POST` | `/api/preflight/inspect` · `/api/preflight/auto-fix` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
-| **Phase 11B Dynamic Imposition & Queue** | `POST / GET` | `/api/manufacturing/imposition/plan` · `/queue` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
-| **Phase 11C Publisher B2B Hub & 3D Proof** | `GET / POST` | `/api/publisher/orders` · `/proof-decision` · `/notifications` | `Bearer JWT (PUBLISHER / PRINTHOUSE_ADMIN)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
-| **Phase 12A Commercial Escrow & POD Split** | `GET / POST` | `/api/financials/escrow/ledger` · `/:orderId/settle-on-pod` | `Bearer JWT (Control Plane / Financial Ops)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
-| **Phase 12B CIP4 JDF 1.7 & JMF Telemetry** | `GET / POST` | `/api/manufacturing/imposition/:jobId/jdf-ticket.xml` · `/jmf/signal` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
-| **Phase 12C Predictive Maintenance & OEE** | `GET / POST` | `/api/machines/predictive-maintenance` · `/:machineId/maintenance-reset` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| **Phase 11A Preflight & Spine Auto-Fix** | `POST` | `/api/preflight/inspect` Â· `/api/preflight/auto-fix` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| **Phase 11B Dynamic Imposition & Queue** | `POST / GET` | `/api/manufacturing/imposition/plan` Â· `/queue` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| **Phase 11C Publisher B2B Hub & 3D Proof** | `GET / POST` | `/api/publisher/orders` Â· `/proof-decision` Â· `/notifications` | `Bearer JWT (PUBLISHER / PRINTHOUSE_ADMIN)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| **Phase 12A Commercial Escrow & POD Split** | `GET / POST` | `/api/financials/escrow/ledger` Â· `/:orderId/settle-on-pod` | `Bearer JWT (Control Plane / Financial Ops)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| **Phase 12B CIP4 JDF 1.7 & JMF Telemetry** | `GET / POST` | `/api/manufacturing/imposition/:jobId/jdf-ticket.xml` Â· `/jmf/signal` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| **Phase 12C Predictive Maintenance & OEE** | `GET / POST` | `/api/machines/predictive-maintenance` Â· `/:machineId/maintenance-reset` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | **Phase 13A Real-Time Executive Profitability** | `GET` | `/api/financials/escrow/profitability` | `Bearer JWT (Control Plane / Financial Ops)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | **Phase 13B EN 16931 Electronic Invoicing** | `GET` | `/api/financials/escrow/:orderId/e-invoice.xml` (`FACTURAE_3_2_2` / `XRECHNUNG_3_0`) | `Bearer JWT (Control Plane / Financial Ops)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 
@@ -123,7 +123,7 @@ The following core contracts have been verified against active controller implem
 :::note Surface Exclusions & Roadmapped Features
 - **Administrative Routes:** All endpoints under `/api/admin/*`, `/api/printhouse/*`, `/api/federation/*`, and global order inspection (`GET /api/marketplace/orders`) are strictly administrative and excluded from public integration contracts.
 - **Mockup 3D API:** The 3D Mockup generation capability is currently a roadmapped feature (`PLANNED`). No backend API endpoints exist at this time.
-- **Developer Self-Service Credentials:** Programmatic self-service creation of API keys from a developer console is undergoing security gate review. Active partner credentials are provisioned manually by contacting [api-support@printprice.pro](mailto:api-support@printprice.pro).
+- **Developer Self-Service Credentials:** Instant self-service Sandbox keys (pp_test_*) and Production Scale keys (pp_live_*) are available directly at **[control.printprice.pro/developers](https://control.printprice.pro/developers)**.
 :::
 
 ---
@@ -132,10 +132,10 @@ The following core contracts have been verified against active controller implem
 
 The official OpenAPI 3.1 specifications are partitioned by functional domain and available for download:
 
-- **[Pricing & Marketplace Orders Specification](/openapi/pricing-marketplace.openapi.yaml)** — Quotes, order intake, file registration, and readiness.
-- **[Preflight Inspection & Normalization Specification](/openapi/preflight.openapi.yaml)** — Capabilities catalog, multipart upload, inspection, and autofix.
-- **[Customer Shared Diagnostic Reports Specification](/openapi/shared-reports.openapi.yaml)** — Human visual preflight summaries and file re-upload customer links.
-- **[Consolidated Partner API Bundle](/openapi/printprice-partner-api.bundle.yaml)** — Consolidated bundle for Postman, Insomnia, and SDK generators.
+- **[Pricing & Marketplace Orders Specification](/openapi/pricing-marketplace.openapi.yaml)** â€” Quotes, order intake, file registration, and readiness.
+- **[Preflight Inspection & Normalization Specification](/openapi/preflight.openapi.yaml)** â€” Capabilities catalog, multipart upload, inspection, and autofix.
+- **[Customer Shared Diagnostic Reports Specification](/openapi/shared-reports.openapi.yaml)** â€” Human visual preflight summaries and file re-upload customer links.
+- **[Consolidated Partner API Bundle](/openapi/printprice-partner-api.bundle.yaml)** â€” Consolidated bundle for Postman, Insomnia, and SDK generators.
 
 ---
 
@@ -145,3 +145,4 @@ The official OpenAPI 3.1 specifications are partitioned by functional domain and
 2. **Strict Separation of Economic Concepts:** Direct manufacturing costs (`total_cost`), platform margins, and commercial suggested prices (`total_price`) are strictly decoupled in all responses.
 3. **Fail-Safe Preflight Inspection:** PDF inspection extracts exact geometry boxes (TrimBox, BleedBox), embedded fonts, and image resolutions up to 2GB per file.
 4. **Sanitized Client Views:** Shared diagnostic reports and customer remediation links automatically filter internal server paths and technical stack traces, presenting only actionable summaries.
+

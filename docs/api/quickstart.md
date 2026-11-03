@@ -2,13 +2,21 @@
 title: Quickstart Guide
 ---
 
+import ApiPlayground from '@site/src/components/ApiPlayground';
+
 # Developer Quickstart Guide
 
-This guide walks you through making your first API calls to PrintPrice OS using standard HTTP tools (`curl` and modern JavaScript `fetch`).
+This guide walks you through making your first API calls to PrintPrice OS using standard HTTP tools (`curl`, modern JavaScript `fetch`, or the **Interactive API Playground** right in your browser).
 
-:::tip Zero Proprietary Dependencies
-PrintPrice OS uses standard REST and JSON interfaces. You do not need any proprietary SDKs to integrate with the platform. Native Node.js 18+ `fetch` or Python `requests` works out of the box.
+:::tip Instant Self-Service Sandbox Key (`pp_test_*`)
+Generate a free `pp_test_*` Sandbox API key in one click at **[control.printprice.pro/developers](https://control.printprice.pro/developers)** (no credit card required), paste it into the console below, and execute real-time calls against the gateway.
 :::
+
+## Interactive API Playground ("Try it Out")
+
+Select any of the core endpoints (`GET /api/developer/keys/test-ping`, `POST /api/pricing/book-estimate`, or `POST /api/preflight/inspect`), customize the JSON payload, and click **SEND REQUEST ▶** to inspect live status codes (`200`, `401`, `402`, `429`), latency, and `X-RateLimit-Remaining` headers:
+
+<ApiPlayground defaultEndpoint="test-ping" />
 
 ---
 
