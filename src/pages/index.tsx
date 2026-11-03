@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 import ApiPlayground from '@site/src/components/ApiPlayground';
@@ -221,7 +221,7 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
         {/* Technical Status Badge */}
         <div className="portal-badge">
           <span className="portal-badge-dot"></span>
-          <span>PrintPrice OS Â· Developer &amp; Integration Platform</span>
+          <span>PrintPrice OS · Developer &amp; Integration Platform</span>
         </div>
 
         {/* Hero Title & Subtitle */}
@@ -290,7 +290,7 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
             <div className="portal-search-dropdown" role="listbox" aria-label="Search suggestions">
               <div className="portal-search-dropdown-header">
                 <span>{searchQuery ? `Suggested results for "${searchQuery}"` : 'Recommended quick links'}</span>
-                <span className="portal-search-dropdown-hint"><kbd>â†‘</kbd> <kbd>â†“</kbd> navigate Â· <kbd>Enter</kbd> open</span>
+                <span className="portal-search-dropdown-hint"><kbd>↑</kbd> <kbd>↓</kbd> navigate · <kbd>Enter</kbd> open</span>
               </div>
 
               <div className="portal-search-dropdown-list">

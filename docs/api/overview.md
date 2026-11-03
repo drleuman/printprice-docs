@@ -84,8 +84,8 @@ flowchart TB
 The following core contracts have been verified against active controller implementations:
 
 <div className="table-scroll-indicator">
-  <span className="table-scroll-icon">â†”</span>
-  <span>Full 6-column specification table. Scroll horizontally to inspect authentication, responsible service, and verification status Â· Keyboard navigable (<kbd>Tab</kbd> + arrow keys).</span>
+  <span className="table-scroll-icon">&#8596;</span>
+  <span>Full 6-column specification table. Scroll horizontally to inspect authentication, responsible service, and verification status · Keyboard navigable (<kbd>Tab</kbd> + arrow keys).</span>
 </div>
 
 <div className="table-responsive-wrapper" tabIndex={0} role="region" aria-label="PrintPrice OS public endpoint inventory, authentication, and verification status">
@@ -109,12 +109,12 @@ The following core contracts have been verified against active controller implem
 | **Warehouse Profile Detail** | `GET` | `/api/logistics/warehouses/:code` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | **3D Cubing & Landed Freight Quote** | `POST` | `/api/logistics/calculate-quote` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | **Printhouse Freight Matrices** | `GET / PUT` | `/api/printhouses/:id/freight-matrices` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
-| **Phase 11A Preflight & Spine Auto-Fix** | `POST` | `/api/preflight/inspect` Â· `/api/preflight/auto-fix` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
-| **Phase 11B Dynamic Imposition & Queue** | `POST / GET` | `/api/manufacturing/imposition/plan` Â· `/queue` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
-| **Phase 11C Publisher B2B Hub & 3D Proof** | `GET / POST` | `/api/publisher/orders` Â· `/proof-decision` Â· `/notifications` | `Bearer JWT (PUBLISHER / PRINTHOUSE_ADMIN)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
-| **Phase 12A Commercial Escrow & POD Split** | `GET / POST` | `/api/financials/escrow/ledger` Â· `/:orderId/settle-on-pod` | `Bearer JWT (Control Plane / Financial Ops)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
-| **Phase 12B CIP4 JDF 1.7 & JMF Telemetry** | `GET / POST` | `/api/manufacturing/imposition/:jobId/jdf-ticket.xml` Â· `/jmf/signal` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
-| **Phase 12C Predictive Maintenance & OEE** | `GET / POST` | `/api/machines/predictive-maintenance` Â· `/:machineId/maintenance-reset` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| **Phase 11A Preflight & Spine Auto-Fix** | `POST` | `/api/preflight/inspect` · `/api/preflight/auto-fix` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| **Phase 11B Dynamic Imposition & Queue** | `POST / GET` | `/api/manufacturing/imposition/plan` · `/queue` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| **Phase 11C Publisher B2B Hub & 3D Proof** | `GET / POST` | `/api/publisher/orders` · `/proof-decision` · `/notifications` | `Bearer JWT (PUBLISHER / PRINTHOUSE_ADMIN)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| **Phase 12A Commercial Escrow & POD Split** | `GET / POST` | `/api/financials/escrow/ledger` · `/:orderId/settle-on-pod` | `Bearer JWT (Control Plane / Financial Ops)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| **Phase 12B CIP4 JDF 1.7 & JMF Telemetry** | `GET / POST` | `/api/manufacturing/imposition/:jobId/jdf-ticket.xml` · `/jmf/signal` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
+| **Phase 12C Predictive Maintenance & OEE** | `GET / POST` | `/api/machines/predictive-maintenance` · `/:machineId/maintenance-reset` | `Bearer JWT (Control Plane / Printhouse Role)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | **Phase 13A Real-Time Executive Profitability** | `GET` | `/api/financials/escrow/profitability` | `Bearer JWT (Control Plane / Financial Ops)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 | **Phase 13B EN 16931 Electronic Invoicing** | `GET` | `/api/financials/escrow/:orderId/e-invoice.xml` (`FACTURAE_3_2_2` / `XRECHNUNG_3_0`) | `Bearer JWT (Control Plane / Financial Ops)` | Control Plane (`ppos-control-plane`) | <span className="status-badge status-badge-prod">CONFIRMED_IN_PRODUCTION</span> |
 
