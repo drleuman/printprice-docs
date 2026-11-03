@@ -2,7 +2,7 @@
 title: API Overview & Architecture
 ---
 
-# PrintPrice OS Developer Platform â€” API Overview
+# PrintPrice OS Developer Platform — API Overview
 
 The PrintPrice OS Developer Platform exposes structured HTTP APIs and event-driven contracts designed to connect external publishing systems, print houses, and e-commerce platforms with the central manufacturing intelligence layer.
 
@@ -132,10 +132,10 @@ The following core contracts have been verified against active controller implem
 
 The official OpenAPI 3.1 specifications are partitioned by functional domain and available for download:
 
-- **[Pricing & Marketplace Orders Specification](/openapi/pricing-marketplace.openapi.yaml)** â€” Quotes, order intake, file registration, and readiness.
-- **[Preflight Inspection & Normalization Specification](/openapi/preflight.openapi.yaml)** â€” Capabilities catalog, multipart upload, inspection, and autofix.
-- **[Customer Shared Diagnostic Reports Specification](/openapi/shared-reports.openapi.yaml)** â€” Human visual preflight summaries and file re-upload customer links.
-- **[Consolidated Partner API Bundle](/openapi/printprice-partner-api.bundle.yaml)** â€” Consolidated bundle for Postman, Insomnia, and SDK generators.
+- **[Pricing & Marketplace Orders Specification](/openapi/pricing-marketplace.openapi.yaml)** — Quotes, order intake, file registration, and readiness.
+- **[Preflight Inspection & Normalization Specification](/openapi/preflight.openapi.yaml)** — Capabilities catalog, multipart upload, inspection, and autofix.
+- **[Customer Shared Diagnostic Reports Specification](/openapi/shared-reports.openapi.yaml)** — Human visual preflight summaries and file re-upload customer links.
+- **[Consolidated Partner API Bundle](/openapi/printprice-partner-api.bundle.yaml)** — Consolidated bundle for Postman, Insomnia, and SDK generators.
 
 ---
 
