@@ -214,7 +214,7 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
 
   return (
     <Layout
-      title="PrintPrice OS â€” Production Intelligence Platform"
+      title="PrintPrice OS — Production Intelligence Platform"
       description="Official API documentation and technical architecture for PrintPrice OS: deterministic quoting, preflight PDF diagnostics, and order governance."
     >
       <main className="portal-hero">
@@ -277,7 +277,7 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
                 }}
                 aria-label="Clear search query"
               >
-                âœ•
+                ✕
               </button>
             )}
             <span className="portal-search-kbd" title="Press Ctrl+K to search">
@@ -322,7 +322,7 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
                       className="portal-search-empty-link"
                       onClick={() => setIsSearchOpen(false)}
                     >
-                      Search &ldquo;{searchQuery}&rdquo; in global documentation index âž”
+                      Search &ldquo;{searchQuery}&rdquo; in global documentation index →
                     </Link>
                   </div>
                 )}
@@ -334,7 +334,7 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
                     to={`/search?q=${encodeURIComponent(searchQuery)}`}
                     onClick={() => setIsSearchOpen(false)}
                   >
-                    View all results for &ldquo;{searchQuery}&rdquo; in global search âž”
+                    View all results for &ldquo;{searchQuery}&rdquo; in global search →
                   </Link>
                 </div>
               )}
@@ -345,7 +345,7 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
         {/* Primary CTA Buttons */}
         <div className="portal-cta-group">
           <Link to="/docs/api/quickstart" className="portal-btn-primary">
-            Start Integrating âž”
+            Start Integrating →
           </Link>
           <Link to="/docs/api/overview" className="portal-btn-secondary">
             View OpenAPI Contracts
@@ -383,7 +383,7 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
             </p>
             <div className="pillar-footer">
               <span>Explore Pricing API &amp; BPE</span>
-              <span>âž”</span>
+              <span>→</span>
             </div>
           </Link>
 
@@ -403,7 +403,7 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
             </p>
             <div className="pillar-footer">
               <span>Explore Preflight &amp; Autofix</span>
-              <span>âž”</span>
+              <span>→</span>
             </div>
           </Link>
 
@@ -425,7 +425,7 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
             </p>
             <div className="pillar-footer">
               <span>Explore Order Lifecycle</span>
-              <span>âž”</span>
+              <span>→</span>
             </div>
           </Link>
 
@@ -448,7 +448,7 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
             </p>
             <div className="pillar-footer">
               <span>Explore Webhooks &amp; Events</span>
-              <span>âž”</span>
+              <span>→</span>
             </div>
           </Link>
         </div>
@@ -464,7 +464,7 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
               <p>No proprietary SDKs or complex dependencies. Standard REST with native JSON payloads.</p>
             </div>
             <Link to="/docs/api/quickstart" className="quickstart-cta-link">
-              View Full Quickstart Guide âž”
+              View Full Quickstart Guide →
             </Link>
           </div>
 
@@ -565,7 +565,7 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
             </p>
             <div className="pillar-footer">
               <span>View Control Plane Specs</span>
-              <span>âž”</span>
+              <span>→</span>
             </div>
           </Link>
 
@@ -588,7 +588,7 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
             </p>
             <div className="pillar-footer">
               <span>Explore Paper Supplier Hub</span>
-              <span>âž”</span>
+              <span>→</span>
             </div>
           </Link>
 
@@ -608,7 +608,7 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
             </p>
             <div className="pillar-footer">
               <span>Discover Matchmaker</span>
-              <span>âž”</span>
+              <span>→</span>
             </div>
           </Link>
 
@@ -629,7 +629,7 @@ console.log("Retrieved offers:", data.offers.length, "Total:", data.offers[0].to
             </p>
             <div className="pillar-footer">
               <span>Explore Architecture Contracts</span>
-              <span>âž”</span>
+              <span>→</span>
             </div>
           </Link>
         </div>
