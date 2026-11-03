@@ -18,6 +18,8 @@ info:
     identifier: Proprietary
 
 servers:
+  - url: https://control.printprice.pro
+    description: PrintPrice OS Control Plane & Self-Service Developer Gateway (Production & Sandbox)
   - url: https://api.printprice.pro
     description: PrintPrice OS Production Server (Preflight Engine)
 
@@ -25,9 +27,64 @@ tags:
   - name: Preflight Capabilities
     description: Public discovery of supported validation rules and profiles.
   - name: Preflight Jobs
-    description: Asynchronous inspection, analysis, and normalization processing for PDF files.
+    description: Asynchronous and synchronous inspection, analysis, and normalization processing for PDF files.
 
 paths:
+  /api/preflight/inspect:
+    post:
+      tags:
+        - Preflight Jobs
+      summary: Run synchronous 6-axis PDF/X-4 geometry, bleed, and parametric spine width inspection
+      description: |
+        Executes synchronous 6-axis preflight and parametric spine validation (`pageCount`, `paperGrammage`, `paperBulk`, `bindingType`, `innerBleedMm`, `declaredSpineMm`) or streaming `multipart/form-data` binary PDF upload (up to 2 GB).
+        - **Metered Billing (`pp_live_*`):** Reports `preflight_2gb_inspection` (€0.10 / file) to Stripe Billing Meters.
+      operationId: inspectPreflightDocument
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                jobId:
+                  type: string
+                isbn:
+                  type: string
+                pageCount:
+                  type: integer
+                paperGrammage:
+                  type: number
+                paperBulk:
+                  type: number
+                bindingType:
+                  type: string
+                innerBleedMm:
+                  type: number
+                declaredSpineMm:
+                  type: number
+                workflowMode:
+                  type: string
+                  enum: [ANALYZE_ONLY, MAGIC_FIX]
+      responses:
+        '200':
+          description: 6-axis preflight inspection report and spine geometry calculation completed.
+          headers:
+            X-RateLimit-Limit:
+              description: Maximum requests per 60s window.
+              schema:
+                type: integer
+            X-RateLimit-Remaining:
+              description: Remaining requests in current window.
+              schema:
+                type: integer
+        '402':
+          description: Payment Required — Monthly spend cap (`monthly_spend_cap_eur`) reached or Production Scale subscription required (`SPEND_CAP_EXCEEDED_PAUSED` / `PAYWALL_REQUIRED`).
+        '413':
+          description: File exceeds maximum size of 2 GB (`PAYLOAD_TOO_LARGE_MAX_2GB`).
+        '429':
+          description: Too Many Requests — Sliding-window rate limit exceeded (`Retry-After` header returned).
   /api/preflight/capabilities:
     get:
       tags:

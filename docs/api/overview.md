@@ -1,4 +1,4 @@
-﻿---
+---
 title: API Overview & Architecture
 ---
 
@@ -10,7 +10,7 @@ The PrintPrice OS Developer Platform exposes structured HTTP APIs and event-driv
 This API documentation reflects the **audited implementation contracts** running in the PrintPrice OS ecosystem (`ppos-control-plane` and `ppos-preflight-service`).
 - **Runtime Environment:** Core contracts are implemented, tested, and active. Partner endpoints require authorized credentials.
 - **Production Safeguard:** Live interactive mutations (*Try-it-out*) against production endpoints (`https://api.printprice.pro`) are strictly gated to authenticated partners to prevent non-governed commercial transactions.
-- **Partner Access:** Onboarding and API access are governed. Integrators can request access through [api-support@printprice.pro](mailto:api-support@printprice.pro).
+- **Partner Access:** Instant self-service Sandbox (`pp_test_*`) and Production Scale (`pp_live_*`) credentials can be provisioned in one click at **[control.printprice.pro/developers](https://control.printprice.pro/developers)**.
 :::
 
 ---

@@ -19,6 +19,8 @@ info:
     identifier: Proprietary
 
 servers:
+  - url: https://control.printprice.pro
+    description: PrintPrice OS Control Plane & Self-Service Developer Gateway (Production & Sandbox)
   - url: https://api.printprice.pro
     description: Production Server (Requires partner credentials and commercial authorization)
 
@@ -29,6 +31,59 @@ tags:
     description: Order intake, offer selection, file registration, and manufacturing readiness evaluation.
 
 paths:
+  /api/pricing/book-estimate:
+    post:
+      tags:
+        - Pricing & Offers
+      summary: Calculate real-time 5-axis book manufacturing cost and Q* crossover
+      description: |
+        Executes deterministic Book Pricing Engine (`PPOS_5AXIS_BPE_V2`) calibration and returns unit manufacturing cost, total cost, and the exact Digital vs. Offset crossover quantity (`qStarCopies`).
+        - **Metered Billing (`pp_live_*`):** Reports `bpe_pricing_quote` (€0.005 / quote) to Stripe Billing Meters.
+      operationId: calculateBookEstimate
+      security:
+        - ApiKeyAuth: []
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                trimWidthMm:
+                  type: number
+                  default: 148
+                trimHeightMm:
+                  type: number
+                  default: 210
+                pageCount:
+                  type: integer
+                  default: 240
+                printRunCopies:
+                  type: integer
+                  default: 1200
+                interiorPaperGsm:
+                  type: integer
+                  default: 90
+                bindingType:
+                  type: string
+                  default: "SOFTCOVER_PUR"
+      responses:
+        '200':
+          description: 5-axis BPE estimate and crossover analysis calculated.
+          headers:
+            X-RateLimit-Limit:
+              description: Maximum requests per 60s window.
+              schema:
+                type: integer
+            X-RateLimit-Remaining:
+              description: Remaining requests in current window.
+              schema:
+                type: integer
+        '402':
+          description: Payment Required — Monthly spend cap (`monthly_spend_cap_eur`) reached or Production Scale subscription required (`SPEND_CAP_EXCEEDED_PAUSED` / `PAYWALL_REQUIRED`).
+        '429':
+          description: Too Many Requests — Sliding-window rate limit exceeded (`Retry-After` header returned).
   /api/marketplace/offers:
     post:
       tags:

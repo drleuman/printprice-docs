@@ -1,18 +1,17 @@
 openapi: 3.1.0
 info:
-  title: PrintPrice OS Partner Developer API (Draft)
-  version: 0.2.0-draft
+  title: PrintPrice OS Partner & Self-Service Developer API
+  version: 2.0.0
   description: |
-    # PrintPrice OS Developer Platform — OpenAPI 3.1 Specification (Draft DEV-02)
+    # PrintPrice OS Developer Platform — OpenAPI 3.1 Specification (Self-Service & Metered API Gateway)
 
     **Important Governance Notice:**
     This specification has been audited and verified field-by-field against the active runtime source code of PrintPrice OS Control Plane (`ppos-control-plane-phase-10-intelligence-layer`).
 
-    - **Contract Status:** `DRAFT_CONTRACT` (Partner Integration Draft Mode).
-    - **Operational Scope:** Algorithmic offer quoting, order intake and file governance, and shared Preflight diagnostic contracts.
+    - **Contract Status:** `PUBLIC_APPROVED` (Self-Service Sandbox & Production Scale Metered Gateway).
+    - **Operational Scope:** Self-service API key verification (`pp_test_*` / `pp_live_*`), deterministic 5-axis Book Pricing Engine (`BPE`) calculation, 6-axis PDF Preflight & Spine Geometry inspection, order intake, and HMAC-SHA256 signed outbound webhooks (`whsec_*`).
+    - **Hybrid Billing & Spend Caps:** Production keys (`pp_live_*`) operate under Stripe Hybrid Billing (€49/mo base + €0.10/preflight + €0.005/BPE quote) with automatic `HTTP 402 Payment Required` protection when monthly spend caps are reached.
     - **Surface Separation:** Administrative cross-tenant order management endpoints (`GET /api/marketplace/orders`) are strictly separated from this partner-oriented specification.
-    - **Base Runtime Status:** `DEV-01B_PARTIAL` (Live probes executed; gateway upstreams and perimeter certificates verified).
-    - **Operational Safeguard:** Executing mutative commercial transactions or test orders against production servers without authorization is strictly prohibited.
   contact:
     name: PrintPrice Architecture & Security Team
     url: https://docs.printprice.pro
@@ -21,10 +20,18 @@ info:
     identifier: Proprietary
 
 servers:
+  - url: https://control.printprice.pro
+    description: PrintPrice OS Control Plane & Self-Service Developer Gateway (Production & Sandbox)
   - url: https://api.printprice.pro
-    description: PrintPrice OS Production Server (Requires support-provisioned partner credentials)
+    description: PrintPrice OS Edge API Gateway
 
 tags:
+  - name: Developer Self-Service & Webhooks
+    description: Instant API key authentication ping, sliding-window rate limits, and HMAC-SHA256 outbound webhook subscriptions.
+  - name: Book Pricing Engine (BPE)
+    description: Real-time 5-axis book manufacturing cost & digital-vs-offset crossover calculator.
+  - name: Preflight & Spine Geometry
+    description: Synchronous & asynchronous 6-axis PDF/X-4 inspection, spine width validation, and automated self-healing.
   - name: Marketplace Offers
     description: Algorithmic book quoting and print house offers via the Book Pricing Engine (BPE).
   - name: Marketplace Orders
@@ -33,6 +40,321 @@ tags:
     description: Shared visual preflight diagnostics and customer file remediation links.
 
 paths:
+  /api/developer/keys/test-ping:
+    get:
+      tags:
+        - Developer Self-Service & Webhooks
+      summary: Verify API Key authentication, scopes, and sliding-window rate limits
+      description: |
+        Authenticates a Sandbox (`pp_test_<32hex>`) or Production (`pp_live_<32hex>`) credential via SHA-256 hash lookup, validates the `pricing:read` scope, and returns live quota and sliding-window rate-limit headers (`X-RateLimit-Limit`, `X-RateLimit-Remaining`).
+      operationId: testDeveloperApiKeyPing
+      x-ppos-lifecycle: VERIFIED_PRODUCTION
+      x-ppos-controller: src/api/routes/developerKeysRoutes.js:223
+      security:
+        - DeveloperApiKeyHeader: []
+        - DeveloperBearerAuth: []
+      responses:
+        '200':
+          description: API Key authenticated and verified.
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeveloperKeyPingResponse'
+              example:
+                ok: true
+                success: true
+                message: "API Key authenticated and verified."
+                keyPrefix: "pp_test_9a8f"
+                keyType: "TEST"
+                tenantId: "tenant-dev-sandbox"
+                scopes:
+                  - "pricing:read"
+                  - "preflight:write"
+                billingTier: "SANDBOX_FREE"
+                rateLimitPerMinute: 60
+                monthlyQuota: 1000
+                usageCurrentMonth: 14
+                timestamp: "2026-11-03T02:15:00.000Z"
+        '401':
+          description: Missing or invalid API key (`API_KEY_REQUIRED` or `INVALID_API_KEY`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GatewayErrorResponse'
+        '402':
+          $ref: '#/components/responses/PaymentRequiredSpendCapResponse'
+        '429':
+          $ref: '#/components/responses/RateLimitExceededResponse'
+
+  /api/pricing/book-estimate:
+    post:
+      tags:
+        - Book Pricing Engine (BPE)
+      summary: Calculate real-time 5-axis book manufacturing cost and Q* crossover
+      description: |
+        Executes deterministic server-side Book Pricing Engine (`PPOS_5AXIS_BPE_V2`) calibration across substrate grammage, press imposition signatures, binding setup, and calculates the exact Digital Inkjet vs. Sheetfed Offset economic crossover quantity (`qStarCopies`).
+        - **Metered Billing Event (`pp_live_*`):** Reports `bpe_pricing_quote` (€0.005 / calculation) to Stripe Billing Meters upon `HTTP 200`.
+      operationId: calculateBookEstimate
+      x-ppos-lifecycle: VERIFIED_PRODUCTION
+      x-ppos-controller: src/api/routes/pricingRoutes.js:348
+      security:
+        - DeveloperApiKeyHeader: []
+        - DeveloperBearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookEstimateRequest'
+            example:
+              trimWidthMm: 148
+              trimHeightMm: 210
+              pageCount: 240
+              printRunCopies: 1200
+              interiorPaperGsm: 90
+              coverPaperGsm: 300
+              bindingType: "SOFTCOVER_PUR"
+              colorModeInterior: "CMYK_4_4"
+      responses:
+        '200':
+          description: Deterministic 5-axis BPE estimate and crossover analysis calculated.
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookEstimateResponse'
+              example:
+                ok: true
+                success: true
+                tenantId: "tenant-dev-sandbox"
+                engine: "PPOS_5AXIS_BPE_V2"
+                input:
+                  trimWidthMm: 148
+                  trimHeightMm: 210
+                  pageCount: 240
+                  printRunCopies: 1200
+                  interiorPaperGsm: 90
+                  bindingType: "SOFTCOVER_PUR"
+                estimate:
+                  unitManufacturingCostEur: 2.38
+                  totalManufacturingCostEur: 2856.00
+                  recommendedTechnology: "SHEETFED_OFFSET"
+                crossover:
+                  qStarCopies: 750
+                  recommendedTechnology: "SHEETFED_OFFSET"
+                timestamp: "2026-11-03T02:18:00.000Z"
+        '401':
+          description: Missing or invalid API key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GatewayErrorResponse'
+        '402':
+          $ref: '#/components/responses/PaymentRequiredSpendCapResponse'
+        '429':
+          $ref: '#/components/responses/RateLimitExceededResponse'
+
+  /api/preflight/inspect:
+    post:
+      tags:
+        - Preflight & Spine Geometry
+      summary: Run 6-axis PDF/X-4 geometry, bleed, and parametric spine width inspection
+      description: |
+        Executes synchronous 6-axis preflight and parametric spine validation (`pageCount`, `paperGrammage`, `paperBulk`, `bindingType`, `innerBleedMm`, `declaredSpineMm`) or streaming `multipart/form-data` binary PDF upload (up to 2 GB). Supports optional automated self-healing (`workflowMode: "MAGIC_FIX"`) and immediate disk asset purge (`?purgeAsset=true`).
+        - **Metered Billing Event (`pp_live_*`):** Reports `preflight_2gb_inspection` (€0.10 / inspected file) to Stripe Billing Meters upon `HTTP 200`.
+      operationId: inspectPreflightDocument
+      x-ppos-lifecycle: VERIFIED_PRODUCTION
+      x-ppos-controller: src/api/routes/preflightRoutes.js:256
+      security:
+        - DeveloperApiKeyHeader: []
+        - DeveloperBearerAuth: []
+      parameters:
+        - name: purgeAsset
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: When `true`, deletes the raw PDF binary from disk immediately after inspection while preserving the immutable JSON telemetry report (`METADATA_ONLY_ASSET_PURGED`).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreflightInspectRequest'
+            example:
+              jobId: "pf_playground_demo_01"
+              isbn: "978-84-376-0494-7"
+              pageCount: 240
+              paperGrammage: 90
+              paperBulk: 1.3
+              bindingType: "SOFTCOVER_PUR"
+              innerBleedMm: 3.0
+              declaredSpineMm: 14.80
+              workflowMode: "MAGIC_FIX"
+      responses:
+        '200':
+          description: 6-axis preflight inspection report and spine geometry calculation completed.
+          headers:
+            X-RateLimit-Limit:
+              $ref: '#/components/headers/X-RateLimit-Limit'
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/X-RateLimit-Remaining'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreflightInspectResponse'
+        '401':
+          description: Missing or invalid API key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GatewayErrorResponse'
+        '402':
+          $ref: '#/components/responses/PaymentRequiredSpendCapResponse'
+        '413':
+          description: Uploaded PDF exceeds maximum size of 2 GB (`PAYLOAD_TOO_LARGE_MAX_2GB`).
+        '429':
+          $ref: '#/components/responses/RateLimitExceededResponse'
+
+  /api/developer/webhooks:
+    get:
+      tags:
+        - Developer Self-Service & Webhooks
+      summary: List outbound webhook subscriptions and recent delivery forensics
+      operationId: listDeveloperWebhooks
+      x-ppos-lifecycle: VERIFIED_PRODUCTION
+      x-ppos-controller: src/api/routes/developerKeysRoutes.js:295
+      security:
+        - DeveloperApiKeyHeader: []
+        - DeveloperBearerAuth: []
+      responses:
+        '200':
+          description: Active webhook subscriptions and delivery log (`webhook_deliveries`).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  tenantId:
+                    type: string
+                  endpoints:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/WebhookSubscription'
+                  deliveries:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/WebhookDeliveryLog'
+    post:
+      tags:
+        - Developer Self-Service & Webhooks
+      summary: Create or update an outbound HTTPS webhook subscription (with SSRF guard)
+      description: |
+        Registers or updates an HTTPS webhook destination for any subset of the 12 canonical industrial topics. Validates the destination URL against loopback/RFC 1918 private IPs (`SSRF_SECURITY_VIOLATION`) and returns a one-time HMAC-SHA256 signing secret (`whsec_<48hex>`).
+      operationId: saveDeveloperWebhook
+      x-ppos-lifecycle: VERIFIED_PRODUCTION
+      x-ppos-controller: src/api/routes/developerKeysRoutes.js:316
+      security:
+        - DeveloperApiKeyHeader: []
+        - DeveloperBearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - url
+              properties:
+                url:
+                  type: string
+                  format: uri
+                  example: "https://hooks.erp-publisher.com/v1/printprice"
+                events:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/WebhookTopicEnum'
+                  example:
+                    - "preflight.certified"
+                    - "routing.assigned_optimal"
+                    - "order.status_changed"
+                    - "einvoice.issued"
+      responses:
+        '200':
+          description: Webhook subscription persisted and signing secret issued.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  endpoint:
+                    $ref: '#/components/schemas/WebhookSubscription'
+        '400':
+          description: SSRF security violation (loopback, metadata, or RFC 1918 private IP rejected).
+
+  /api/developer/webhooks/test-event:
+    post:
+      tags:
+        - Developer Self-Service & Webhooks
+      summary: Dispatch a live HMAC-SHA256 signed test webhook event
+      operationId: dispatchDeveloperTestWebhook
+      x-ppos-lifecycle: VERIFIED_PRODUCTION
+      x-ppos-controller: src/api/routes/developerKeysRoutes.js:353
+      security:
+        - DeveloperApiKeyHeader: []
+        - DeveloperBearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                eventType:
+                  $ref: '#/components/schemas/WebhookTopicEnum'
+                targetUrl:
+                  type: string
+                  format: uri
+            example:
+              eventType: "preflight.certified"
+              targetUrl: "https://hooks.erp-publisher.com/v1/printprice"
+      responses:
+        '200':
+          description: Test webhook signed with `X-PPOS-Signature` (`sha256=...`) and recorded in `webhook_deliveries`.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  delivery:
+                    $ref: '#/components/schemas/WebhookDeliveryLog'
+                  signedHeaders:
+                    type: object
+                    properties:
+                      X-PPOS-Signature:
+                        type: string
+                        example: "sha256=8f9d2a1b4c6e7f0123456789abcdef0123456789abcdef0123456789abcdef01"
+                      X-PrintPrice-Signature:
+                        type: string
+                      X-PPOS-Event-Id:
+                        type: string
+                      X-PPOS-Timestamp:
+                        type: string
   /api/marketplace/offers:
     post:
       tags:
@@ -936,6 +1258,18 @@ paths:
 
 components:
   securitySchemes:
+    DeveloperApiKeyHeader:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: |
+        Self-Service Sandbox (`pp_test_<32hex>`) or Production Scale (`pp_live_<32hex>`) credential issued at `https://control.printprice.pro/developers`.
+    DeveloperBearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: API_KEY_OR_JWT
+      description: |
+        Transmit `Authorization: Bearer pp_test_...` or `Authorization: Bearer pp_live_...`.
     MarketplaceIntakeToken:
       type: apiKey
       in: header
@@ -949,6 +1283,68 @@ components:
       scheme: bearer
       bearerFormat: JWT
       description: System operator or administrator JWT token.
+
+  headers:
+    X-RateLimit-Limit:
+      description: Maximum requests permitted per 60-second sliding window for the authenticated credential (`60` for `SANDBOX_FREE`, `600` for `PRODUCTION_SCALE`, `1200` for `ENTERPRISE_TENANT`).
+      schema:
+        type: integer
+        example: 600
+    X-RateLimit-Remaining:
+      description: Remaining requests available in the current 60-second sliding window.
+      schema:
+        type: integer
+        example: 598
+    Retry-After:
+      description: Number of seconds to wait before retrying after an `HTTP 429 Too Many Requests` response.
+      schema:
+        type: integer
+        example: 18
+
+  responses:
+    PaymentRequiredSpendCapResponse:
+      description: |
+        **HTTP 402 Payment Required** — Returned when:
+        1. A tenant on `SANDBOX_FREE` attempts to provision or invoke a Production (`pp_live_*`) endpoint without an active Stripe Hybrid subscription (`PAYWALL_REQUIRED`).
+        2. The tenant's accrued monthly metered spend (€49 base + €0.10/preflight + €0.005/BPE quote) reaches **100% of `monthly_spend_cap_eur`**, triggering automatic spend-cap protection (`SPEND_CAP_EXCEEDED_PAUSED`).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GatewayErrorResponse'
+          examples:
+            spendCapReached:
+              summary: Monthly spend cap reached (100% auto-pause protection)
+              value:
+                ok: false
+                error:
+                  code: "SPEND_CAP_EXCEEDED_PAUSED"
+                  message: "Monthly spend cap of €150.00 EUR reached. Production pp_live_* keys are paused to prevent unintended charges. Increase your ceiling in the Developer Hub."
+            paywallRequired:
+              summary: Production Scale activation required
+              value:
+                ok: false
+                error:
+                  code: "PAYWALL_REQUIRED"
+                  message: "Production Scale subscription (€49/mo + metered usage) is required to use pp_live_* keys."
+    RateLimitExceededResponse:
+      description: |
+        **HTTP 429 Too Many Requests** — Sliding-window rate limit exceeded for the API key. Inspect `Retry-After` header for backoff duration in seconds.
+      headers:
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        Retry-After:
+          $ref: '#/components/headers/Retry-After'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GatewayErrorResponse'
+          example:
+            ok: false
+            error:
+              code: "RATE_LIMIT_EXCEEDED"
+              message: "Rate limit of 60 requests/minute exceeded for key pp_test_9a8f. Retry after 18s."
 
   schemas:
     OfferRequestPayload:
@@ -1469,3 +1865,507 @@ components:
             - type: string
               format: date-time
             - type: "null"
+
+    DeveloperKeyPingResponse:
+      type: object
+      required:
+        - ok
+        - keyPrefix
+        - keyType
+        - tenantId
+        - scopes
+        - billingTier
+      properties:
+        ok:
+          type: boolean
+        success:
+          type: boolean
+        message:
+          type: string
+        keyPrefix:
+          type: string
+          example: "pp_test_9a8f"
+        keyType:
+          type: string
+          enum: [TEST, LIVE]
+        tenantId:
+          type: string
+        scopes:
+          type: array
+          items:
+            type: string
+        billingTier:
+          type: string
+          enum: [SANDBOX_FREE, PRODUCTION_SCALE, ENTERPRISE_TENANT]
+        rateLimitPerMinute:
+          type: integer
+        monthlyQuota:
+          type: integer
+        usageCurrentMonth:
+          type: integer
+        timestamp:
+          type: string
+          format: date-time
+
+    BookEstimateRequest:
+      type: object
+      properties:
+        trimWidthMm:
+          type: number
+          default: 148
+        trimHeightMm:
+          type: number
+          default: 210
+        pageCount:
+          type: integer
+          default: 240
+        printRunCopies:
+          type: integer
+          default: 1000
+        interiorPaperGsm:
+          type: integer
+          default: 90
+        coverPaperGsm:
+          type: integer
+          default: 300
+        bindingType:
+          type: string
+          default: "SOFTCOVER_PUR"
+        colorModeInterior:
+          type: string
+          default: "CMYK_4_4"
+
+    BookEstimateResponse:
+      type: object
+      required:
+        - ok
+        - engine
+        - input
+        - estimate
+        - crossover
+      properties:
+        ok:
+          type: boolean
+        success:
+          type: boolean
+        tenantId:
+          type: string
+        engine:
+          type: string
+          example: "PPOS_5AXIS_BPE_V2"
+        input:
+          $ref: '#/components/schemas/BookEstimateRequest'
+        estimate:
+          type: object
+        crossover:
+          type: object
+          properties:
+            qStarCopies:
+              type: integer
+            recommendedTechnology:
+              type: string
+              enum: [HIGH_SPEED_INKJET_DIGITAL, SHEETFED_OFFSET]
+        timestamp:
+          type: string
+          format: date-time
+
+    PreflightInspectRequest:
+      type: object
+      properties:
+        jobId:
+          type: string
+        isbn:
+          type: string
+        pageCount:
+          type: integer
+        paperGrammage:
+          type: number
+        paperBulk:
+          type: number
+        bindingType:
+          type: string
+        innerBleedMm:
+          type: number
+        declaredSpineMm:
+          type: number
+        workflowMode:
+          type: string
+          enum: [ANALYZE_ONLY, MAGIC_FIX]
+        purgeAsset:
+          type: boolean
+
+    PreflightInspectResponse:
+      type: object
+      properties:
+        jobId:
+          type: string
+        tenantId:
+          type: string
+        overallStatus:
+          type: string
+          enum: [PASS, WARNING, FAIL, FIXED_BY_ENGINE]
+        spineGeometry:
+          type: object
+          properties:
+            pageCount:
+              type: integer
+            theoreticalSpineMm:
+              type: number
+            detectedSpineMm:
+              type: number
+            deltaMm:
+              type: number
+        bleedGeometry:
+          type: object
+        autoFixSummary:
+          type: object
+
+    WebhookTopicEnum:
+      type: string
+      description: Canonical 12-topic industrial event catalog dispatched by `outgoingWebhookService.js`.
+      enum:
+        - preflight.certified
+        - preflight.failed
+        - preflight.autofix_ready
+        - routing.assigned_optimal
+        - routing.forced_manual
+        - routing.queue_saturated
+        - order.created
+        - order.status_changed
+        - press.completed
+        - escrow.released
+        - einvoice.issued
+        - shipping.dispatched
+
+    WebhookSubscription:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "whsub_4f8b9c21-9e12-4a11-8f2a-112233445566"
+        tenantId:
+          type: string
+        url:
+          type: string
+          format: uri
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhookTopicEnum'
+        status:
+          type: string
+          enum: [ACTIVE, PAUSED]
+        secretPrefix:
+          type: string
+          example: "whsec_9a8b7c..."
+        maskedSecret:
+          type: string
+          example: "whsec_••••••••••••••••••••••••"
+        oneTimeSigningSecret:
+          type: string
+          description: Returned ONLY once on initial subscription creation or atomic secret rotation (`whsec_<48hex>`).
+
+    WebhookDeliveryLog:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "whdel_7a1c8b90-1234-4567-89ab-cdef01234567"
+        tenantId:
+          type: string
+        subscriptionId:
+          type: string
+        eventType:
+          $ref: '#/components/schemas/WebhookTopicEnum'
+        eventId:
+          type: string
+        targetUrl:
+          type: string
+        status:
+          type: string
+          enum: [DELIVERED, FAILED, RETRYING]
+        statusCode:
+          type: integer
+          example: 200
+        durationMs:
+          type: integer
+          example: 28
+        attemptCount:
+          type: integer
+          example: 1
+        maxAttempts:
+          type: integer
+          example: 3
+        backoffSchedule:
+          type: string
+          example: "1m -> 5m -> 15m"
+        signature:
+          type: string
+          example: "sha256=8f9d2a1b4c6e7f0123456789abcdef0123456789abcdef0123456789abcdef01"
+        payload:
+          $ref: '#/components/schemas/SignedWebhookEnvelope'
+        createdAt:
+          type: string
+          format: date-time
+
+    SignedWebhookEnvelope:
+      type: object
+      required:
+        - id
+        - event
+        - tenantId
+        - timestamp
+        - data
+      properties:
+        id:
+          type: string
+          example: "evt_live_99887766-5544-3322-1100-aabbccddeeff"
+        event:
+          $ref: '#/components/schemas/WebhookTopicEnum'
+        tenantId:
+          type: string
+          example: "tenant-dev-sandbox"
+        subscriptionId:
+          type: string
+          example: "whsub_4f8b9c21-9e12-4a11-8f2a-112233445566"
+        timestamp:
+          type: string
+          format: date-time
+        data:
+          type: object
+          additionalProperties: true
+
+    GatewayErrorResponse:
+      type: object
+      required:
+        - ok
+        - error
+      properties:
+        ok:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+
+webhooks:
+  preflight.certified:
+    post:
+      tags:
+        - Developer Self-Service & Webhooks
+      summary: PDF/X-4 Certified & Ready for Press
+      description: Dispatched when a 6-axis PDF inspection passes all TrimBox, BleedBox (+3.0 mm), CMYK FOGRA39, and spine thickness tolerances.
+      parameters:
+        - name: X-PPOS-Signature
+          in: header
+          required: true
+          schema:
+            type: string
+          description: HMAC-SHA256 signature (`sha256=<hex>`) computed over the raw JSON body using your `whsec_*` secret.
+        - name: X-PrintPrice-Signature
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Alias header carrying the identical `sha256=<hex>` HMAC-SHA256 signature.
+        - name: X-PPOS-Event-Id
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: X-PPOS-Timestamp
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignedWebhookEnvelope'
+            example:
+              id: "evt_live_101a2b3c"
+              event: "preflight.certified"
+              tenantId: "tenant-dev-sandbox"
+              subscriptionId: "whsub_4f8b9c21"
+              timestamp: "2026-11-03T02:20:00.000Z"
+              data:
+                preflightJobId: "pf_job_2gb_8821"
+                orderId: "ord_ppos_demo_9941"
+                status: "CERTIFIED_READY"
+                spineWidthMm: 14.54
+                bleedMarginMm: 3.0
+                colorProfile: "FOGRA39 (ISO 12647-2)"
+      responses:
+        '200':
+          description: Return HTTP 2xx within 5,000 ms to acknowledge receipt.
+
+  preflight.failed:
+    post:
+      tags:
+        - Developer Self-Service & Webhooks
+      summary: Preflight Validation Rejected / Blocking Errors
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignedWebhookEnvelope'
+      responses:
+        '200':
+          description: Acknowledged.
+
+  preflight.autofix_ready:
+    post:
+      tags:
+        - Developer Self-Service & Webhooks
+      summary: Automated Bleed & Spine Self-Healing Completed
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignedWebhookEnvelope'
+      responses:
+        '200':
+          description: Acknowledged.
+
+  routing.assigned_optimal:
+    post:
+      tags:
+        - Developer Self-Service & Webhooks
+      summary: 5-Axis Optimal Plant Assigned Automatically
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignedWebhookEnvelope'
+      responses:
+        '200':
+          description: Acknowledged.
+
+  routing.forced_manual:
+    post:
+      tags:
+        - Developer Self-Service & Webhooks
+      summary: Operator Manual Routing Override Applied
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignedWebhookEnvelope'
+      responses:
+        '200':
+          description: Acknowledged.
+
+  routing.queue_saturated:
+    post:
+      tags:
+        - Developer Self-Service & Webhooks
+      summary: Plant Capacity Saturation Alert (>85% Load)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignedWebhookEnvelope'
+      responses:
+        '200':
+          description: Acknowledged.
+
+  order.created:
+    post:
+      tags:
+        - Developer Self-Service & Webhooks
+      summary: New Manufacturing Order Ingested
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignedWebhookEnvelope'
+      responses:
+        '200':
+          description: Acknowledged.
+
+  order.status_changed:
+    post:
+      tags:
+        - Developer Self-Service & Webhooks
+      summary: Order Lifecycle State Transition
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignedWebhookEnvelope'
+      responses:
+        '200':
+          description: Acknowledged.
+
+  press.completed:
+    post:
+      tags:
+        - Developer Self-Service & Webhooks
+      summary: Press Run & Binding Completed on Shopfloor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignedWebhookEnvelope'
+      responses:
+        '200':
+          description: Acknowledged.
+
+  escrow.released:
+    post:
+      tags:
+        - Developer Self-Service & Webhooks
+      summary: Commercial Escrow Funds Released to Node
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignedWebhookEnvelope'
+      responses:
+        '200':
+          description: Acknowledged.
+
+  einvoice.issued:
+    post:
+      tags:
+        - Developer Self-Service & Webhooks
+      summary: EN 16931 Facturae 3.2.2 / XRechnung 3.0 Issued
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignedWebhookEnvelope'
+      responses:
+        '200':
+          description: Acknowledged.
+
+  shipping.dispatched:
+    post:
+      tags:
+        - Developer Self-Service & Webhooks
+      summary: EPAL Pallet & GS1-128 SSCC-18 Consignment Dispatched
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignedWebhookEnvelope'
+      responses:
+        '200':
+          description: Acknowledged.

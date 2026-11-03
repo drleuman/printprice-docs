@@ -61,7 +61,8 @@ Mounted at `/api/preflight`:
 | `GET` | `/api/preflight/workers` | `@fastify/http-proxy` (`:8001`) | `x-api-key`, `x-marketplace-token` | `200` | Returns live worker health and queue metrics from the native preflight container. |
 | `GET` | `/api/preflight/inspections` | `requireLogisticsControlPlaneAuth` | `x-marketplace-token` | `200`, `403` | Lists tenant preflight inspections, `PREFLIGHT_STANDARDS`, and `MASTER_PAPER_CATALOG`. |
 | `GET` | `/api/preflight/inspections/:id` | `requireLogisticsControlPlaneAuth` | `x-marketplace-token` | `200`, `403` | Returns detailed 6-axis inspection telemetry for a specific inspection or job ID. |
-| `POST` | `/api/preflight/inspect` | `requireLogisticsControlPlaneAuth` | `x-marketplace-token` | `200`, `400`, `403` | Executes synchronous 6-axis preflight and parametric spine bulk validation. |
+| `POST` | `/api/preflight/inspect` | `requireLogisticsControlPlaneAuth` | `x-marketplace-token` | `200`, `400`, `403`, `413` | Executes synchronous 6-axis preflight and parametric spine validation via streaming `multipart/form-data` (up to 2 GB) or `?purgeAsset=true`. |
+| `DELETE` | `/api/preflight/jobs/:jobId/asset` | `requireLogisticsControlPlaneAuth` | `x-marketplace-token` | `200`, `400`, `403` | Purges the heavy PDF binary asset from local disk (`fs.unlinkSync`) while preserving the immutable 6-axis inspection JSON report and spine telemetry (`METADATA_ONLY_ASSET_PURGED`). |
 | `POST` | `/api/preflight/auto-fix` | `requireLogisticsControlPlaneAuth` | `x-marketplace-token` | `200`, `400`, `403` | Runs the automated FIX IT Engine (CMYK GCR conversion, +3.0 mm bleed extension, spine resize). |
 | `POST` | `/api/preflight/callback` | `requireLogisticsControlPlaneAuth` | `x-marketplace-token` | `200`, `400` | Global webhook receiver for asynchronous preflight worker verdict callbacks. |
 
